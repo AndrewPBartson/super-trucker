@@ -1,4 +1,4 @@
 module.exports = {
-  // candidates: require('./candidates'),
-  // american_state: require('./american_state'),
+  users: require('./users'),
+  trips: require('./trips')
 }
