@@ -1,5 +1,5 @@
 let model = require('../models');
-const  = require('axios')
+const axios = require('axios')
 const polyline = require('polyline')
 
 function isValidTripInput(trip) {
