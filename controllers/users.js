@@ -1,10 +1,7 @@
 let model = require('../models');
 
 function isValidUserInput(user) {
-  // let hasGenus = typeof user.genus == 'string' && user.stringVal.trim() != '';
-  // let hasSpecies = typeof user.users_name == 'string' && user.stringVal.trim() != '';
-  // let hasCommonName = typeof user.common_name == 'string' && user.stringVal.trim() != '';
-  return true; //hasGenus && hasSpecies && hasCommonName;
+  return true;
 }
 
 function getAllUsersController(req, res, next) {
@@ -15,7 +12,7 @@ function getAllUsersController(req, res, next) {
 };
 function getUserByIdController(req, res, next) {
   if (isNaN(req.params.id)) {
-    return next({message: 'Invalid ID, not a number'});
+    return next({ message: 'Invalid ID, not a number' });
   }
   else {
     model.users.getUserById(req.params.id)
@@ -25,7 +22,7 @@ function getUserByIdController(req, res, next) {
         }
         else {
           res.status(404);
-          next({message: 'ID not found'});
+          next({ message: 'ID not found'  });
         }
       })
     }
@@ -41,17 +38,13 @@ console.log(req.body)
       })
   }
    else {
-     next({message: 'Invalid or missing input'});
+     next({ message: 'Invalid or missing input' });
    }
-// Next fixes -
-// to create a new species_site (means plant a new tree on a new
-// site), need to create both a species_site and a site. So somehow
-// need to create two objects, one of each kind, in one operation.
 }
 
 function updateUserController(req, res, next) {
   if (isNaN(req.params.id)) {
-    return next({message: 'Invalid ID, not a number'});
+    return next({ message: 'Invalid ID, not a number' });
   }
   else if (!isValidUserInput(req.body)) {
     return next({message: 'Invalid or missing input'});
@@ -66,7 +59,7 @@ function updateUserController(req, res, next) {
 
 function deleteUserController(req, res, next) {
   if (isNaN(req.params.id)) {
-    return next({message: 'Invalid ID, not a number'});
+    return next({ message: 'Invalid ID, not a number' });
   }
   else {
     model.users.deleteUser(req.params.id)
@@ -76,7 +69,7 @@ function deleteUserController(req, res, next) {
       }
       else {
         res.status(404);
-        next({message: 'ID not found'});
+        next({ message: 'ID not found' });
       }
     })
   }
