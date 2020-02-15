@@ -1,0 +1,12 @@
+app-header {
+  float: left;
+  width: 480px;
+  height: 83px;
+}
+.ui-area {
+  display: grid;
+  grid-template-rows: 85px 1fr;
+  width: 480px;
+  float: left;
+  height: 100vh;
+}

@@ -1,0 +1,28 @@
+h1 {
+  font-size: 1.85rem;
+  margin: auto auto 0;
+  font-weight: 300;
+  text-shadow: 1px 3px 2px #b3bcf9;
+}
+h3 {
+  font-size: 1.2rem;
+  margin: 0 20px;
+  font-weight: 400;
+}
+h1, h3 {
+  text-align: center;
+  font-family: 'Titillium Web', sans-serif;
+  color: #000;
+}
+#header {
+  display: grid;
+  grid-template-columns: 152px auto;
+  grid-template-rows: 54px 29px;
+  align-items: center;
+  margin: 0 15px;
+}
+.truckIcon {
+  height: 70px;
+  margin: 10px 0 0 auto;
+  grid-row: 1 / span 2;
+}

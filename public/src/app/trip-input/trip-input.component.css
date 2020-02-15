@@ -1,0 +1,74 @@
+.inputForm {
+  width: 480px;
+  float: left;
+  color: #757575;
+  display: grid;
+  grid-template-rows: 15px repeat(15, 36px);
+  grid-template-columns: 215px auto;
+}
+.sectionText {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin: auto;
+}
+.message {
+  color: red;
+}
+/* margins */
+mat-form-field {
+  margin: auto 35px auto 15px;
+}
+.clickInput {
+  margin: auto auto auto 48px;
+}
+.item_A {
+  margin: auto auto auto 35px;
+}
+.item_E, .item_K {
+  margin: 50px auto auto 50px;
+}
+.item_F {
+  margin: auto auto 0 35px;
+}
+.item_H, .item_I, .item_J {
+  margin-bottom: 0;
+}
+.item_U_not_jump {
+  margin: auto auto auto 184px;
+}
+.item_U_jump {
+  margin: 5px auto auto 184px;
+}
+.item_K {
+  display: none;
+}
+.item_P_tall {
+  background-color: #f7f7f7;
+  border: 1px solid #e9e9e9;
+  border-radius: 7px;
+  margin: 0 18px;
+  margin-bottom: 10px;
+  width: 185px;
+}
+.item_S, .item_R, .item_Q_jump {
+  margin-right: 17px;
+}
+.item_T_jump {
+  margin-top: 7px;
+}
+.container {
+  padding: 15px;
+}
+.inputReport {
+  margin: 10px;
+  padding: 20px 20px 30px 40px;
+}
+mat-card-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+mat-card-content div {
+  margin: 0 15px;
+}
+.formData {
+  color: darkblue;
+}

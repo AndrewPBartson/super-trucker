@@ -1,0 +1,7 @@
+agm-map {
+  height: 100vh;
+}
+.container1 {
+  display: grid;
+  grid-template-columns: 480px 1fr ;
+}
