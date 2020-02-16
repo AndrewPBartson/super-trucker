@@ -367,16 +367,16 @@ function createTripController(req, res, next) {
         }
         extractTripPoints(response, trip)
         calcFirstWayPoints(trip)
-        console.log('   ==============>>>>  promise_1     complete  -----------------')
+        console.log('   /*****************  promise_1     complete  *****************/')
         return recalculateWayPoints(trip)  // promise 2  
         .then(trip => {
-          console.log('   ==============>>>>  promise_2    complete  -----------------')
+          console.log('   /*****************  promise_2    complete  *****************/')
           return recalculateWayPoints(trip)  // promise 3    
           .then(trip => {
-            console.log('   ==============>>>>  promise_3    complete  -----------------')
+            console.log('   /*****************  promise_3    complete  *****************/')
             return recalculateWayPoints(trip)  // promise 4  
               .then(trip => {
-                console.log('   ==============>>>>  promise_4     complete  -----------------')
+                console.log('   /*****************  promise_4     complete  *****************/')
                 printRecalcResults(trip) 
                 createTestUrl(trip)
                 searchForOptionsSet(trip)

@@ -7,7 +7,7 @@ import { InputModel } from '../models/input.model';
 })
 export class ApiService {
 
-  apiURL: string = 'http://localhost:8001';
+  apiURL: string = 'http://localhost:3001';
   private input: InputModel = {
     origin: '',
     end_point: '',

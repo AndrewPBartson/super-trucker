@@ -126,6 +126,7 @@ export class InputService {
           if (miTemp > 2472) {
             miTemp = 2472;
           }
+          console.log('e.srcElement.id :', e.srcElement.id);
           hrsTemp = (Math.round((miTemp / spdTemp) / 0.25)) * 0.25;
           if (hrsTemp > 24) {
             hrsTemp = 24;

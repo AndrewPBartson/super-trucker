@@ -1,9 +1,14 @@
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 8001
+const port = process.env.PORT || 3001
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const CONSTANTS = require("./constants");
+// const mongoose = require('mongoose');
+// need to run mongodb in a terminal window
+// deprecated error -
+// mongoose.connect('mongodb://localhost/usersSchema');
 
 app.disable('x-powered-by');
 app.use(morgan('dev'))

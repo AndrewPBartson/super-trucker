@@ -6,8 +6,9 @@
 # testing
 /coverage
 
-# vs code settings?
+# vs code and other settings
 /.vscode
+/.unotes
 
 # production
 /build
@@ -23,4 +24,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/public/src/assets/junkyard/
+/src/assets/junkyard/

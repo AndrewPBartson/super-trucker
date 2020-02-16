@@ -1,6 +1,6 @@
 <form
   [formGroup]='tripForm'
-  (ngSubmit)="[this.inputService.adjustFormValues($event, this.tripForm, this.presets), onGetRoute()]"
+  (ngSubmit)="onGetRoute()"
   class="inputForm"
 >
   <div class="sectionText item_A">
@@ -124,7 +124,7 @@
         formControlName="miles_per_day"
       />
         <mat-error>
-          <!-- <span *ngIf="tripForm.controls.miles_per_day.errors">Miles per day must be 100 or more</span> -->
+          Miles per day must be at least 100
         </mat-error>
     </mat-form-field>
     <mat-form-field
@@ -143,9 +143,6 @@
         max="103"
         formControlName="avg_speed"
       />
-      <mat-error>
-        <span *ngIf="tripForm.controls.avg_speed.errors !== null">Average speed can't be negative</span>
-      </mat-error>
     </mat-form-field>
     <mat-form-field
     [ngClass]="{
@@ -163,9 +160,6 @@
         step="0.25"
         formControlName="hours_driving"
       />
-      <mat-error>
-        <!-- <span *ngIf="tripForm.controls.hrs_driving.errors === null">Driving time can't be negative</span> -->
-      </mat-error>
     </mat-form-field>
 </div>
   <mat-form-field
