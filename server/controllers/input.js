@@ -1,30 +1,47 @@
 
-function isValidTripInput(req_data) {
+function isValidTripInput(req) {
+  req.ok = true;
   // console.log('req_data :', req_data);
   // The incoming request must have the following or no deal:
   // origin, end_point, miles_per_day, 
   // hours_driving, avg_speed, depart_time
-  // use functions similar to the front end validation
-  // spin it off into input-controller
-  return true; 
+  // use functions similar to front end validation
+  return true;
 }
 
-function handleInputData(req_data) {
-  let trip = false;
-  if (isValidTripInput(req_data)) {
-  trip = {};
-  trip.exports = {}
-  trip.way_points = []
-  trip.miles_per_day = req_data.miles_per_day 
-  trip.meters_per_day = trip.miles_per_day * 1609.34
-  trip.origin = req_data.origin
-  trip.end_point = req_data.end_point
-  trip.leg_distances = []
-  trip.meter_counts = []
-  return trip;
+function setupDataStructure(req) {
+  req.trip = {
+    miles_per_day: req.body.miles_per_day,
+    meters_per_day: req.body.miles_per_day * 1609.34,
+    origin: req.body.origin,
+    end_point: req.body.end_point,
+    avg_speed: req.body.avg_speed,
+    hours_driving: req.body.hours_driving,
+    total_meters: 0,
+    total_mi: 0,
+    all_points: [],
+    way_points: [],
+    new_way_points: [],
+    old_way_points: [],
+    leg_distances: [],
+    meter_counts: [],
+    way_points_set: [],
+    options: {},
+    exports: {}
+  };
+  if (req.trip.weather) {
+    req.trip.options.weather = true;
   }
+  if (req.trip.hotels) {
+    req.trip.options.hotels = true;
+  }
+  if (req.trip.truck_stops) {
+    req.trip.options.truck_stops = true;
+  }
+  return req;
 }
 
 module.exports = {
-  handleInputData
+  isValidTripInput,
+  setupDataStructure
 }

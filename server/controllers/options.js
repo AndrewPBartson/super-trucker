@@ -1,7 +1,16 @@
+function createPlacesUrl(points) {
+  let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=` +
+  + points[0] + ',' + points[1] + `&radius=7000&type=lodging&key=AIzaSyDZSeVvDKJQFTgtYkjzOe368PIDbaq6OQE`
+//  console.log("url -  ", url)
+ return url
+}
+
+// example of correct url for google places API:
+// https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CnRtAAAATLZNl354RwP_9UKbQ_5Psy40texXePv4oAlgP4qNEkdIrkyse7rPXYGd9D_Uj1rVsQdWT4oRz4QrYAJNpFX7rzqqMlZw2h2E2y5IKMUZ7ouD_SlcHxYq1yL4KbKUv3qtWgTK0A6QbGh87GB3sscrHRIQiG2RrmU_jF4tENr9wGS_YxoUSSDrYjWmrNfeEHSGSc3FyhNLlBU&key=AIzaSyDZSeVvDKJQFTgtYkjzOe368PIDbaq6OQE
 
 function searchForOptions(trip, item) {
-  // this function makes excessive number of calls, google will start charging...
-  // this function is sometimes called extra times, unnecessarily
+  // makes too many calls, google will start charging...
+  // it is sometimes called extra times, unnecessarily
   //console.log('searchForOptions()   ==============> - ', item.points)
   let info_url = createPlacesUrl(item.points)
   item.places = []
@@ -31,15 +40,13 @@ function searchForOptions(trip, item) {
     .catch(function(error) {
       console.log(error);
     });
-// example of correct url for google places API:
-// https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CnRtAAAATLZNl354RwP_9UKbQ_5Psy40texXePv4oAlgP4qNEkdIrkyse7rPXYGd9D_Uj1rVsQdWT4oRz4QrYAJNpFX7rzqqMlZw2h2E2y5IKMUZ7ouD_SlcHxYq1yL4KbKUv3qtWgTK0A6QbGh87GB3sscrHRIQiG2RrmU_jF4tENr9wGS_YxoUSSDrYjWmrNfeEHSGSc3FyhNLlBU&key=AIzaSyDZSeVvDKJQFTgtYkjzOe368PIDbaq6OQE
 }
 
 function searchForOptionsSet(trip) {
-  // commented out for now, too many unnecessary hits on Google Places
+  // comment out for now, too many hits on Google Places
   let count = 0;
   let promises = [];
-  // iterate each way point set, which consists of three separate points near stopping point
+  // iterate each way point set, which consists of stopping point plus 2 nearby ones
   // many unnecessary calls here because not using results for prev and next :(
   // for (let i = 1; i < trip.exports.way_points_set.length; i++) { 
   //   // do three searches for way_points_set, one for each of the three
