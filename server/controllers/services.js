@@ -5,13 +5,9 @@ function createPlacesUrl(points) {
  return url
 }
 
-// example of correct url for google places API:
-// https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CnRtAAAATLZNl354RwP_9UKbQ_5Psy40texXePv4oAlgP4qNEkdIrkyse7rPXYGd9D_Uj1rVsQdWT4oRz4QrYAJNpFX7rzqqMlZw2h2E2y5IKMUZ7ouD_SlcHxYq1yL4KbKUv3qtWgTK0A6QbGh87GB3sscrHRIQiG2RrmU_jF4tENr9wGS_YxoUSSDrYjWmrNfeEHSGSc3FyhNLlBU&key=AIzaSyDZSeVvDKJQFTgtYkjzOe368PIDbaq6OQE
-
-function searchForOptions(trip, item) {
+function searchForServices(trip, item) {
   // makes too many calls, google will start charging...
-  // it is sometimes called extra times, unnecessarily
-  //console.log('searchForOptions()   ==============> - ', item.points)
+  //console.log('searchForServices()   ==============> - ', item.points)
   let info_url = createPlacesUrl(item.points)
   item.places = []
   return axios.get(info_url)
@@ -42,7 +38,7 @@ function searchForOptions(trip, item) {
     });
 }
 
-function searchForOptionsSet(trip) {
+function searchForServicesSet(trip) {
   // comment out for now, too many hits on Google Places
   let count = 0;
   let promises = [];
@@ -50,12 +46,12 @@ function searchForOptionsSet(trip) {
   // many unnecessary calls here because not using results for prev and next :(
   // for (let i = 1; i < trip.exports.way_points_set.length; i++) { 
   //   // do three searches for way_points_set, one for each of the three
-  //   promises.push(searchForOptions(trip, trip.exports.way_points_set[i].stop))
+  //   promises.push(searchForServices(trip, trip.exports.way_points_set[i].stop))
   //   if (trip.exports.way_points_set[i].prev.points) {
-  //     promises.push(searchForOptions(trip, trip.exports.way_points_set[i].prev))
+  //     promises.push(searchForServices(trip, trip.exports.way_points_set[i].prev))
   //   }
   //   if (trip.exports.way_points_set[i].next.points) {
-  //     promises.push(searchForOptions(trip, trip.exports.way_points_set[i].next))
+  //     promises.push(searchForServices(trip, trip.exports.way_points_set[i].next))
   //   }
   // }
   return Promise.all(promises)
@@ -68,5 +64,8 @@ function searchForOptionsSet(trip) {
 }
 
 module.exports = {
-  searchForOptionsSet
+  searchForServicesSet
 }
+
+// example of correct url for google places API:
+// https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CnRtAAAATLZNl354RwP_9UKbQ_5Psy40texXePv4oAlgP4qNEkdIrkyse7rPXYGd9D_Uj1rVsQdWT4oRz4QrYAJNpFX7rzqqMlZw2h2E2y5IKMUZ7ouD_SlcHxYq1yL4KbKUv3qtWgTK0A6QbGh87GB3sscrHRIQiG2RrmU_jF4tENr9wGS_YxoUSSDrYjWmrNfeEHSGSc3FyhNLlBU&key=AIzaSyDZSeVvDKJQFTgtYkjzOe368PIDbaq6OQE

@@ -8,14 +8,14 @@ function getInitialTripData(req, res, next) {
     ${format_origin}&destination=${format_end_point}
     &key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
   return axios.get(trip_url)
-    .then(response => {
-      console.log('response.data.status :', response.data.status);
-      if (!response.data || response.data.status === "NOT_FOUND") {
-        console.log('response.data :', response.data);
+    .then(response_1 => {
+      console.log('response_1.data.status :', response_1.data.status);
+      if (!response_1.data || response_1.data.status === "NOT_FOUND") {
+        console.log('response_1.data :', response_1.data);
         console.log('search term(s) not found :(');
         return;
       }
-      calcFirstWayPoints(req.trip, response)
+      calcFirstWayPoints(req.trip, response_1)
       console.log('****************** first-version of trip done ******************');
       return req;
     })
@@ -24,12 +24,12 @@ function getInitialTripData(req, res, next) {
     });
 }
 
-function calcFirstWayPoints(trip, response) {
+function calcFirstWayPoints(trip, response_1) {
   // takes Gmaps trip summary polyline and converts it
   // to array of lat/lng coordinates
-  trip.all_points = polyline.decode(response.data.routes[0].overview_polyline.points)
+  trip.all_points = polyline.decode(response_1.data.routes[0].overview_polyline.points)
   // get total length of trip in meters and miles
-  trip.total_meters = response.data.routes[0].legs[0].distance.value
+  trip.total_meters = response_1.data.routes[0].legs[0].distance.value
   trip.total_mi = trip.total_meters / 1609.34
   // find out total number of points and segments -
   trip.num_segments = trip.all_points.length - 1
@@ -62,7 +62,7 @@ function calcFirstWayPoints(trip, response) {
   }
   trip.way_points.push(trip.all_points[trip.all_points.length - 1]) // push destination
   // now trip.way_points contains a first approximation of where stopping places should be
-  console.log('trip after calcFirstWayPoints() :', trip);
+  console.log('first_version.calcFirstWayPoints() - trip :', trip);
   return trip
 }
 

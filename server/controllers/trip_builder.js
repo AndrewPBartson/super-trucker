@@ -1,7 +1,7 @@
 const { setupDataStructure, isValidTripInput } = require('./input')
-const { searchForOptionsSet } = require('./options')
-const { recalculateWayPoints } = require('./waypoints')
 const { getInitialTripData } = require('./first_version')
+const { recalculateWayPoints, getExtraWayPoints } = require('./waypoints')
+const { searchForServicesSet } = require('./services')
 
 function viewFinalData(trip) {
   console.log(`
@@ -54,21 +54,26 @@ function build_trip(req, res, next) {
   if (!isValidTripInput(req)) {
     next({ message: 'Invalid or missing input' });
   }
-  setupDataStructure(req)
+  setupDataStructure(req, res, next)
   return getInitialTripData(req, res, next)
-  .then(req => {
-  return recalculateWayPoints(req, res, next)
     .then(req => {
-      console.log('   *************  waypoints finished *************')
-      viewFinalData(req.trip)
-      // createTestUrl(req.trip)
-      searchForOptionsSet(req)
+      return recalculateWayPoints(req, res, next)
         .then(req => {
-          finalizeResponseData(req);
-          console.log('req.trip.exports :', req.trip.exports);
-          res.json(req.trip.exports)
+          console.log('   *************  waypoints finished *************')
+          // to search for services, get extra nearby way points
+          if (Object.keys(req.trip.services).length !== 0) {
+            getExtraWayPoints(req, res, next)
+          }
+          viewFinalData(req.trip)
+          // createTestUrl(req.trip)
+          searchForServicesSet(req)
+            .then(req => {
+              finalizeResponseData(req);
+              console.log('req.trip.exports :', req.trip.exports);
+              res.json(req.trip.exports)
+            })
+
         })
-      })
     })
     .catch(err => {
       console.log(err);
