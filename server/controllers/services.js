@@ -38,7 +38,7 @@ function searchForServices(trip, item) {
     });
 }
 
-function searchForServicesSet(trip) {
+function searchForServicesSet(req, res, next) {
   // comment out for now, too many hits on Google Places
   let count = 0;
   let promises = [];
@@ -56,7 +56,7 @@ function searchForServicesSet(trip) {
   // }
   return Promise.all(promises)
   .then(results => { 
-    return trip
+    return req
   })
   .catch(function(error) {
     console.log(error);

@@ -64,34 +64,35 @@ function calibrateMeterCounts(trip) {
   return trip
 }
 
-function findMeterCountAtBreakPoints(trip) {
-  let { meter_counts, new_way_points, way_points_indexes, all_points, meters_per_day } = trip;
+function findMeterCountAtBreakPoints(req) {
+  console.log('**** findMeterCounts()  req.trip.way_points_indexes :', req.trip.way_points_indexes);
+  let { meter_counts, all_points, meters_per_day } = req.trip;
   let new_way_point;
-  new_way_points = [];
-  way_points_indexes = [];
+  req.trip.new_way_points = [];
+  req.trip.way_points_indexes = [];
   let break_point = meters_per_day
   let target_meters = break_point
-  // prev, next are points on either side of the selected point
-  // these points provide additional areas to search when 
+  // prev, next are points on either side of selected point
+  // they provide additional areas to search when 
   // results come back empty (not implemented yet)
   let cutoff, diff
   let count_to_next_hit = 0;
   // might not need this variable outside this function
-  trip.num_segments_in_leg_array = [];
+  req.trip.num_segments_in_leg_array = [];
   // find value closest to each stopping point - 'target_meters'. 
   // Create an object w/ info for point and push to trip.way_points_set.
   for (let b = 0; b < meter_counts.length; b++) {
     if (b == 0) {  // if first one
       new_way_point = all_points[b]
-      new_way_points.push(new_way_point)
-      way_points_indexes.push(b)
+      req.trip.new_way_points.push(new_way_point)
+      req.trip.way_points_indexes.push(b)
     }
     // if last one
     if (b == meter_counts.length - 1) {
       new_way_point = all_points[b]
-      new_way_points.push(new_way_point)
-      way_points_indexes.push(b)
-      trip.num_segments_in_leg_array.push(count_to_next_hit)
+      req.trip.new_way_points.push(new_way_point)
+      req.trip.way_points_indexes.push(b)
+      req.trip.num_segments_in_leg_array.push(count_to_next_hit)
       //console.log('---------------->>> LAST ONE!  b - ', b, meter_counts[b], new_way_point, count_to_next_hit)
       continue // this is last one, no further calculations
     }
@@ -100,28 +101,28 @@ function findMeterCountAtBreakPoints(trip) {
       //console.log('---------------->>>  HIT!  b - ', b, meter_counts[b], new_way_point, count_to_next_hit)
       // if yes, select meter_count closer to break_point, either [b] or [b+1]
       // compare to cutoff point midway between: [b] or [b+1]
-      trip.num_segments_in_leg_array.push(count_to_next_hit)
+      req.trip.num_segments_in_leg_array.push(count_to_next_hit)
       count_to_next_hit = 0;
       diff = meter_counts[b + 1] - meter_counts[b]
       cutoff = meter_counts[b] + (diff / 2)
       if (meter_counts[b] > cutoff) {
         new_way_point = all_points[b + 1]
-        way_points_indexes.push(b + 1)
+        req.trip.way_points_indexes.push(b + 1)
       }
       else {
         new_way_point = all_points[b]
-        way_points_indexes.push(b)
+        req.trip.way_points_indexes.push(b)
       }
       target_meters += break_point
-      new_way_points.push(new_way_point)
+      req.trip.new_way_points.push(new_way_point)
     }
     count_to_next_hit += 1;
   }
   //console.log('==============>>>>  num_segments_in_leg_array - ',trip.num_segments_in_leg_array)
   //console.log('==============>>>>  leg_distances - ', trip.leg_distances)
-  console.log('way_points_indexes :', way_points_indexes);
-  console.log('all_points.length :', all_points.length);
-  return trip
+  console.log('req.trip.new_way_points :', req.trip.new_way_points);
+  console.log('req.trip.way_points_indexes :', req.trip.way_points_indexes);
+  return req
 }
 
 function setUrlWithWayPoints(trip) {
@@ -139,6 +140,7 @@ function setUrlWithWayPoints(trip) {
 }
 
 function getExtraWayPoints(req, res, next) {
+  console.log('***** getExtra() req.trip.way_points_indexes :', req.trip.way_points_indexes);
   let { all_points, way_points_indexes, way_points_set } = req.trip
   let way_pt_obj;
   for (let a = 0, i = 0; a < all_points.length; a++) {
@@ -166,37 +168,67 @@ function getExtraWayPoints(req, res, next) {
   return req
 }
 
+function reviewFinalData(trip) {
+  console.log(`
+      ********************** reviewFinalData() ****************
+      total_meters -  ${trip.total_meters}
+      meters_per_day -  ${trip.meters_per_day}
+      length of second leg -  ${trip.leg_distances[1]}
+      total mi -  ${trip.total_mi}
+      miles_per_day -  ${trip.miles_per_day}
+      all_points.length -  ${trip.all_points.length}  
+      meter_counts.length -  ${trip.meter_counts.length}
+      num_segments -  ${trip.num_segments}
+      trip.way_points :
+       ${trip.way_points}
+      way_points.length -  ${trip.way_points.length}
+      leg_distances.length -  ${trip.leg_distances.length}
+      num_legs -  ${trip.num_legs}
+      num_legs_round -  ${trip.num_legs_round}
+      segments_per_leg -  ${trip.segments_per_leg}
+      segments_per_leg_round -  ${trip.segments_per_leg_round}
+      'leftover' segments -  ${trip.leftovers}
+      ${trip.segments_per_leg_round}  *  ${trip.num_legs_round - 1}  +  ${trip.leftovers}  =  ${trip.num_segments}
+      ******************************************************
+   `)
+  return trip
+}
+
 function recalculateWayPoints(req, res, next) {
-  // Stop recalculation as soon as estimated way_points stabilize
-  let allMatching = true;
-  // if old_way_points exist
-  if (req.trip.old_way_points !== null && req.trip.old_way_points.length !== 0) {
+  console.log('*** recalc() - req.trip.way_points_indexes :', req.trip.way_points_indexes);
+  // if first iteration, old_way_points don't exist
+  if (req.trip.old_way_points.length === 0) {
+    console.log("old way points don't exist");
+  } else {
     console.log('old_way_points exist!');
-    // find out if current way_points are same as old_way_points 
-    for (let i = 1; i < req.trip.way_points.length - 1 && allMatching; i++) {
+    // 1) Are current way_points same as old_way_points?
+       // yes - return
+       // no - continue
+    // 2) Are way points improving? Create function that detects improvements or lack of.
+        // yes - continue
+        // no - Select best way point among finalists, then return
+    let allMatching = true 
+    for (let i = 1; i < req.trip.way_points.length - 1; i++) {
       for (let j = 0; j < req.trip.way_points[i].length; j++) {
-        console.log(`way_points[${i}][${j}] : ${req.trip.way_points[i][j]}`);
-        console.log(`old_points[${i}][${j}] : ${req.trip.old_way_points[i][j]}`);
-        if (req.trip.way_points[i][j] === req.trip.old_way_points[i][j]) {
-          console.log('its a match!');
-        } else {
-          console.log('No match!');
+        // console.log(`way_points[${i}][${j}] : ${req.trip.way_points[i][j]}`);
+        // console.log(`old_points[${i}][${j}] : ${req.trip.old_way_points[i][j]}`);
+        if (req.trip.way_points[i][j] !== req.trip.old_way_points[i][j]) {
           allMatching = false;
         }
-        console.log(' ');
       }
     }
-    console.log('allMatching :', allMatching);
+    console.log(`
+       allMatching : ${allMatching}`);
     if (allMatching) {
+      console.log(`   *************  It's a match - way points finished *************`)
+      reviewFinalData(req.trip)
       return req;
     }
-  } else {
-    console.log("old way points don't exist");
-  }
-  console.log('**************** starting recalcWayPts() ****************')
+  } 
+  console.log('**************** create new way points! ****************')
   // delete old leg_distances
   req.trip.leg_distances = []
-  // send request to obtain distances between updated way_points
+  // send request to obtain distances between most recent way_points
   setUrlWithWayPoints(req.trip)
   return axios.get(req.trip.trip_url)
     .then(response => {
@@ -209,14 +241,25 @@ function recalculateWayPoints(req, res, next) {
 
       getMeterCounts(req.trip)
       calibrateMeterCounts(req.trip)
-      findMeterCountAtBreakPoints(req.trip)
+      findMeterCountAtBreakPoints(req)
+      // The calculations of way points do not necessarily stabilize completely
+      // There are often slight (insignificant) variations between iterations
+      // At some number of iterations, call it done.
+      // Solution -
+      // Write a test to compare each set of way points to see how much it varies.
+      console.log('Before replacing old way points -');
       console.log('req.trip.old_way_points :', req.trip.old_way_points);
       console.log('req.trip.way_points:', req.trip.way_points);
       console.log('req.trip.new_way_points :', req.trip.new_way_points);
+      console.log(' ');
       req.trip.old_way_points = [];
       req.trip.old_way_points = req.trip.way_points;
       req.trip.way_points = req.trip.new_way_points;
-      return recalculateWayPoints(req)
+      console.log('After replacing old way points -');
+      console.log('req.trip.old_way_points :', req.trip.old_way_points);
+      console.log('req.trip.way_points:', req.trip.way_points);
+      console.log('req.trip.new_way_points :', req.trip.new_way_points);
+      return recalculateWayPoints(req, res, next)
     })
     .catch(function (error) {
       console.log(error);

@@ -62,7 +62,7 @@ function calcFirstWayPoints(trip, response_1) {
   }
   trip.way_points.push(trip.all_points[trip.all_points.length - 1]) // push destination
   // now trip.way_points contains a first approximation of where stopping places should be
-  console.log('first_version.calcFirstWayPoints() - trip :', trip);
+  console.log('***** First_version is done! - trip :', trip);
   return trip
 }
 

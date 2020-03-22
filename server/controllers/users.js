@@ -31,7 +31,7 @@ function getUserByIdController(req, res, next) {
 function createUserController(req, res, next) {
 console.log(req.body)
   if(isValidUserInput(req.body)) {
-    // insert into db
+    // save to db
     model.users.createUser(req.body)
       .then(users => {
         res.status(201).json(users[0]);

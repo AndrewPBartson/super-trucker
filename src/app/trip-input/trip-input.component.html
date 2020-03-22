@@ -171,13 +171,10 @@
       matInput
       placeholder="Departure Date/Time"
       id="depart_time"
-      [owlDateTimeTrigger]="depart_time"
-      [owlDateTime]="depart_time"
-      [owlDateTimeTrigger]="depart_time"
-      formControlName="depart_time"
+
       [min]="currentTime"
     />
-    <owl-date-time #depart_time></owl-date-time>
+    <!-- <owl-date-time #depart_time></owl-date-time> -->
   </mat-form-field>
 
   <div class="item_U"
@@ -190,5 +187,5 @@
     >
       Create Route
     </button>
-  </div>
+  </div> 
 </form>

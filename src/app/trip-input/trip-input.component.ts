@@ -5,7 +5,7 @@ import { InputModel } from '../models/input.model';
 import { ApiService } from '../services/api.service';
 import { InputService } from '../services/input.service';
 import * as _moment from 'moment';
-import { DateTimeAdapter, OWL_DATE_TIME_FORMATS, OWL_DATE_TIME_LOCALE } from 'ng-pick-datetime';
+// import { DateTimeAdapter, OWL_DATE_TIME_FORMATS, OWL_DATE_TIME_LOCALE } from 'ng-pick-datetime';
 // import { MomentDateTimeAdapter } from 'ng-pick-datetime-moment';
 
 const moment = (_moment as any).default ? (_moment as any).default : _moment;
@@ -25,15 +25,15 @@ export const MY_CUSTOM_FORMATS = {
   templateUrl: './trip-input.component.html',
   styleUrls: ['./trip-input.component.css', './trip-input-grid.component.css'],
   providers: [
-    {
-      provide: DateTimeAdapter,
-      // useClass: MomentDateTimeAdapter,
-      deps: [OWL_DATE_TIME_LOCALE]
-    },
-    {
-      provide: OWL_DATE_TIME_FORMATS,
-      useValue: MY_CUSTOM_FORMATS
-    },
+    // {
+    //   provide: DateTimeAdapter,
+    //   // useClass: MomentDateTimeAdapter,
+    //   deps: [OWL_DATE_TIME_LOCALE]
+    // },
+    // {
+    //   provide: OWL_DATE_TIME_FORMATS,
+    //   useValue: MY_CUSTOM_FORMATS
+    // },
   ]
 })
 export class TripInputComponent implements OnInit {
@@ -119,5 +119,4 @@ export class TripInputComponent implements OnInit {
       avg_speed: selection.avg_speed
     });
   }
-  // user should be able to save a trip route - saveTripOptions()
 }

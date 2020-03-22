@@ -27,7 +27,7 @@ function getTripByIdController(req, res, next) {
 }
 
 function createTripController(req, res, next) {
-  console.log('createTripController - req.body :', req.body);
+  console.log('createTripController() - req.body :', req.body);
   build_trip(req, res, next);
       // save trip to db
       //   model.trips.createTrip(req.body)
