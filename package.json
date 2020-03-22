@@ -8,7 +8,7 @@
     "start-frontend": "ng serve --port=3000 --o --proxy-config proxy.config.json",
     "start-backend": "nodemon server/server.js",
     "build": "ng build",
-    "test": "ng test",
+    "test": "nightwatch",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
@@ -51,6 +51,7 @@
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
     "concurrently": "^4.1.0",
+    "geckodriver": "^1.19.1",
     "gulp": "^4.0.2",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",

@@ -1,24 +1,24 @@
 import { Component, EventEmitter, OnInit, ViewChild, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators, ControlContainer } from '@angular/forms';
 
-import { InputModel } from '../models/input.model';
-import { ApiService } from '../services/api.service';
-import { InputService } from '../services/input.service';
+import { InputModel } from '../../models/input.model';
+import { ApiService } from '../../services/api.service';
+import { InputService } from '../../services/input.service';
 import * as _moment from 'moment';
 // import { DateTimeAdapter, OWL_DATE_TIME_FORMATS, OWL_DATE_TIME_LOCALE } from 'ng-pick-datetime';
 // import { MomentDateTimeAdapter } from 'ng-pick-datetime-moment';
 
-const moment = (_moment as any).default ? (_moment as any).default : _moment;
+// const moment = (_moment as any).default ? (_moment as any).default : _moment;
 
-export const MY_CUSTOM_FORMATS = {
-  parseInput: 'LL LT',
-  fullPickerInput: 'LL LT',
-  datePickerInput: 'LL',
-  timePickerInput: 'LT',
-  monthYearLabel: 'MMM YYYY',
-  dateA11yLabel: 'LL',
-  monthYearA11yLabel: 'MMMM YYYY',
-};
+// export const MY_CUSTOM_FORMATS = {
+//   parseInput: 'LL LT',
+//   fullPickerInput: 'LL LT',
+//   datePickerInput: 'LL',
+//   timePickerInput: 'LT',
+//   monthYearLabel: 'MMM YYYY',
+//   dateA11yLabel: 'LL',
+//   monthYearA11yLabel: 'MMMM YYYY',
+// };
 
 @Component({
   selector: 'app-trip-input',
@@ -43,7 +43,7 @@ export class TripInputComponent implements OnInit {
   }>();
 
   currentTime = new Date();
-  public dateTime = new moment();
+  // public dateTime = new moment();
   advInputVisible = false;
 
   tripForm: FormGroup;
@@ -118,5 +118,8 @@ export class TripInputComponent implements OnInit {
       hours_driving: selection.hours_driving,
       avg_speed: selection.avg_speed
     });
+  }
+  tempTest(message) {
+    console.log(message);
   }
 }

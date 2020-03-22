@@ -7,14 +7,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { MaterialModule } from './modules/material.module';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-
+// import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+// import { OwlMomentDateTimeModule } from 'ng-pick-datetime-moment';
 import { AppComponent } from './app.component';
 import { UiAreaComponent } from './ui-area/ui-area.component';
 import { HeaderComponent } from './ui-area/header/header.component';
-import { TripInputComponent } from './trip-input/trip-input.component';
+import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
 import { TripSummaryComponent } from './trip-summary/trip-summary.component';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
-import { OwlMomentDateTimeModule } from 'ng-pick-datetime-moment';
 
 @NgModule({
   declarations: [
@@ -34,10 +33,10 @@ import { OwlMomentDateTimeModule } from 'ng-pick-datetime-moment';
     }),
     PopoverModule.forRoot(),
     BrowserAnimationsModule,
-    MaterialModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule,
-    OwlMomentDateTimeModule
+    MaterialModule
+    // OwlDateTimeModule,
+    // OwlNativeDateTimeModule,
+    // OwlMomentDateTimeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

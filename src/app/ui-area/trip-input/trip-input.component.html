@@ -28,7 +28,7 @@
   <label for="truck_stops">Truck Stops</label>
   </mat-checkbox>
   <div class="item_E">
-    <button (click)="showMoreLess()" type="button"   mat-raised-button>
+    <button (click)="showMoreLess()" id="settings_btn" type="button"   mat-raised-button>
       {{ advInputVisible ? 'Less Settings' : 'More Settings' }}
     </button>
   </div>
@@ -42,7 +42,7 @@
     [ngClass]="{ 'hideToStart' : !advInputVisible }">
     <mat-radio-button
       type="radio"
-      id="average"
+      id="typical"
       class="item_H clickInput"
       value="average"
       (click)="useQuickPick(this.presets.average)"
@@ -95,9 +95,6 @@
       formControlName="end_point"
     />
     <mat-error>
-      <span *ngIf="tripForm.get('end_point').value === 'Houston 1'">
-        Don't go to Houston!
-      </span>
       Please enter a valid city name
     </mat-error>
   </mat-form-field>
@@ -166,20 +163,33 @@
     [ngClass]="{
     'item_T' : !advInputVisible,
     'item_T_jump' : advInputVisible }">
-    <input
+    <!-- <input
       (click)="this.inputService.adjustDateTime(this.tripForm)"
       matInput
       placeholder="Departure Date/Time"
       id="depart_time"
-
+      [owlDateTimeTrigger]="depart_time"
+      [owlDateTime]="depart_time"
+      [owlDateTimeTrigger]="depart_time"
+      formControlName="depart_time"
       [min]="currentTime"
-    />
+    /> -->
+    <input
+    (click)="this.tempTest('date-time-picker is disabled')"
+    matInput
+    placeholder="Departure Date/Time"
+    id="depart_time"
+
+    formControlName="depart_time"
+    [min]="currentTime"
+  />
     <!-- <owl-date-time #depart_time></owl-date-time> -->
   </mat-form-field>
 
   <div class="item_U"
     [ngClass]="advInputVisible ? 'item_U_jump' : 'item_U_not_jump'">
     <button
+      id="create_route_btn"
       type="submit"
       class="createRoute item"
       mat-raised-button
