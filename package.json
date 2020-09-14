@@ -1,7 +1,7 @@
 {
-  "name": "supertrucker-azure",
+  "name": "supertrucker_",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",

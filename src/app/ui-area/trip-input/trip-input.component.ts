@@ -74,6 +74,7 @@ export class TripInputComponent implements OnInit {
     }
   };
 
+  // should the service (injected) be private?
   constructor(public apiService: ApiService, public inputService: InputService) { }
 
   ngOnInit() {

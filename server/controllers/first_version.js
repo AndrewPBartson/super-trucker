@@ -9,14 +9,15 @@ function getInitialTripData(req, res, next) {
     &key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
   return axios.get(trip_url)
     .then(response_1 => {
-      console.log('response_1.data.status :', response_1.data.status);
+      console.log(`response_1.data.status : ${response_1.data.status}`);
       if (!response_1.data || response_1.data.status === "NOT_FOUND") {
-        console.log('response_1.data :', response_1.data);
-        console.log('search term(s) not found :(');
+        console.log(`response_1.data : ${response_1.data}
+        search term(s) not found :(`);
         return;
       }
       calcFirstWayPoints(req.trip, response_1)
-      console.log('****************** first-version of trip done ******************');
+      console.log(`********* 1st version of trip done, back to trip_builder() ***********
+      `);
       return req;
     })
     .catch(function (error) {
@@ -44,8 +45,9 @@ function calcFirstWayPoints(trip, response_1) {
   // calculate number of 'leftover' segments in final driving period
   trip.leftovers = trip.num_segments - ((trip.num_legs_round - 1) * trip.segments_per_leg_round)
   trip.num_segments_in_leg_array = [];
+  trip.way_points_indexes = [];
   for (let t = 0; t < trip.num_legs_round; t++) {
-    // if last leg, (what?)
+    // if last leg, push number of "leftover" segments in last leg of trip
     if (t === trip.num_legs_round - 1) {
       trip.num_segments_in_leg_array.push(trip.leftovers)
     }
@@ -58,11 +60,14 @@ function calcFirstWayPoints(trip, response_1) {
   // grab out a point that (somewhat) corresponds to end of each leg
   for (let i = 0; i <= trip.num_legs_round - 1; i++) {
     trip.way_points.push(trip.all_points[count]);
+    trip.way_points_indexes.push(count);
     count += trip.num_segments_in_leg_array[i]
   }
-  trip.way_points.push(trip.all_points[trip.all_points.length - 1]) // push destination
+  // push destination
+  trip.way_points.push(trip.all_points[trip.all_points.length - 1]) 
+  trip.way_points_indexes.push(trip.all_points.length - 1);
   // now trip.way_points contains a first approximation of where stopping places should be
-  console.log('***** First_version is done! - trip :', trip);
+  console.log(`********* 1st version of trip in process -> trip : ${trip}`);
   return trip
 }
 

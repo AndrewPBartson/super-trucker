@@ -1,4 +1,4 @@
-const { setupDataStructure, isValidTripInput } = require('./input')
+const { setupDataStructure, isValidTripInput } = require('./trip_input')
 const { getInitialTripData } = require('./first_version')
 const { recalculateWayPoints, getExtraWayPoints } = require('./waypoints')
 const { getPlaceNames } = require('./place_names')
@@ -20,18 +20,23 @@ function createTestUrl(trip) {
   return trip
 }
 
-function finalizeResponseData(req, res, next) {
-  req.trip.exports.way_points = req.trip.way_points;
-  req.trip.exports.way_points_set = req.trip.way_points_set;
-  req.trip.exports.response = req.trip.response;
-  return req
+function loadResponseData(req, res, next) {
+  //if (req.trip.exports) {
+    console.log(`loadResponseData() check for req.trip -> req :  ${req}`);
+    req.trip.exports.way_points = req.trip.way_points;
+    req.trip.exports.way_points_set = req.trip.way_points_set;
+    req.trip.exports.response = req.trip.response;
+ // }
+  next();
 }
 
 function build_trip(req, res, next) { // 1
   console.log(`
               *** in trip_builder.build_trip() ***`)
   if (!isValidTripInput(req)) {
-    next({ message: 'Invalid or missing input' });
+    // don't understand how to handle errors in middleware context :(
+    // so don't do anything for now
+    // next({ message: 'Invalid or missing trip input' });
   }
   setupDataStructure(req, res, next)
   return getInitialTripData(req, res, next)
@@ -47,14 +52,15 @@ function build_trip(req, res, next) { // 1
         //     // }
         //     .then(req => { // 4
         //       getPlaceNames(req, res, next)
-                // createTestUrl(req.trip)  
-                //createSchedule(req, res, next) 
-                //createMatrix(req, res, next)       
-                .then(req => {  // 5
-                  finalizeResponseData(req, res, next);
-                  console.log('now sending request - req.trip.exports :', req.trip.exports);
-                  res.json(req.trip.exports)
-                }) // 5
+        // createTestUrl(req.trip)  
+        //createSchedule(req, res, next) 
+        //createMatrix(req, res, next)       
+        .then(req => {  // 5
+          
+          // loadResponseData(req, res, next);
+          // console.log('now sending response - req.trip.exports :', req.trip.exports);
+          res.json({"ok": "not ok"})
+        }) // 5
         //     })  // 4
         // }) // 3
         .catch(err => {

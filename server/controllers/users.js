@@ -1,7 +1,13 @@
 let model = require('../models');
 
 function isValidUserInput(user) {
-  return true;
+  if (user.name && user.superPower) {
+    console.log('validating user.name and user.superPower');
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 function getAllUsersController(req, res, next) {
@@ -29,16 +35,20 @@ function getUserByIdController(req, res, next) {
 }
 
 function createUserController(req, res, next) {
-console.log(req.body)
+  // res.send(`Hello from Earth: Be Happy`)
+  console.log('createUserController() - req.body :', req.body);
   if(isValidUserInput(req.body)) {
-    // save to db
-    model.users.createUser(req.body)
-      .then(users => {
-        res.status(201).json(users[0]);
-      })
+    console.log('req.body :>> ', req.body);
+    console.log('user is valid, proceed');
+    // // save to db
+    // model.users.createUser(req.body)
+    //   .then(users => {
+         res.status(201)//.json(users[0]);
+         res.send('ok, black lives matter!')
+    //   })
   }
    else {
-     next({ message: 'Invalid or missing input' });
+     next({ message: 'Invalid or missing input to create new user' });
    }
 }
 
