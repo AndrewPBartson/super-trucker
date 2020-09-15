@@ -1,5 +1,5 @@
 {
-  "name": "supertrucker_",
+  "name": "supertrucker",
   "version": "1.0.0",
   "main": "server/server.js",
   "scripts": {
@@ -12,6 +12,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "author": "Andrew Bartson",
+  "license": "ISC",
+  "description": "Interactive map for trip planning - Enter origin and destination, app creates a route with schedule.",
   "private": true,
   "dependencies": {
     "@agm/core": "^1.0.0",
@@ -28,6 +31,7 @@
     "@angular/router": "~8.2.11",
     "axios": "^0.19.2",
     "cors": "^2.8.5",
+    "eslint": "^5.16.0",
     "express": "^4.17.1",
     "hammerjs": "^2.0.8",
     "knex": "^0.20.9",
@@ -42,7 +46,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.803.12",
+    "@angular-devkit/build-angular": "^0.803.24",
     "@angular/cli": "~8.3.12",
     "@angular/compiler-cli": "~8.2.11",
     "@angular/language-service": "~8.2.11",
@@ -64,5 +68,14 @@
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
     "typescript": "~3.5.3"
-  }
+  },
+  "keywords": [
+    "trip",
+    "planning",
+    "planner",
+    "road",
+    "interstate",
+    "travel",
+    "trucker"
+  ]
 }
