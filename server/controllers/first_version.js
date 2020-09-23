@@ -13,7 +13,7 @@ function getInitialTripData(req, res, next) {
       if (!response_1.data || response_1.data.status === "NOT_FOUND") {
         console.log(`response_1.data : ${response_1.data}
         search term(s) not found :(`);
-        return;
+        return;  // What is supposed to happen when this returns?
       }
       calcFirstWayPoints(req.trip, response_1)
       console.log(`********* 1st version of trip done, back to trip_builder() ***********

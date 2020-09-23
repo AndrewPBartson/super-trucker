@@ -275,7 +275,7 @@ function recalculateWayPoints(req, res, next) {
     .catch(function (error) {
       console.log(error);
     });
-    next()
+  // next() // is this the place to call next()? I'm confused
 }
 
 module.exports = {
