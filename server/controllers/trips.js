@@ -27,16 +27,18 @@ function getTripByIdController(req, res, next) {
 }
 
 function createTripController(req, res, next) {
-  console.log('createTripController() - req.body :', req.body);
-  build_trip(req, res, next);
-      // save trip to db
+  build_trip(req, res, next)
+  .then(req => {
+      // // save trip to db
       //   model.trips.createTrip(req.body)
       //   .then(trips => {
       //   res.status(201).json(trips[0]);
-      // })   
-        // .catch(function(error) {
-        //   console.log(error);
-        // });
+      // })  
+      res.json(req.completeTrip);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 }
 
 function updateTripController(req, res, next) {

@@ -37,12 +37,10 @@ function getMeterCounts(trip) {
   let count = 0;
 
   for (let i = 0; i < num_legs_round; i++) {
-    current_step = leg_distances[i] / trip.num_segments_in_leg_array[i]
-    // console.log('                i -', i, leg_distances[i], current_step)      
+    current_step = leg_distances[i] / trip.num_segments_in_leg_array[i]  
 
     for (let j = 0; j < trip.num_segments_in_leg_array[i]; j++) {
       running_total += current_step
-      // console.log('   j -> ', j, count, running_total)
       count += 1
       trip.meter_counts.push(Math.round(running_total));
     }
@@ -65,28 +63,22 @@ function calibrateMeterCounts(trip) {
 }
 
 function findMeterCountAtBreakPoints(req) {
-  console.log('**** findMeterCounts()  req.trip.way_points_indexes :', req.trip.way_points_indexes);
   let { meter_counts, all_points, meters_per_day } = req.trip;
-  let new_way_point;
-  req.trip.new_way_points = [];
-  req.trip.way_points_indexes = [];
-  let break_point = meters_per_day
-  let target_meters = break_point
-  let cutoff, diff
-  let count_to_next_hit = 0;
   req.trip.num_segments_in_leg_array = [];
+  let break_point = meters_per_day;
+  let target_meters = break_point;
+  let cutoff, diff;
+  let count_to_next_hit = 0;
   // find value closest to each stopping point - 'target_meters'. 
-  // create an object w/ info for point and push to trip.way_points_set.
   for (let b = 0; b < meter_counts.length; b++) {
-    if (b == 0) {  // if first one
-      new_way_point = all_points[b]
-      req.trip.new_way_points.push(new_way_point)
+    // if first one
+    if (b == 0) {  
+      req.trip.way_points.push(all_points[b])
       req.trip.way_points_indexes.push(b)
     }
     // if last one
     if (b == meter_counts.length - 1) {
-      new_way_point = all_points[b]
-      req.trip.new_way_points.push(new_way_point)
+      req.trip.way_points.push(all_points[b])
       req.trip.way_points_indexes.push(b)
       req.trip.num_segments_in_leg_array.push(count_to_next_hit)
       continue // last one, no further calculations
@@ -100,20 +92,17 @@ function findMeterCountAtBreakPoints(req) {
       diff = meter_counts[b + 1] - meter_counts[b]
       cutoff = meter_counts[b] + (diff / 2)
       if (meter_counts[b] > cutoff) {
-        new_way_point = all_points[b + 1]
+        req.trip.way_points.push(all_points[b + 1])
         req.trip.way_points_indexes.push(b + 1)
       }
       else {
-        new_way_point = all_points[b]
+        req.trip.way_points.push(all_points[b])
         req.trip.way_points_indexes.push(b)
       }
       target_meters += break_point
-      req.trip.new_way_points.push(new_way_point)
     }
     count_to_next_hit += 1;
   }
-  console.log('req.trip.new_way_points :', req.trip.new_way_points);
-  console.log('req.trip.way_points_indexes :', req.trip.way_points_indexes);
   return req
 }
 
@@ -190,110 +179,72 @@ function reviewFinalData(trip) {
   return trip
 }
 
-function recalculateWayPoints(req, res, next) {
-  console.log('*** recalc() - req.trip.way_points_indexes :', req.trip.way_points_indexes);
-  // if first iteration, old_way_points don't exist
-  if (req.trip.old_way_points.length === 0) {
-    console.log("old way points don't exist");
-  } else {
-    console.log('old_way_points exist!');
-    //  
-    // June 2020 - Addressing problem where way_points aren't improving but
-    // rather just keep flipping between two almost identical solutions.
-    // Write an if statement that compares the way_points to the old_way_points and
-    // also compares to the next older way_points.
-    // So need to create an array of next older way points.
-    // Also it will be simpler to compare the indexes of the way_points instead of
-    // comparing the coordinates. 
-    //
-    // 1) Are current way_points same as old_way_points?
-       // yes - return
-       // no - continue
-    // 2) Are way points improving? Create function that detects improvements or lack of.
-        // yes - continue
-        // no - Select best way point among finalists, then return
-    let allMatching = true 
-    for (let i = 1; i < req.trip.way_points.length - 1; i++) {
-      for (let j = 0; j < req.trip.way_points[i].length; j++) {
-        // console.log(`way_points[${i}][${j}] : ${req.trip.way_points[i][j]}`);
-        // console.log(`old_points[${i}][${j}] : ${req.trip.old_way_points[i][j]}`);
-        if (req.trip.way_points[i][j] !== req.trip.old_way_points[i][j]) {
-          allMatching = false;
-        }
-      }
+function isResultFinal(result, old_A, old_B) {
+  // In most cases, the calculations of way points do not stabilize. 
+  // Rather they keep flipping between two almost identical solutions.
+  // That's why it's necessary to compare current solution to 
+  // previous solution AND the solution before that
+  let answer = false;
+  if (old_B.length === 0) {
+    if (JSON.stringify(result) === JSON.stringify(old_A))  {
+      answer = true;
+    } 
+  }
+  else {
+    if ((JSON.stringify(result) === JSON.stringify(old_A)) || 
+        (JSON.stringify(result) === JSON.stringify(old_B))) {
+      answer = true;
     }
-    console.log(`
-       allMatching : ${allMatching}`);
-    if (allMatching) {
-      console.log(`   *************  It's a match - way points finished *************`)
-      //reviewFinalData(req.trip)
-      console.log('reviewFinalData() complete - req.trip :>> ', req.trip);
-      next();
-      return req.trip;
-    }
-  } 
-  console.log('**************** create new way points! ****************')
-  // delete old leg_distances
-  req.trip.leg_distances = []
-  
-  // send request to obtain distances between most recent way_points
-  setUrlWithWayPoints(req.trip)
-  return axios.get(req.trip.trip_url)
-    .then(response => {
-      // pull out current leg distances from response
-      console.log('we cool');
-      let leg_set = response.data.routes[0].legs
-      for (let i = 0; i < leg_set.length; i++) {
-        req.trip.leg_distances.push(leg_set[i].distance.value)
-      }
-      req.trip.response = response.data;
+  }
+  return answer;
+}
 
+function savePreviousData (req) {
+  req.trip.old_way_pts_2_indexes = req.trip.old_way_pts_indexes;
+  req.trip.old_way_pts_indexes = req.trip.way_points_indexes;
+  req.trip.way_points_indexes = [];
+
+  req.trip.old_way_points_2 = req.trip.old_way_points
+  req.trip.old_way_points = req.trip.way_points;
+  req.trip.way_points = [];
+}
+
+function pullDataFromResponse(response, req) {
+  // pull out current leg distances from response
+  let leg_set = response.data.routes[0].legs
+  for (let i = 0; i < leg_set.length; i++) {
+    req.trip.leg_distances.push(leg_set[i].distance.value)
+  }
+  req.trip.response = response.data;
+}
+
+function fixWayPoints(req, res, next) {
+  let isFinal = false;
+  while (!isFinal) {
+    req.trip.leg_distances = []
+
+    setUrlWithWayPoints(req.trip)
+    // after building url, rename way_points and way_points_indexes:
+    savePreviousData(req)
+    // fetch data for recalculating way_points
+    // need distances between most recent way_points
+    return axios.get(req.trip.trip_url)
+    .then(response => {
+      pullDataFromResponse(response, req);
       getMeterCounts(req.trip)
       calibrateMeterCounts(req.trip)
       findMeterCountAtBreakPoints(req)
-      // The calculations of way points do not necessarily stabilize completely
-      // There are often slight (insignificant) variations between iterations
-      // At some number of iterations, call it done.
-      // Solution -
-      // Write a test to compare each set of way points to see how much it varies.
-      console.log(`Before replacing old way points -
-      req.trip.old_way_points : ${req.trip.old_way_points}
-      req.trip.way_points: ${req.trip.way_points}
-      req.trip.new_way_points : ${req.trip.new_way_points}
-      `);
-      req.trip.old_way_points = [];
-      req.trip.old_way_points = req.trip.way_points;
-      req.trip.way_points = req.trip.new_way_points;
-      console.log(`After replacing old way points -
-      req.trip.old_way_points : ${req.trip.old_way_points}
-      req.trip.way_points: ${req.trip.way_points}
-      req.trip.new_way_points : ${req.trip.new_way_points}
-      `);
-      recalculateWayPoints(req, res, next)
-      next()
+      isFinal = isResultFinal(req.trip.way_points_indexes, req.trip.old_way_pts_indexes, req.trip.old_way_pts_2_indexes);
+      return req;
     })
     .catch(function (error) {
       console.log(error);
     });
-  // next() // is this the place to call next()? I'm confused
+  }
+  return req;
 }
 
 module.exports = {
-  recalculateWayPoints,
+  fixWayPoints,
   getExtraWayPoints
 }
-// function getWayPoints(req, res, next) {
-//   // return getInitialTripData(req)  // promise 1
-//   //   .then(response => {
-//   //     console.log('   /*****************  first recalc starting  *****************/')
-//       return recalculateWayPoints(req, res, next)  // promise 2  
-//       // .then(req => {
-//       //   console.log('   /*****************  promise_2    complete  *****************/')
-//       //   return recalculateWayPoints(req)  // promise 3    
-//       //     .then(req => {
-//       //       console.log('   /*****************  promise_3    complete  *****************/')
-//       //       return recalculateWayPoints(req)  // promise 4  
-//       //     })
-//       // })
-//     // })
-// }
