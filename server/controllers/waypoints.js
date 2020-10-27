@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 function checkLegDistances(trip) {
-  // this function for testing during development - can be commented out
+  // for testing during development - can be commented out
   let total = 0;
   let avg = 0;
   let array_1 = [];
@@ -25,6 +25,19 @@ function checkLegDistances(trip) {
   }
   other_avg = other_total / array_1.length;
   console.log('Are leg distances improving? (less is better) - ', other_avg)
+}
+
+function createTestUrl(trip) {
+  // creates a normal url (not to API) for checking way points
+  let { way_points } = trip
+  trip.test_url = `https://www.google.com/maps/dir/`
+  for (let i = 0; i < trip.way_points.length; i++) {
+    trip.test_url += trip.way_points[i];
+    trip.test_url += '/';
+  }
+  trip.test_url += `&key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
+  // console.log('trip.test_url (for checking waypoints):>> ', trip.test_url);
+  return trip.test_url;
 }
 
 function getMeterCounts(trip) {
@@ -63,9 +76,9 @@ function calibrateMeterCounts(trip) {
 }
 
 function findMeterCountAtBreakPoints(req) {
-  let { meter_counts, all_points, meters_per_day } = req.trip;
+  let { meter_counts, all_points, meters_per_interval } = req.trip;
   req.trip.num_segments_in_leg_array = [];
-  let break_point = meters_per_day;
+  let break_point = meters_per_interval;
   let target_meters = break_point;
   let cutoff, diff;
   let count_to_next_hit = 0;
@@ -117,12 +130,10 @@ function setUrlWithWayPoints(trip) {
     }
   }
   trip.trip_url += `&key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
-  
   return trip
 }
 
 function getExtraWayPoints(req, res, next) {
-  console.log('***** getExtra() req.trip.way_points_indexes :', req.trip.way_points_indexes);
   let { all_points, way_points_indexes, way_points_set } = req.trip
   let way_pt_obj;
   // prev, next are points on either side of selected point (stop)
@@ -131,7 +142,7 @@ function getExtraWayPoints(req, res, next) {
   for (let a = 0, i = 0; a < all_points.length; a++) {
     way_pt_obj = { prev: null, stop: null, next: null }
     if (all_points[a] === way_points_indexes[i]) {
-      if (i === 0) { // first wayPt  
+      if (i === 0) { // 1st wayPoint  
         way_pt_obj.stop = [...trip.all_points[a]]
         way_pt_obj.next = [...trip.all_points[a + 1]]
         i++
@@ -161,6 +172,7 @@ function reviewFinalData(trip) {
       length of second leg -  ${trip.leg_distances[1]}
       total mi -  ${trip.total_mi}
       miles_per_day -  ${trip.miles_per_day}
+      miles_per_half_day -  ${trip.miles_per_half_day}
       all_points.length -  ${trip.all_points.length}  
       meter_counts.length -  ${trip.meter_counts.length}
       num_segments -  ${trip.num_segments}
@@ -179,31 +191,30 @@ function reviewFinalData(trip) {
   return trip
 }
 
-function isResultFinal(result, old_A, old_B) {
+function isResultFinal(result, old_A, old_B, old_C, iterations) {
   // In most cases, the calculations of way points do not stabilize. 
-  // Rather they keep flipping between two almost identical solutions.
+  // Rather they keep flipping between two (or three) very similar solutions.
   // That's why it's necessary to compare current solution to 
   // previous solution AND the solution before that
   let answer = false;
-  if (old_B.length === 0) {
-    if (JSON.stringify(result) === JSON.stringify(old_A))  {
-      answer = true;
-    } 
-  }
-  else {
     if ((JSON.stringify(result) === JSON.stringify(old_A)) || 
-        (JSON.stringify(result) === JSON.stringify(old_B))) {
+        (JSON.stringify(result) === JSON.stringify(old_B)) || 
+        (JSON.stringify(result) === JSON.stringify(old_C))) {
       answer = true;
     }
-  }
+    // for debugging:
+    console.log('                                                    old : ' + JSON.stringify(old_A));
+    console.log('iteration ' + iterations + '  :  '+  JSON.stringify(result)); 
   return answer;
 }
 
 function savePreviousData (req) {
+  req.trip.old_way_pts_3_indexes = req.trip.old_way_pts_2_indexes;
   req.trip.old_way_pts_2_indexes = req.trip.old_way_pts_indexes;
   req.trip.old_way_pts_indexes = req.trip.way_points_indexes;
   req.trip.way_points_indexes = [];
 
+  req.trip.old_way_points_3 = req.trip.old_way_points_2
   req.trip.old_way_points_2 = req.trip.old_way_points
   req.trip.old_way_points = req.trip.way_points;
   req.trip.way_points = [];
@@ -218,28 +229,37 @@ function pullDataFromResponse(response, req) {
   req.trip.response = response.data;
 }
 
-function fixWayPoints(req, res, next) {
+const fixWayPoints = async (req, res, next) => {
+  let iterations = 2
   let isFinal = false;
+
   while (!isFinal) {
     req.trip.leg_distances = []
-
     setUrlWithWayPoints(req.trip)
     // after building url, rename way_points and way_points_indexes:
     savePreviousData(req)
     // fetch data for recalculating way_points
     // need distances between most recent way_points
-    return axios.get(req.trip.trip_url)
-    .then(response => {
-      pullDataFromResponse(response, req);
-      getMeterCounts(req.trip)
-      calibrateMeterCounts(req.trip)
-      findMeterCountAtBreakPoints(req)
-      isFinal = isResultFinal(req.trip.way_points_indexes, req.trip.old_way_pts_indexes, req.trip.old_way_pts_2_indexes);
-      return req;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    let response = await axios.get(req.trip.trip_url)
+    pullDataFromResponse(response, req);
+    getMeterCounts(req.trip)
+    calibrateMeterCounts(req.trip)
+    findMeterCountAtBreakPoints(req)
+    isFinal = isResultFinal(
+      req.trip.way_points_indexes, 
+      req.trip.old_way_pts_indexes, 
+      req.trip.old_way_pts_2_indexes, 
+      req.trip.old_way_pts_3_indexes,
+      iterations);
+    iterations++;
+    // if last iteration, add raw route data and test url to response for debugging and stuff
+    // for development, use iterations > 2, produces less polished route
+    // for production, use iterations > 6:
+    if (isFinal || iterations > 2) {
+      isFinal = true;
+      req.trip.response.raw_data = response;
+      createTestUrl(req.trip);
+    }   
   }
   return req;
 }

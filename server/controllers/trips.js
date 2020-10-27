@@ -1,3 +1,4 @@
+const { createLogicalOr } = require('typescript');
 let model = require('../models');
 let { build_trip } = require('./trip_builder');
 
@@ -33,8 +34,9 @@ function createTripController(req, res, next) {
       //   model.trips.createTrip(req.body)
       //   .then(trips => {
       //   res.status(201).json(trips[0]);
-      // })  
-      res.json(req.completeTrip);
+      // })
+      // res.json(req);
+      res.json(req.payload);  
     })
     .catch(function(error) {
       console.log(error);
@@ -81,3 +83,10 @@ module.exports = {
   updateTripController,
   deleteTripController
 }
+
+
+
+
+// console.log('object :>> ', object);
+// https://api.weather.gov/points/38.6860,-101.9331/forecast
+// https://api.weather.gov/points/35.0695,-104.2121/forecast
