@@ -30,12 +30,11 @@ export class ApiService {
     this.httpClient.post(`${ this.apiURL }/trips`, tripSettings)
     .subscribe(response => {
       console.log('response - OMG', response);
-      // // if request comes back successfully
-      // do stuff
-    // // hide input form and show trip summary
-    // this.inputSubmitted.emit({
-    //   enableInput: false, showSummary: true
-    // });
-      });
+      // if request comes back successfully,
+      // hide input form and show trip summary
+      // this.inputSubmitted.emit({
+      //   enableInput: false, showSummary: true
+      // });
+    });
   }
 }

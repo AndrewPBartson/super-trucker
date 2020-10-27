@@ -159,31 +159,32 @@
       />
     </mat-form-field>
 </div>
-  <mat-form-field
-    [ngClass]="{
+
+  <mat-form-field    [ngClass]="{
     'item_T' : !advInputVisible,
     'item_T_jump' : advInputVisible }">
-    <!-- <input
-      (click)="this.inputService.adjustDateTime(this.tripForm)"
-      matInput
-      placeholder="Departure Date/Time"
-      id="depart_time"
-      [owlDateTimeTrigger]="depart_time"
-      [owlDateTime]="depart_time"
-      [owlDateTimeTrigger]="depart_time"
-      formControlName="depart_time"
-      [min]="currentTime"
-    /> -->
     <input
-    (click)="this.tempTest('date-time-picker is disabled')"
-    matInput
-    placeholder="Departure Date/Time"
-    id="depart_time"
-
-    formControlName="depart_time"
-    [min]="currentTime"
-  />
-    <!-- <owl-date-time #depart_time></owl-date-time> -->
+      matInput
+      [ngxMatDatetimePicker]="picker" 
+      placeholder="Departure Date/Time"
+      [min]="currentTime"
+      id="depart_time"
+      formControlName="depart_time"
+      [disabled]="disabled">
+    <mat-datepicker-toggle 
+      matSuffix 
+      [for]="picker">
+    </mat-datepicker-toggle>
+    <ngx-mat-datetime-picker #picker
+      [showSpinners]="showSpinners"
+      [showSeconds]="showSeconds"
+      [stepHour]="stepHour"
+      [stepMinute]="stepMinute"
+      [stepSecond]="stepSecond"
+      [touchUi]="touchUi"
+      [color]="color"
+      [enableMeridian]="enableMeridian">
+    </ngx-mat-datetime-picker>
   </mat-form-field>
 
   <div class="item_U"

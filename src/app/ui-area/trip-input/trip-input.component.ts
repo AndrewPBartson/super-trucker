@@ -1,40 +1,17 @@
 import { Component, EventEmitter, OnInit, ViewChild, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators, ControlContainer } from '@angular/forms';
+import * as moment from 'moment';
+import { ThemePalette } from '@angular/material/core';
 
 import { InputModel } from '../../models/input.model';
 import { ApiService } from '../../services/api.service';
 import { InputService } from '../../services/input.service';
-import * as _moment from 'moment';
-// import { DateTimeAdapter, OWL_DATE_TIME_FORMATS, OWL_DATE_TIME_LOCALE } from 'ng-pick-datetime';
-// import { MomentDateTimeAdapter } from 'ng-pick-datetime-moment';
-
-// const moment = (_moment as any).default ? (_moment as any).default : _moment;
-
-// export const MY_CUSTOM_FORMATS = {
-//   parseInput: 'LL LT',
-//   fullPickerInput: 'LL LT',
-//   datePickerInput: 'LL',
-//   timePickerInput: 'LT',
-//   monthYearLabel: 'MMM YYYY',
-//   dateA11yLabel: 'LL',
-//   monthYearA11yLabel: 'MMMM YYYY',
-// };
 
 @Component({
   selector: 'app-trip-input',
   templateUrl: './trip-input.component.html',
   styleUrls: ['./trip-input.component.css', './trip-input-grid.component.css'],
-  providers: [
-    // {
-    //   provide: DateTimeAdapter,
-    //   // useClass: MomentDateTimeAdapter,
-    //   deps: [OWL_DATE_TIME_LOCALE]
-    // },
-    // {
-    //   provide: OWL_DATE_TIME_FORMATS,
-    //   useValue: MY_CUSTOM_FORMATS
-    // },
-  ]
+  providers: [ ]
 })
 export class TripInputComponent implements OnInit {
   @Output() inputSubmitted = new EventEmitter<{
@@ -42,11 +19,50 @@ export class TripInputComponent implements OnInit {
     showSummary: boolean
   }>();
 
-  currentTime = new Date();
-  // public dateTime = new moment();
+  @ViewChild('picker', {static: true}) picker: any;
+
+  public disabled = false;
+  public showSpinners = true;
+  public showSeconds = false;
+  public touchUi = false;
+  public enableMeridian = true;
+  public minDate: moment.Moment;
+  public stepHour = 1;
+  public stepMinute = 10;
+  public stepSecond = 1;
+  public color: ThemePalette = 'primary';
+
+  public tripForm = new FormGroup({
+    weather: new FormControl(true),
+    hotels: new FormControl(null),
+    truck_stops: new FormControl(null),
+    origin: new FormControl('', [
+      Validators.required,
+      this.inputService.checkCityName.bind(this)
+    ]),
+    end_point: new FormControl('', [
+      Validators.required,
+      this.inputService.checkCityName.bind(this)
+    ]),
+    miles_per_day: new FormControl(null, [
+      this.inputService.checkMilesPerDay
+    ]),
+    avg_speed: new FormControl(null),
+    hours_driving: new FormControl(null),
+    depart_time: new FormControl(moment().toDate()),
+  });
+
+  public options = [
+    { value: true, label: 'True' },
+    { value: false, label: 'False' }
+  ];
+
+  public stepHours = [1, 2, 3, 4, 5];
+  public stepMinutes = [1, 5, 10, 15, 20, 25];
+  public stepSeconds = [1, 5, 10, 15, 20, 25];
+
   advInputVisible = false;
 
-  tripForm: FormGroup;
   input: InputModel = {
     origin: '',
     end_point: '',
@@ -56,7 +72,7 @@ export class TripInputComponent implements OnInit {
     depart_time: null
   };
 
-  presets = {
+    presets = {
     trucker: {
       avg_speed: 62,
       hours_driving: 11,
@@ -77,27 +93,8 @@ export class TripInputComponent implements OnInit {
   // should the service (injected) be private?
   constructor(public apiService: ApiService, public inputService: InputService) { }
 
-  ngOnInit() {
-    this.tripForm = new FormGroup({
-      weather: new FormControl(true),
-      hotels: new FormControl(null),
-      truck_stops: new FormControl(null),
-      origin: new FormControl('', [
-        Validators.required,
-        this.inputService.checkCityName.bind(this)
-      ]),
-      end_point: new FormControl('', [
-        Validators.required,
-        this.inputService.checkCityName.bind(this)
-      ]),
-      miles_per_day: new FormControl(null, [
-        this.inputService.checkMilesPerDay
-      ]),
-      avg_speed: new FormControl(null),
-      hours_driving: new FormControl(null),
-      depart_time: new FormControl(new Date()),
-    });
-  }
+  ngOnInit() { }
+
   onGetRoute() {
     console.log('onGetRoute() - this.tripForm :', this.tripForm);
     Object.entries(this.tripForm.value)

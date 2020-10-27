@@ -7,8 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { MaterialModule } from './modules/material.module';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-// import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
-// import { OwlMomentDateTimeModule } from 'ng-pick-datetime-moment';
+
 import { AppComponent } from './app.component';
 import { UiAreaComponent } from './ui-area/ui-area.component';
 import { HeaderComponent } from './ui-area/header/header.component';
@@ -34,9 +33,6 @@ import { TripSummaryComponent } from './trip-summary/trip-summary.component';
     PopoverModule.forRoot(),
     BrowserAnimationsModule,
     MaterialModule
-    // OwlDateTimeModule,
-    // OwlNativeDateTimeModule,
-    // OwlMomentDateTimeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
