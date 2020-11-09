@@ -39,7 +39,7 @@ let getPointData = function(url) {
   }
 
 function getAllWeatherData (req, res, next) {
-  console.log('enter getAllWeatherData()');
+  console.log('*****   weather.getAllWeatherData() working!');
   // let lat;
   // let lng;
   // let url_weather;

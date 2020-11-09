@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Leg } from '../models/Leg';
+import { Leg } from '../../models/Leg';
 import { WeatherIcons } from 'src/assets/images/weather_icons';
 
 @Component({

@@ -37,8 +37,6 @@ function build_trip(req, res, next) {
         // })  
               
     .then(req => { 
-
-      //console.log('req.payload.data.trip.test :>> ', req.payload.data.trip.test);
       return createMatrix(req, res, next)    
     })
     .catch(err => {

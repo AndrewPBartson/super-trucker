@@ -12,7 +12,7 @@ import { AppComponent } from './app.component';
 import { UiAreaComponent } from './ui-area/ui-area.component';
 import { HeaderComponent } from './ui-area/header/header.component';
 import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
-import { TripSummaryComponent } from './trip-summary/trip-summary.component';
+import { TripSummaryComponent } from './ui-area/trip-summary/trip-summary.component';
 
 @NgModule({
   declarations: [

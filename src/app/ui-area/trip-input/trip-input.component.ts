@@ -96,13 +96,14 @@ export class TripInputComponent implements OnInit {
   ngOnInit() { }
 
   onGetRoute() {
-    console.log('onGetRoute() - this.tripForm :', this.tripForm);
-    Object.entries(this.tripForm.value)
-      .forEach(([key, inputValue]) => {
-        this.input[key] = inputValue;
-      });
-    this.apiService.sendTripRequest(this.input);
+      console.log('onGetRoute() - this.tripForm :', this.tripForm);
+      Object.entries(this.tripForm.value)
+        .forEach(([key, inputValue]) => {
+          this.input[key] = inputValue;
+        });
+      this.apiService.sendTripRequest(this.input);
   }
+
   showMoreLess() {
     if (!this.advInputVisible) {
       this.advInputVisible = true;
