@@ -1,11 +1,10 @@
-<form
-  [formGroup]='tripForm'
-  (ngSubmit)="onGetRoute()"
-  class="inputForm"
->
-  <div class="sectionText item_A">
-    Add Options to Trip:
+<form [formGroup]="tripForm" (ngSubmit)="onGetRoute()" class="inputForm">
+  <div class="item_AA">
+    <!-- <button (click)="showMoreLess()" id="login_btn" type="button" mat-raised-button></button> -->
+    <button id="login_btn" type="button" mat-raised-button>Login/Register</button>
   </div>
+
+  <div class="sectionText item_A">Add Options to Trip:</div>
   <mat-checkbox
     id="weather"
     class="clickInput item_B"
@@ -13,33 +12,30 @@
   >
     <label for="weather">Weather</label>
   </mat-checkbox>
-  <mat-checkbox
-    id="hotels"
-    class="clickInput item_C"
-    formControlName="hotels"
-  >
-  <label for="hotels">Hotels</label>
+  <mat-checkbox id="hotels" class="clickInput item_C" formControlName="hotels">
+    <label for="hotels">Hotels</label>
   </mat-checkbox>
   <mat-checkbox
     id="truck_stops"
     class="clickInput item_D"
     formControlName="truck_stops"
   >
-  <label for="truck_stops">Truck Stops</label>
+    <label for="truck_stops">Truck Stops</label>
   </mat-checkbox>
   <div class="item_E">
-    <button (click)="showMoreLess()" id="settings_btn" type="button"   mat-raised-button>
-      {{ advInputVisible ? 'Less Settings' : 'More Settings' }}
+    <button
+      (click)="showMoreLess()"
+      id="settings_btn"
+      type="button"
+      mat-raised-button
+    >
+      {{ advInputVisible ? "Less Settings" : "More Settings" }}
     </button>
   </div>
-  <div
-    class="sectionText item_F"
-    [ngClass]="{ 'hideToStart' : !advInputVisible }">
+  <div class="sectionText item_F" [ngClass]="{ hideToStart: !advInputVisible }">
     Popular Settings:
   </div>
-  <mat-radio-group
-    class="item_G"
-    [ngClass]="{ 'hideToStart' : !advInputVisible }">
+  <mat-radio-group class="item_G" [ngClass]="{ hideToStart: !advInputVisible }">
     <mat-radio-button
       type="radio"
       id="typical"
@@ -47,7 +43,7 @@
       value="average"
       (click)="useQuickPick(this.presets.average)"
     >
-    <label for="average">Pope Francis</label>
+      <label for="average">Pope Francis</label>
     </mat-radio-button>
     <mat-radio-button
       type="radio"
@@ -56,26 +52,19 @@
       value="fast"
       (click)="useQuickPick(this.presets.fast)"
     >
-    <label for="fast">James Bond</label>
+      <label for="fast">James Bond</label>
     </mat-radio-button>
     <mat-radio-button
       type="radio"
       id="trucker"
       class="item_J clickInput"
-      [ngClass]="{ 'hideToStart' : !advInputVisible }"
+      [ngClass]="{ hideToStart: !advInputVisible }"
       value="trucker"
       (click)="useQuickPick(this.presets.trucker)"
     >
-    <label for="trucker">Super Trucker</label>
+      <label for="trucker">Super Trucker</label>
     </mat-radio-button>
   </mat-radio-group>
-
-  <div class="item_K">
-    <button type="button" mat-raised-button>
-      Login
-    </button>
-  </div>
-
   <mat-form-field class="item_N">
     <input
       matInput
@@ -83,9 +72,7 @@
       id="origin"
       formControlName="origin"
     />
-    <mat-error>
-      Please enter a valid city name
-    </mat-error>
+    <mat-error> Please enter a valid city name </mat-error>
   </mat-form-field>
   <mat-form-field class="item_O">
     <input
@@ -94,23 +81,31 @@
       id="end_point"
       formControlName="end_point"
     />
-    <mat-error>
-      Please enter a valid city name
-    </mat-error>
+    <mat-error> Please enter a valid city name </mat-error>
   </mat-form-field>
-  <div class="item_P"
+  <div
+    class="item_P"
     [ngClass]="{
-      'item_P_short' : !advInputVisible,
-      'item_P_tall' : advInputVisible,
-      'highLight' : advInputVisible,
-      'mat-elevation-z2' : advInputVisible }">
+      item_P_short: !advInputVisible,
+      item_P_tall: advInputVisible,
+      highLight: advInputVisible,
+      'mat-elevation-z2': advInputVisible
+    }"
+  >
     <mat-form-field
       [ngClass]="{
-        'item_Q' : !advInputVisible,
-        'item_Q_jump' : advInputVisible
-        }">
+        item_Q: !advInputVisible,
+        item_Q_jump: advInputVisible
+      }"
+    >
       <input
-        (change)="this.inputService.adjustFormValues($event, this.tripForm, this.presets)"
+        (change)="
+          this.inputService.adjustFormValues(
+            $event,
+            this.tripForm,
+            this.presets
+          )
+        "
         matInput
         placeholder="Miles Per Day"
         id="miles_per_day"
@@ -120,18 +115,24 @@
         step="20"
         formControlName="miles_per_day"
       />
-        <mat-error>
-          Miles per day must be at least 100
-        </mat-error>
+      <mat-error> Miles per day must be at least 100 </mat-error>
     </mat-form-field>
     <mat-form-field
       hintLabel="Miles per hour"
       [ngClass]="{
-        'hideToStart' : !advInputVisible,
-        'item_R' : !advInputVisible,
-        'item_R_jump' : advInputVisible }">
+        hideToStart: !advInputVisible,
+        item_R: !advInputVisible,
+        item_R_jump: advInputVisible
+      }"
+    >
       <input
-        (change)="this.inputService.adjustFormValues($event, this.tripForm, this.presets)"
+        (change)="
+          this.inputService.adjustFormValues(
+            $event,
+            this.tripForm,
+            this.presets
+          )
+        "
         matInput
         placeholder="Average Speed"
         id="avg_speed"
@@ -142,14 +143,22 @@
       />
     </mat-form-field>
     <mat-form-field
-    [ngClass]="{
-      'hideToStart' : !advInputVisible,
-      'item_S' : !advInputVisible,
-      'item_S_jump' : advInputVisible }">
+      [ngClass]="{
+        hideToStart: !advInputVisible,
+        item_S: !advInputVisible,
+        item_S_jump: advInputVisible
+      }"
+    >
       <input
         matInput
         placeholder="Hours Driving Per Day"
-        (change)="this.inputService.adjustFormValues($event, this.tripForm, this.presets)"
+        (change)="
+          this.inputService.adjustFormValues(
+            $event,
+            this.tripForm,
+            this.presets
+          )
+        "
         id="hours_driving"
         type="number"
         min="1"
@@ -158,24 +167,26 @@
         formControlName="hours_driving"
       />
     </mat-form-field>
-</div>
+  </div>
 
-  <mat-form-field    [ngClass]="{
-    'item_T' : !advInputVisible,
-    'item_T_jump' : advInputVisible }">
+  <mat-form-field
+    [ngClass]="{
+      item_T: !advInputVisible,
+      item_T_jump: advInputVisible
+    }"
+  >
     <input
       matInput
-      [ngxMatDatetimePicker]="picker" 
+      [ngxMatDatetimePicker]="picker"
       placeholder="Departure Date/Time"
       [min]="currentTime"
       id="depart_time"
       formControlName="depart_time"
-      [disabled]="disabled">
-    <mat-datepicker-toggle 
-      matSuffix 
-      [for]="picker">
-    </mat-datepicker-toggle>
-    <ngx-mat-datetime-picker #picker
+      [disabled]="disabled"
+    />
+    <mat-datepicker-toggle matSuffix [for]="picker"> </mat-datepicker-toggle>
+    <ngx-mat-datetime-picker
+      #picker
       [showSpinners]="showSpinners"
       [showSeconds]="showSeconds"
       [stepHour]="stepHour"
@@ -183,12 +194,15 @@
       [stepSecond]="stepSecond"
       [touchUi]="touchUi"
       [color]="color"
-      [enableMeridian]="enableMeridian">
+      [enableMeridian]="enableMeridian"
+    >
     </ngx-mat-datetime-picker>
   </mat-form-field>
 
-  <div class="item_U"
-    [ngClass]="advInputVisible ? 'item_U_jump' : 'item_U_not_jump'">
+  <div
+    class="item_U"
+    [ngClass]="advInputVisible ? 'item_U_jump' : 'item_U_not_jump'"
+  >
     <button
       id="create_route_btn"
       type="submit"
@@ -198,5 +212,5 @@
     >
       Create Route
     </button>
-  </div> 
+  </div>
 </form>

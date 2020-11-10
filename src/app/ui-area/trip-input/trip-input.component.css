@@ -23,13 +23,18 @@ mat-form-field {
 .item_A {
   margin: auto auto auto 35px;
 }
-.item_E, .item_K {
-  margin: 50px auto auto 50px;
+.item_AA {
+  margin: 11px auto auto 50px;
+}
+.item_E {
+  margin: 30px auto auto 50px;
 }
 .item_F {
   margin: auto auto 0 35px;
 }
-.item_H, .item_I, .item_J {
+.item_H,
+.item_I,
+.item_J {
   margin-bottom: 0;
 }
 .item_U_not_jump {
@@ -37,9 +42,6 @@ mat-form-field {
 }
 .item_U_jump {
   margin: 5px auto auto 184px;
-}
-.item_K {
-  display: none;
 }
 .item_P_tall {
   background-color: #f7f7f7;
@@ -49,7 +51,9 @@ mat-form-field {
   margin-bottom: 10px;
   width: 185px;
 }
-.item_S, .item_R, .item_Q_jump {
+.item_S,
+.item_R,
+.item_Q_jump {
   margin-right: 17px;
 }
 .item_T_jump {

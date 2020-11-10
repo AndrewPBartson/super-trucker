@@ -1,22 +1,26 @@
-.item_A {
+.item_AA {
   grid-column-start: 1;
-  grid-row-start: 3;
+  grid-row: 2 / 4;
 }
-.item_B {
+.item_A {
   grid-column-start: 1;
   grid-row-start: 4;
 }
-.item_C {
+.item_B {
   grid-column-start: 1;
   grid-row-start: 5;
 }
-.item_D {
+.item_C {
   grid-column-start: 1;
   grid-row-start: 6;
 }
+.item_D {
+  grid-column-start: 1;
+  grid-row-start: 7;
+}
 .item_E {
   grid-column-start: 1;
-  grid-row: 7 / 10;
+  grid-row: 8 / 10;
 }
 .item_F {
   grid-column-start: 1;
@@ -26,17 +30,13 @@
   grid-column-start: 1;
   grid-row: 11 / 13;
   display: grid;
-  grid-template-rows: repeat(3, 36px)
-}
-.item_K {
-  grid-column-start: 1;
-  grid-row: 12 / 14;
+  grid-template-rows: repeat(3, 36px);
 }
 .item_L {
   grid-column-start: 1;
   grid-row: 16 / 18;
 }
-/**** right column starts here ****/
+/****   begin right column   ****/
 .item_N {
   grid-column-start: 2;
   grid-row: 2 / 4;
