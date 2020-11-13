@@ -1,39 +1,40 @@
-const axios = require('axios')
-const polyline = require('polyline')
+const axios = require('axios');
+const polyline = require('polyline');
+const keys = require('../../config/keys');
 
 function setIntervalsPerDay(miles_per_day, total_mi) {
-  let num_days = total_mi/ miles_per_day
+  let num_days = total_mi / miles_per_day
   let divide_by;
   if (num_days >= 24) {  // gray
     divide_by = -1;
-  } 
+  }
   else if (num_days < 24 && num_days >= 12) {  // green
     divide_by = 1;
-  } 
+  }
   else if (num_days < 24 && miles_per_day < 20) {  // dark green
     divide_by = 1;
   }
-  else if ((num_days < 12 && num_days >= 6 ) && miles_per_day >= 20) {  // violet
+  else if ((num_days < 12 && num_days >= 6) && miles_per_day >= 20) {  // violet
     divide_by = 2;
   }
-  else if (num_days < 12 && (miles_per_day < 60 && miles_per_day >= 20) ) {  // dark violet
+  else if (num_days < 12 && (miles_per_day < 60 && miles_per_day >= 20)) {  // dark violet
     divide_by = 2;
   }
   else if (num_days < 6 && num_days >= 4) {  // blue
     divide_by = 4;
-  } 
+  }
   else if ((miles_per_day >= 60 && miles_per_day < 600) && num_days < 4) {  // dark blue
     divide_by = 4;
   }
   else if (miles_per_day >= 600 && (num_days < 4 && num_days >= 3)) {  // orange
     divide_by = 6;
-  }  
+  }
   else if ((miles_per_day >= 600 && miles_per_day < 800) && num_days < 3) {  // dark orange
     divide_by = 6;
-  } 
+  }
   else if (miles_per_day >= 800 && (num_days < 3)) {  // yellow
     divide_by = 8;
-  } 
+  }
   return divide_by;
 }
 
@@ -44,7 +45,7 @@ function calcFirstWayPoints(trip, response_1) {
   trip.total_mi = trip.total_meters / 1609.34
   trip.num_intervals = setIntervalsPerDay(trip.miles_per_day, trip.total_mi);
   trip.meters_per_interval = trip.meters_per_day / trip.num_intervals;
-  trip.miles_per_interval = trip.miles_per_day / trip.num_intervals; 
+  trip.miles_per_interval = trip.miles_per_day / trip.num_intervals;
   // take G_maps trip summary polyline and convert
   // to array of lat/lng coordinates
   trip.all_points = polyline.decode(response_1.data.routes[0].overview_polyline.points)
@@ -79,7 +80,7 @@ function calcFirstWayPoints(trip, response_1) {
     count += trip.num_segments_in_leg_array[i]
   }
   // push destination
-  trip.way_points.push(trip.all_points[trip.all_points.length - 1]) 
+  trip.way_points.push(trip.all_points[trip.all_points.length - 1])
   trip.way_points_indexes.push(trip.all_points.length - 1);
   // now trip.way_points contains a first approximation of where stopping places should be
   return trip
@@ -90,7 +91,7 @@ function getInitialTripData(req, res, next) {
   let format_end_point = req.trip.end_point.split(" ").join("+");
   let trip_url = `https://maps.googleapis.com/maps/api/directions/json?origin=
     ${format_origin}&destination=${format_end_point}
-    &key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
+    &key=${keys.GMkey}`
   return axios.get(trip_url)
     .then(response_1 => {
       if (!response_1.data || response_1.data.status === "NOT_FOUND") {

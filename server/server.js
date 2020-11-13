@@ -3,12 +3,20 @@ const app = express();
 const port = process.env.PORT || 3001;
 const morgan = require('morgan');
 const cors = require('cors');
-let routes = require('./routes');
+const routes = require('./routes');
+const mongoose = require('mongoose');
 
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(cors());
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
+
+const dbURI = require('../config/keys').mongoURI;
+mongoose
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -20,7 +28,7 @@ app.use((req, res, next) => {
 app.use(routes.users);
 app.use(routes.trips);
 
-// it seems that angular handles the root requests, because this
+// it seems that angular handles root requests, because this
 // doesn't get called:
 // app.get('/', (req, res, next) => {
 //   res.send(`Hello from Earth!`)

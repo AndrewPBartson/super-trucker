@@ -16,28 +16,28 @@ function build_trip(req, res, next) {
   setupDataStructure(req, res, next);
   return getInitialTripData(req, res, next)
     .then(req => {
-      return fixWayPoints(req, res, next); 
+      return fixWayPoints(req, res, next);
     })
     .then(req => {
-      createTripPath(req, res, next); 
+      createTripPath(req, res, next);
       // add times and locations along route
       createTimePoints(req, res, next);
 
       return getAllWeatherData(req, res, next);
-      })
-        // .then(req => {
-        //    // if user wants services (hotels, truck stops), 
-        //    // gather extra nearby way points for
-        //    // search purposes
-        //   if (Object.keys(req.trip.services).length !== 0) {
-        //     getExtraWayPoints(req, res, next)
-        //     searchForServicesSet(req, res, next)
-        //   } 
-        // return req; 
-        // })  
-              
-    .then(req => { 
-      return createMatrix(req, res, next)    
+    })
+    // .then(req => {
+    //    // if user wants services (hotels, truck stops), 
+    //    // gather extra nearby way points for
+    //    // search purposes
+    //   if (Object.keys(req.trip.services).length !== 0) {
+    //     getExtraWayPoints(req, res, next)
+    //     searchForServicesSet(req, res, next)
+    //   } 
+    // return req; 
+    // })  
+
+    .then(req => {
+      return createMatrix(req, res, next)
     })
     .catch(err => {
       console.log(err);

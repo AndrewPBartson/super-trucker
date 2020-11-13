@@ -98,7 +98,7 @@ function createTimePoints(req, res, next) {
    if (depart_time + legs[0].duration.msec < midnight) {
       timer = depart_time;
    } else {    
-      // corner case - start time is too close to midnight,
+      // edge case - start time is too close to midnight,
       // delay start time until next morning 
       if (break_period < 21600000) {
          timer = midnight + break_period; }

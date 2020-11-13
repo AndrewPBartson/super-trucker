@@ -1,6 +1,15 @@
-const { createLogicalOr } = require('typescript');
-let model = require('../models');
+const Trip = require('../models/Trip');
 let { build_trip } = require('./trip_builder');
+
+
+function randomStr(length) {
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  var result = '';
+  for (var i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 function getAllTripsController(req, res, next) {
   model.trips.getAllTrips()
@@ -16,7 +25,7 @@ function getTripByIdController(req, res, next) {
   else {
     model.trips.getTripById(req.params.id)
       .then((result) => {
-        if(result) {
+        if (result) {
           res.status(200).json(result);
         }
         else {
@@ -24,23 +33,29 @@ function getTripByIdController(req, res, next) {
           next({ message: 'ID not found' });
         }
       })
-    }
+  }
 }
 
 function createTripController(req, res, next) {
   build_trip(req, res, next)
-  .then(req => {
-      // // save trip to db
-      //   model.trips.createTrip(req.body)
-      //   .then(trips => {
-      //   res.status(201).json(trips[0]);
-      // })
-      // res.json(req);
-      res.json(req.payload);  
+    .then(req => {
+      res.json(req.payload);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
-    });
+    })
+    .finally(req => {
+      const newTrip = new Trip({
+        name: req.body.name ? req.body.name : randomStr(4),
+        notes: req.body.notes,
+        origin: req.body.origin,
+        end_point: req.body.end_point,
+        hrs_driving: req.body.hrs_driving,
+        avg_speed: req.body.avg_speed,
+        miles_per_day: req.body.miles_per_day
+      })
+      newTrip.save()
+    })
 }
 
 function updateTripController(req, res, next) {
@@ -64,15 +79,15 @@ function deleteTripController(req, res, next) {
   }
   else {
     model.trips.deleteTrip(req.params.id)
-    .then((result) => {
-      if(result) {
-        res.status(200).json({ result });
-      }
-      else {
-        res.status(404);
-        next({ message: 'ID not found' });
-      }
-    })
+      .then((result) => {
+        if (result) {
+          res.status(200).json({ result });
+        }
+        else {
+          res.status(404);
+          next({ message: 'ID not found' });
+        }
+      })
   }
 }
 

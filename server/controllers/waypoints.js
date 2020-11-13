@@ -1,7 +1,8 @@
-const axios = require('axios')
+const axios = require('axios');
+const keys = require('../../config/keys');
 
 function checkLegDistances(trip) {
-  // for testing during development - can be commented out
+  // for debugging during development
   let total = 0;
   let avg = 0;
   let array_1 = [];
@@ -35,7 +36,7 @@ function createTestUrl(trip) {
     trip.test_url += trip.way_points[i];
     trip.test_url += '/';
   }
-  trip.test_url += `&key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
+  trip.test_url = `${trip.test_url}&key=${keys.GMkey}`;
   // console.log('trip.test_url (for checking waypoints):>> ', trip.test_url);
   return trip.test_url;
 }
@@ -50,7 +51,7 @@ function getMeterCounts(trip) {
   let count = 0;
 
   for (let i = 0; i < num_legs_round; i++) {
-    current_step = leg_distances[i] / trip.num_segments_in_leg_array[i]  
+    current_step = leg_distances[i] / trip.num_segments_in_leg_array[i]
 
     for (let j = 0; j < trip.num_segments_in_leg_array[i]; j++) {
       running_total += current_step
@@ -85,7 +86,7 @@ function findMeterCountAtBreakPoints(req) {
   // find value closest to each stopping point - 'target_meters'. 
   for (let b = 0; b < meter_counts.length; b++) {
     // if first one
-    if (b == 0) {  
+    if (b == 0) {
       req.trip.way_points.push(all_points[b])
       req.trip.way_points_indexes.push(b)
     }
@@ -120,16 +121,15 @@ function findMeterCountAtBreakPoints(req) {
 }
 
 function setUrlWithWayPoints(trip) {
-  let { way_points } = trip
-  trip.trip_url = `https://maps.googleapis.com/maps/api/directions/json?origin=`
-  trip.trip_url += way_points[0] + "&destination=" + way_points[way_points.length - 1] + "&waypoints=";
+  let { way_points } = trip;
+  trip.trip_url = `https://maps.googleapis.com/maps/api/directions/json?origin=${way_points[0]}&destination=${way_points[way_points.length - 1]}&waypoints=`;
   for (let i = 1; i < trip.way_points.length - 1; i++) {
     trip.trip_url += way_points[i];
     if (i !== trip.way_points.length - 2) {
       trip.trip_url += '|';
     }
   }
-  trip.trip_url += `&key=AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac`
+  trip.trip_url = `${trip.trip_url}&key=${keys.GMkey}`;
   return trip
 }
 
@@ -197,18 +197,18 @@ function isResultFinal(result, old_A, old_B, old_C, iterations) {
   // That's why it's necessary to compare current solution to 
   // previous solution AND the solution before that
   let answer = false;
-    if ((JSON.stringify(result) === JSON.stringify(old_A)) || 
-        (JSON.stringify(result) === JSON.stringify(old_B)) || 
-        (JSON.stringify(result) === JSON.stringify(old_C))) {
-      answer = true;
-    }
-    // for debugging:
-    console.log('                                                    old : ' + JSON.stringify(old_A));
-    console.log('iteration ' + iterations + '  :  '+  JSON.stringify(result)); 
+  if ((JSON.stringify(result) === JSON.stringify(old_A)) ||
+    (JSON.stringify(result) === JSON.stringify(old_B)) ||
+    (JSON.stringify(result) === JSON.stringify(old_C))) {
+    answer = true;
+  }
+  // for debugging:
+  console.log('                                                    old : ' + JSON.stringify(old_A));
+  console.log('iteration ' + iterations + '  :  ' + JSON.stringify(result));
   return answer;
 }
 
-function savePreviousData (req) {
+function savePreviousData(req) {
   req.trip.old_way_pts_3_indexes = req.trip.old_way_pts_2_indexes;
   req.trip.old_way_pts_2_indexes = req.trip.old_way_pts_indexes;
   req.trip.old_way_pts_indexes = req.trip.way_points_indexes;
@@ -246,9 +246,9 @@ const fixWayPoints = async (req, res, next) => {
     calibrateMeterCounts(req.trip)
     findMeterCountAtBreakPoints(req)
     isFinal = isResultFinal(
-      req.trip.way_points_indexes, 
-      req.trip.old_way_pts_indexes, 
-      req.trip.old_way_pts_2_indexes, 
+      req.trip.way_points_indexes,
+      req.trip.old_way_pts_indexes,
+      req.trip.old_way_pts_2_indexes,
       req.trip.old_way_pts_3_indexes,
       iterations);
     iterations++;
@@ -259,7 +259,7 @@ const fixWayPoints = async (req, res, next) => {
       isFinal = true;
       req.trip.response.raw_data = response;
       createTestUrl(req.trip);
-    }   
+    }
   }
   return req;
 }
