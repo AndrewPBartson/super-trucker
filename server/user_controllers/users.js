@@ -116,7 +116,7 @@ function createUserController(req, res, next) {
   // res.send(`Hello from Earth: Be Happy`)
   console.log('createUserController() - req.body :', req.body);
   if (isValidUserInput(req.body)) {
-    console.log('req.body :>> ', req.body);
+    // console.log('req.body :>> ', req.body);
     console.log('user is valid, proceed');
     // // save to db
     // model.users.createUser(req.body)

@@ -86,12 +86,12 @@ function findMeterCountAtBreakPoints(req) {
   // find value closest to each stopping point - 'target_meters'. 
   for (let b = 0; b < meter_counts.length; b++) {
     // if first one
-    if (b == 0) {
+    if (b === 0) {
       req.trip.way_points.push(all_points[b])
       req.trip.way_points_indexes.push(b)
     }
     // if last one
-    if (b == meter_counts.length - 1) {
+    if (b === meter_counts.length - 1) {
       req.trip.way_points.push(all_points[b])
       req.trip.way_points_indexes.push(b)
       req.trip.num_segments_in_leg_array.push(count_to_next_hit)
@@ -134,11 +134,12 @@ function setUrlWithWayPoints(trip) {
 }
 
 function getExtraWayPoints(req, res, next) {
-  let { all_points, way_points_indexes, way_points_set } = req.trip
+  let { all_points, way_points_indexes, way_points_extra } = req.trip
   let way_pt_obj;
   // prev, next are points on either side of selected point (stop)
   // they provide additional areas to search when 
   // results come back empty (not implemented yet)
+  // In the end, for hotels, don't search at enroute nodes, just rest_stops
   for (let a = 0, i = 0; a < all_points.length; a++) {
     way_pt_obj = { prev: null, stop: null, next: null }
     if (all_points[a] === way_points_indexes[i]) {
@@ -158,7 +159,7 @@ function getExtraWayPoints(req, res, next) {
         way_pt_obj.next = [...trip.all_points[a + 1]]
         i++
       }
-      way_points_set.push(way_pt_obj)
+      way_points_extra.push(way_pt_obj)
     }
   }
   return req
@@ -170,9 +171,8 @@ function reviewFinalData(trip) {
       total_meters -  ${trip.total_meters}
       meters_per_day -  ${trip.meters_per_day}
       length of second leg -  ${trip.leg_distances[1]}
-      total mi -  ${trip.total_mi}
+      total miles -  ${trip.total_meters / 1609.34}
       miles_per_day -  ${trip.miles_per_day}
-      miles_per_half_day -  ${trip.miles_per_half_day}
       all_points.length -  ${trip.all_points.length}  
       meter_counts.length -  ${trip.meter_counts.length}
       num_segments -  ${trip.num_segments}
@@ -192,10 +192,10 @@ function reviewFinalData(trip) {
 }
 
 function isResultFinal(result, old_A, old_B, old_C, iterations) {
-  // In most cases, the calculations of way points do not stabilize. 
-  // Rather they keep flipping between two (or three) very similar solutions.
+  // Often calculation of way points doesn't stabilize 
+  // Rather they keep flipping between two or three very similar solutions.
   // That's why it's necessary to compare current solution to 
-  // previous solution AND the solution before that
+  // the TWO previous solutions
   let answer = false;
   if ((JSON.stringify(result) === JSON.stringify(old_A)) ||
     (JSON.stringify(result) === JSON.stringify(old_B)) ||
@@ -203,8 +203,8 @@ function isResultFinal(result, old_A, old_B, old_C, iterations) {
     answer = true;
   }
   // for debugging:
-  console.log('                                                    old : ' + JSON.stringify(old_A));
-  console.log('iteration ' + iterations + '  :  ' + JSON.stringify(result));
+  // console.log('old : ' + JSON.stringify(old_A));
+  // console.log('iteration ' + iterations + '  :  ' + JSON.stringify(result));
   return answer;
 }
 
@@ -253,7 +253,7 @@ const fixWayPoints = async (req, res, next) => {
       iterations);
     iterations++;
     // if last iteration, add raw route data and test url to response for debugging and stuff
-    // for development, use iterations > 2, produces less polished route
+    // for development, use iterations > 2, produces less polished route.
     // for production, use iterations > 6:
     if (isFinal || iterations > 2) {
       isFinal = true;

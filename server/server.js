@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 8880;
 const morgan = require('morgan');
 const cors = require('cors');
 const routes = require('./routes');
@@ -36,13 +36,13 @@ app.use(routes.trips);
 
 // last middleware (except error MW) handles req w/ no matching route
 app.use((req, res, next) => {
-  res.status(404).json({ error: { message: 'Not found - status 404' }})
+  res.status(404).json({ error: { message: 'Not found - status 404' } })
 });
 
 // middleware with 4 arguments is only called in case of error
 app.use((err, req, res, next) => {
   console.log('err.status - ', err.status);
-  res.status(500).json({error: { message: `Whaaaat?   ${err}` } })
+  res.status(500).json({ error: { message: `Whaaaat?   ${err}` } })
   // this also works:
   // res.status(500).json(err.message)
 });

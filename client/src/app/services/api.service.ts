@@ -9,13 +9,15 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  apiURL: string = 'http://localhost:3001';
+  apiURL: string = 'http://localhost:8880';
   football: {};
 
   private input: InputModel = {
     origin: '',
     end_point: '',
-    miles_per_day: 0
+    miles_per_day: 0,
+    timezone_user: '',
+    time_str_user: ''
   };
 
   constructor(private httpClient: HttpClient) { }

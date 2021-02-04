@@ -1,9 +1,9 @@
 <form [formGroup]="tripForm" (ngSubmit)="onGetRoute()" class="inputForm">
   <div class="item_AA">
-    <!-- <button (click)="showMoreLess()" id="login_btn" type="button" mat-raised-button></button> -->
-    <button id="login_btn" type="button" mat-raised-button>Login/Register</button>
+    <button id="login_btn" type="button" mat-raised-button>
+      Login/Register
+    </button>
   </div>
-
   <div class="sectionText item_A">Add Options to Trip:</div>
   <mat-checkbox
     id="weather"
@@ -182,7 +182,6 @@
       [min]="currentTime"
       id="depart_time"
       formControlName="depart_time"
-      [disabled]="disabled"
     />
     <mat-datepicker-toggle matSuffix [for]="picker"> </mat-datepicker-toggle>
     <ngx-mat-datetime-picker
@@ -198,7 +197,19 @@
     >
     </ngx-mat-datetime-picker>
   </mat-form-field>
-
+  <mat-form-field
+    [ngClass]="{
+      item_TT: !advInputVisible,
+      item_TT_jump: advInputVisible
+    }"
+  >
+    <mat-label>Home Time Zone</mat-label>
+    <select matNativeControl formControlName="timezone_user" id="tmezone_user">
+      <option *ngFor="let item of selections" [selected]="false" [value]="item">
+        {{ item }}
+      </option>
+    </select>
+  </mat-form-field>
   <div
     class="item_U"
     [ngClass]="advInputVisible ? 'item_U_jump' : 'item_U_not_jump'"

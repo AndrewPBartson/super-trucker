@@ -1,0 +1,97 @@
+<div class="row d-flex">
+  <div class="mat-app-background basic-container">
+    <div class="col h3">
+      Trip Plan - {{ trip.params.origin }} to {{ trip.params.end_point }} via
+      {{ trip.params.summary }} {{ trip.nodes[0].parent }}
+    </div>
+    <button mat-raised-button (click)="allExpandState = true">
+      Expand All
+    </button>
+    <button mat-raised-button (click)="allExpandState = false">
+      Collapse All
+    </button>
+
+    <ng-container *ngFor="let node of trip.nodes; index as i">
+      <ng-container *ngFor="let group of trip.day_nodes; index as j">
+        <ng-container *ngFor="let day of trip.day_nodes[j]; index as k">
+          <!-- create panel for each days travel info -->
+          <mat-expansion-panel
+            *ngIf="i === day && k === 0"
+            [expanded]="allExpandState"
+          >
+            <mat-expansion-panel-header>
+              <!-- create title with overview of days travel -->
+              <mat-panel-title>
+                <ng-container *ngIf="trip.day_nodes.length !== j + 1">
+                  <p>
+                    Day {{ j + 1 }} - {{ trip.nodes[i + k].cityState }} to
+                    {{ trip.nodes[i + trip.day_nodes[j].length].cityState }},
+                    {{ trip.nodes[i + trip.day_nodes[j].length].miles_today }},
+                    {{ trip.nodes[i + trip.day_nodes[j].length].hours_today }}
+                  </p>
+                </ng-container>
+                <!-- edge case - final destination -->
+                <ng-container *ngIf="trip.day_nodes.length === j + 1">
+                  <p>End of Trip - {{ trip.nodes[i + k].cityState }}</p>
+                </ng-container>
+              </mat-panel-title>
+              <mat-panel-description>
+                <p *ngIf="node.type === 'end_trip'">
+                  Total miles - {{ trip.params.total_mi }}
+                </p>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <!-- create card for each time_point of the day -->
+            <ng-container *ngFor="let day of trip.day_nodes[j]; index as k2">
+              <ng-container
+                *ngFor="let time of trip.nodes[i + k2].time_points; index as n"
+              >
+                <mat-card
+                  *ngIf="
+                    trip.nodes[i + k2].type === 'start_trip' ||
+                    (trip.nodes[i + k2].type === 'rest_stop' && n === 1) ||
+                    trip.nodes[i + k2].type === 'enroute'
+                  "
+                >
+                  <p>
+                    {{ time.time_text }} - {{ trip.nodes[i + k2].cityState }}
+                  </p>
+                  <p *ngIf="node.type !== 'end_trip'">
+                    {{ trip.nodes[i].next_leg.distance.text_mi }},
+                    {{ trip.nodes[i].next_leg.duration.text }}
+                  </p>
+                </mat-card>
+                <!-- edge case - show arrival for overnight stop -->
+                <mat-card
+                  *ngIf="
+                    trip.nodes[i + k2].type === 'enroute' &&
+                    k2 === trip.day_nodes[j].length - 1
+                  "
+                >
+                  <p>
+                    {{ trip.nodes[i + k2 + 1].time_points[0].time_text }} -
+                    {{ trip.nodes[i + k2 + 1].cityState }}
+                  </p>
+                </mat-card>
+              </ng-container>
+            </ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+    <mat-expansion-panel
+      [expanded]="allExpandState"
+      (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false"
+    >
+      <mat-expansion-panel-header>
+        <mat-panel-title> Self aware panel </mat-panel-title>
+        <mat-panel-description>
+          Currently I am {{ panelOpenState ? "open" : "closed" }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <p>I'm visible because I am open</p>
+    </mat-expansion-panel>
+  </div>
+</div>

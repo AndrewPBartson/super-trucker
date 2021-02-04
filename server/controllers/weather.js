@@ -1,117 +1,190 @@
 const axios = require('axios');
+const keys = require('../../config/keys');
 
-// function sendWeatherRequest(req, res, next) {
-//   let lat = 40.401638;
-//   let lng = -111.850373;
-
-//   let url_weather = 'https://api.weather.gov/points/' + lat + ',' + lng + '/forecast';
-// let url_weather = 'https://api.weather.gov/points/' + lat + ',' + lng + '/forecast';
-
-//   return axios.get(url_weather)
-//     .then(response => {
-//       if (!response.data || response.data.status === "NOT_FOUND") {
-//         console.log(`search term(s) not found :(`);
-//         return;  // What is supposed to happen when this returns?
-//       }
-//       console.log('response.data :>> ', response.data);
-//       return req;
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-// }
-
-let getPointData = function(url) {
-  console.log('enter getPointData()');
-  return axios.get(url);
+function createUrlsNOAA(req) {
+  req.grid_pts_urls = [];
+  let url;
+  for (let i = 0; i < req.trip.way_points.length; i++) {
+    url =
+      'https://api.weather.gov/points/'
+      + req.trip.way_points[i][0] + ','
+      + req.trip.way_points[i][1];
+    req.grid_pts_urls.push(url);
   }
-  let getAllPointData = function() {
-    console.log('enter getAllPointData()'); 
-    // 35.41199,-99.4042228
-    // 35.2665072,-102.5444808
-    // 35.0695266,-104.2121425
-    let promisesArray = [ 
-      getPointData('https://api.weather.gov/points/35.4119,-99.4042/forecast'), 
-      getPointData('https://api.weather.gov/points/35.2665072,-102.544808/forecast'), 
-      getPointData('https://api.weather.gov/points/35.0695266,-104.2121425/forecast')
-    ];
-    return Promise.all(promisesArray);
+}
+
+let getPointNOAA = function (url) {
+  return axios.get(url)
+    .then(point => {
+      let weatherUrl = point.data.properties.forecast
+      return axios.get(weatherUrl)
+    })
+}
+
+let sendRequestsNOAA = function (req, res, next) {
+  let promisesArray = []
+  for (let i = 0; i < req.trip.way_points.length; i++) {
+    promisesArray.push(getPointNOAA(req.grid_pts_urls[i]))
   }
+  return Promise.allSettled(promisesArray);
+}
 
-function getAllWeatherData (req, res, next) {
-  console.log('*****   weather.getAllWeatherData() working!');
-  // let lat;
-  // let lng;
-  // let url_weather;
-  // let weather_urls = [ ];
-  // for (let i = 0; i < req.payload.data.trip.time_points.length; i++) {
-  //   url_weather = 
-  //     'https://api.weather.gov/points/' 
-  //     + req.payload.data.trip.time_points[i].latLng.lat + ',' 
-  //     + req.payload.data.trip.time_points[i].latLng.lng   
-  //     + '/forecast';
-  //   weather_urls.push(url_weather);
-  //   console.log('url_weather :>> ', url_weather);
-  // }
+function getDataNOAA(req, res, next) {
+  createUrlsNOAA(req)
+  return sendRequestsNOAA(req, res, next)
+}
 
+function createUrlsOWM(req) {
+  req.urls_OWM = [];
+  let url;
+  for (let i = 0; i < req.trip.way_points.length; i++) {
+    url =
+      'https://api.openweathermap.org/data/2.5/onecall?lat='
+      + req.trip.way_points[i][0] + '&lon='
+      + req.trip.way_points[i][1]
+      + '&exclude=minutely,hourly&units=imperial&appid='
+      + keys.OWMkey;
+    req.urls_OWM.push(url);
+  }
+}
 
-  // getAllPointData()
-  // .then(function (data) {
-  //   //console.log('data.length :>> ', data.length);
-  //   return req;
-  // })
-  // .catch(val => {
-  //   console.log("rejected: " + val);
-  // })
+const sendRequestsOWM = (req, res, next) => {
+  let promisesArray = []
+  for (let i = 0; i < req.trip.way_points.length; i++) {
+    promisesArray.push(axios.get(req.urls_OWM[i]))
+  }
+  return Promise.all(promisesArray);
+}
 
+const getDataOWM = (req, res, next) => {
+  createUrlsOWM(req)
+  return sendRequestsOWM(req, res, next)
+}
 
-  // weather_urls.forEach(currentUrl => {
-  //   return function(currentUrl) {
-  //     axios.get(currentUrl);
-  //   }
-  // });
+const addSnapshot24 = (pointOWM) => {
+  let snapshot = {
+    "start": (pointOWM.dt * 1000) - 43200000,
+    "end": (pointOWM.dt * 1000) + 43200000,
+    "text24short": pointOWM.weather[0].main,
+    "text24": pointOWM.weather[0].description,
+    "icon_OWM": 'http://openweathermap.org/img/wn/' + pointOWM.weather[0].icon + '@2x.png',
+    "min": Math.round(pointOWM.temp.min),
+    "max": Math.round(pointOWM.temp.max),
+    "wind_speed": pointOWM.wind_speed,
+    "clouds": pointOWM.clouds,
+    "ppt": pointOWM.pop,
+    "rain_amt": pointOWM.rain,
+    "snow_amt": pointOWM.snow,
+    "sunrise": pointOWM.sunrise * 1000,
+    "sunset": pointOWM.sunset * 1000,
+    "noon": pointOWM.dt * 1000,
+    "temps": [
+      {
+        "start": (pointOWM.dt * 1000) - 43200000,
+        "end": (pointOWM.dt * 1000) - 32400000,
+        "name": "night_12_3am",
+        // incorrect - add night temp from previous day as night_am
+        "temp": Math.round(pointOWM.temp.night)
+      },
+      {
+        "start": (pointOWM.dt * 1000) - 32400000,
+        "end": (pointOWM.dt * 1000) - 10800000,
+        "name": "morn_3_9am",
+        "temp": Math.round(pointOWM.temp.morn)
+      },
+      {
+        "start": (pointOWM.dt * 1000) - 10800000,
+        "end": (pointOWM.dt * 1000) + 10800000,
+        "name": "day_9am_3pm",
+        "temp": Math.round(pointOWM.temp.day)
+      }, {
+        "start": (pointOWM.dt * 1000) + 10800000,
+        "end": (pointOWM.dt * 1000) + 32400000,
+        "name": "eve_3_9pm",
+        "temp": Math.round(pointOWM.temp.eve)
+      },
+      {
+        "start": (pointOWM.dt * 1000) + 32400000,
+        "end": (pointOWM.dt * 1000) + 43200000,
+        "name": "night_9pm_12am",
+        "temp": Math.round(pointOWM.temp.night)
+      }
+    ]
+  }
+  return snapshot;
+}
+
+const AddPointForecastOWM = (dataOWM) => {
+  let weather = {
+    "timezone_local": dataOWM.data.timezone,
+    "timezone_id_local": dataOWM.data.timezone_offset / 36,
+    "forecast24hour": [],
+    "forecast12hour": [],
+    "statusNOAA": ""
+  }
+  for (let i = 0; i < dataOWM.data.daily.length; i++) {
+    weather.forecast24hour.push(addSnapshot24(dataOWM.data.daily[i]));
+  }
+  return weather;
+}
+
+const addSnapshot12 = (pointNOAA) => {
+  let snapshot = {
+    "start": Date.parse(pointNOAA.startTime),
+    "end": Date.parse(pointNOAA.endTime),
+    "isDaytime": pointNOAA.isDaytime,
+    "temperature": pointNOAA.temperature,
+    "windSpeed": pointNOAA.windSpeed,
+    "icon_NOAA": pointNOAA.icon,
+    "text12short": pointNOAA.shortForecast,
+    "text12": pointNOAA.detailedForecast
+  }
+  return snapshot;
+}
+const AddPointForecastNOAA = (dataNOAA) => {
+  let forecast12hour = [];
+  if (dataNOAA.status === "fulfilled") {
+    for (let i = 0; i < dataNOAA.value.data.properties.periods.length; i++) {
+      forecast12hour.push(addSnapshot12(dataNOAA.value.data.properties.periods[i]))
+    }
+  }
+  return forecast12hour;
+}
+
+const getWeatherData = (req, res, next) => {
+  return getDataOWM(req, res, next)
+    .then(dataOWM => {
+      for (let i = 0; i < dataOWM.length; i++) {
+        req.trip.weather.push(AddPointForecastOWM(dataOWM[i]));
+      }
+      return getDataNOAA(req, res, next)
+        .then(dataNOAA => {
+          for (let i = 0; i < dataNOAA.length; i++) {
+            console.log('dataNOAA[i].status :>> ', dataNOAA[i].status);
+            req.trip.weather[i].statusNOAA = dataNOAA[i].status;
+            req.trip.weather[i].forecast12hour = (AddPointForecastNOAA(dataNOAA[i]));
+          }
+          return req;
+        })
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+}
+
+module.exports = {
+  getWeatherData
+}
 
   // const fetchURL = (url) => axios.get(url);
   // const promiseArray = weather_urls.map(fetchURL);
-  // console.log('1)  promiseArray :>> ', promiseArray);
 
-  // Promise.all(promiseArray)
-  // .then(data => { 
-  //   console.log('data :>> ', data);
-  //   return req;
-    // console.log(' 2) promiseArray :>> ', promiseArray);
-    // req.payload.data.trip.test = data;
-    // for (let i = 0; i < data.length; i++) {
-    //   console.log('data[i].data.properties.periods[i].detailedForecast :>> ', data[i].data.properties.periods[i].detailedForecast);
-    //   req.payload.data.trip.weather_sets.push(data[i].data.properties);
-    //}  
-    // console.log(' req.payload.data.trip.weather_sets[0]:>> ', req.payload.data.trip.weather_sets[0]); 
-    // return new Promise(function(resolve, reject) {
-    //   resolve(req);
-    // })
- 
-  
+
   // .then(req => {
   //   return new Promise(resolve => {
   //     resolve(req);
   // })
   // })
-  // return req;
-  // return Promise.all(promiseArray)
-  // .then((data) => {
-    // for (let i = 0; i < data.length; i++) {
-    //   console.log('data[i].data.properties.periods[i].detailedForecast :>> ', data[i].data.properties.periods[i].detailedForecast);
-    //   req.payload.data.trip.weather_sets.push(data[i].data.properties);
-    // }
-  // })
-  // .catch((err) => {
-  // });
-  return req;
-}
-
-module.exports = {
-  getAllWeatherData
-}
 
 
 // return new Promise(function(resolve, reject) {

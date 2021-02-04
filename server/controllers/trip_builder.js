@@ -1,43 +1,41 @@
-const { setupDataStructure, isValidTripInput } = require('./trip_input')
+const { setupTripStructure, isValidTripInput } = require('./trip_input')
 const { getInitialTripData } = require('./first_version')
 const { fixWayPoints, getExtraWayPoints } = require('./waypoints')
 const { searchForServicesSet } = require('./services')
+const { getWeatherData } = require('./weather')
 const { createTripPath } = require('./trip_path')
 const { createTimePoints } = require('./time_points')
-const { getAllWeatherData } = require('./weather')
-const { createMatrix } = require('./matrix')
+const { nailPointTimeData } = require('./final_merge')
 
 function build_trip(req, res, next) {
   if (!isValidTripInput(req)) {
-    // don't know how to handle errors in middleware context :(
-    // so do nothing for now
-    // next({ message: 'Invalid or missing trip input' });
+    // coming not very soon!
   }
-  setupDataStructure(req, res, next);
+  setupTripStructure(req, res, next);
   return getInitialTripData(req, res, next)
     .then(req => {
-      return fixWayPoints(req, res, next);
-    })
-    .then(req => {
-      createTripPath(req, res, next);
-      // add times and locations along route
-      createTimePoints(req, res, next);
+      return fixWayPoints(req, res, next)
+        .then(req => {
+          // get weather forecasts for way_points
+          return getWeatherData(req, res, next)
 
-      return getAllWeatherData(req, res, next);
-    })
-    // .then(req => {
-    //    // if user wants services (hotels, truck stops), 
-    //    // gather extra nearby way points for
-    //    // search purposes
-    //   if (Object.keys(req.trip.services).length !== 0) {
-    //     getExtraWayPoints(req, res, next)
-    //     searchForServicesSet(req, res, next)
-    //   } 
-    // return req; 
-    // })  
+            // .then(req => {
+            //   // if user wants services (hotels, truck stops)
+            //   if (req.trip.services.hotels || req.trip.services.truck_stops) {
+            //     // gather extra nearby way points for search purposes
+            //     getExtraWayPoints(req, res, next)
+            //     //return searchForServicesSet(req, res, next)
+            //   }
+            //   return req;
+            // })
 
-    .then(req => {
-      return createMatrix(req, res, next)
+            .then(req => {
+              createTripPath(req, res, next);
+              // add times for locations along route -
+              createTimePoints(req, res, next);
+              return nailPointTimeData(req, res, next);
+            })
+        })
     })
     .catch(err => {
       console.log(err);

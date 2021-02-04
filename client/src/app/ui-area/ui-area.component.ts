@@ -8,18 +8,20 @@ import { ApiService } from '../services/api.service';
 })
 export class UiAreaComponent implements OnInit {
   @Input() enableInput = true;
-  @Input() showSummary = false;
+  @Input() showSummary = true;
+
+  testData = { msg: 'testData' }
 
   constructor(private apiService: ApiService) { }
 
   ngOnInit() {
-    const apiObservable = this.apiService.tellTheOthers();
+    const apiObservable = this.apiService.tellTheOthers(this.testData);
     apiObservable.subscribe(data => {
       this.doStuffWithData(data);
     });
   }
 
-  onInputSubmitted( newUiSettings: { enableInput: boolean, showSummary: boolean}) {
+  onInputSubmitted(newUiSettings: { enableInput: boolean, showSummary: boolean }) {
     this.enableInput = newUiSettings.enableInput;
     this.showSummary = newUiSettings.showSummary;
   }

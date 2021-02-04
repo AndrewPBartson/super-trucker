@@ -11,7 +11,7 @@ function randomStr(length) {
   return result;
 }
 
-function getAllTripsController(req, res, next) {
+function getAllTrips(req, res, next) {
   model.trips.getAllTrips()
     .then((result) => {
       res.status(200).json(result);
@@ -36,7 +36,7 @@ function getTripByIdController(req, res, next) {
   }
 }
 
-function createTripController(req, res, next) {
+function createTrip(req, res, next) {
   build_trip(req, res, next)
     .then(req => {
       res.json(req.payload);
@@ -44,18 +44,18 @@ function createTripController(req, res, next) {
     .catch(function (error) {
       console.log(error);
     })
-    .finally(req => {
-      const newTrip = new Trip({
-        name: req.body.name ? req.body.name : randomStr(4),
-        notes: req.body.notes,
-        origin: req.body.origin,
-        end_point: req.body.end_point,
-        hrs_driving: req.body.hrs_driving,
-        avg_speed: req.body.avg_speed,
-        miles_per_day: req.body.miles_per_day
-      })
-      newTrip.save()
-    })
+  // .finally(req => {
+  //   const newTrip = new Trip({
+  //     name: req.body.name ? req.body.name : randomStr(4),
+  //     notes: req.body.notes,
+  //     origin: req.body.origin,
+  //     end_point: req.body.end_point,
+  //     hrs_driving: req.body.hrs_driving,
+  //     avg_speed: req.body.avg_speed,
+  //     miles_per_day: req.body.miles_per_day
+  //   })
+  //   newTrip.save()
+  // })
 }
 
 function updateTripController(req, res, next) {
@@ -92,9 +92,9 @@ function deleteTripController(req, res, next) {
 }
 
 module.exports = {
-  getAllTripsController,
+  getAllTrips,
   getTripByIdController,
-  createTripController,
+  createTrip,
   updateTripController,
   deleteTripController
 }

@@ -86,12 +86,20 @@
   grid-column-start: 2;
   grid-row: 13 / 15;
 }
-.item_U {
+.item_TT {
+  grid-column-start: 2;
   grid-row: 10 / 12;
+}
+.item_TT_jump {
+  grid-column-start: 2;
+  grid-row: 15 / 17;
+}
+.item_U {
+  grid-row: 12 / 14;
   grid-column: 1 / 3;
 }
 .item_U_jump {
-  grid-row: 15 / 17;
+  grid-row: 17 / 19;
   grid-column: 1 / 3;
 }
 .hideToStart {

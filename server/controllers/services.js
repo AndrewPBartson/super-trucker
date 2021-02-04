@@ -36,18 +36,18 @@ function searchForServices(trip, item) {
 }
 
 function searchForServicesSet(req, res, next) {
-  // mostly commented out - too many hits on Google Places
   let count = 0;
   let promises = [];
+  // commented out - too many hits on Google Places
   // iterate each way point set which consists of stop point plus 2 nearby ones
-  // for (let i = 1; i < trip.exports.way_points_set.length; i++) { 
-  //   // do three searches for way_points_set, one for each of the three
-  //   promises.push(searchForServices(trip, trip.exports.way_points_set[i].stop))
-  //   if (trip.exports.way_points_set[i].prev.points) {
-  //     promises.push(searchForServices(trip, trip.exports.way_points_set[i].prev))
+  // for (let i = 1; i < trip.exports.way_points_extra.length; i++) { 
+  //   // do three searches for way_points_extra, one for each of the three
+  //   promises.push(searchForServices(trip, trip.exports.way_points_extra[i].stop))
+  //   if (trip.exports.way_points_extra[i].prev.points) {
+  //     promises.push(searchForServices(trip, trip.exports.way_points_extra[i].prev))
   //   }
-  //   if (trip.exports.way_points_set[i].next.points) {
-  //     promises.push(searchForServices(trip, trip.exports.way_points_set[i].next))
+  //   if (trip.exports.way_points_extra[i].next.points) {
+  //     promises.push(searchForServices(trip, trip.exports.way_points_extra[i].next))
   //   }
   // }
   return Promise.all(promises)

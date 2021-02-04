@@ -3,8 +3,8 @@ const router = express.Router()
 const controllers = require('../controllers')
 
 router.route('/trips')
-  .get(controllers.trips.getAllTripsController)
-  .post(controllers.trips.createTripController)
+  .get(controllers.trips.getAllTrips)
+  .post(controllers.trips.createTrip)
 
 router.route('/trips/:id')
   .get(controllers.trips.getTripByIdController)
