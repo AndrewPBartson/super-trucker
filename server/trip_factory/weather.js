@@ -2,29 +2,29 @@ const axios = require('axios');
 const keys = require('../../config/keys');
 
 function createUrlsNOAA(req) {
-  req.grid_pts_urls = [];
-  let url;
-  for (let i = 0; i < req.trip.way_points.length; i++) {
-    url =
+  req.factory.urls_NOAA = [];
+  let url_NOAA_prelim;
+  for (let i = 0; i < req.factory.way_points.length; i++) {
+    url_NOAA_prelim =
       'https://api.weather.gov/points/'
-      + req.trip.way_points[i][0] + ','
-      + req.trip.way_points[i][1];
-    req.grid_pts_urls.push(url);
+      + req.factory.way_points[i][0] + ','
+      + req.factory.way_points[i][1];
+    req.factory.urls_NOAA.push(url_NOAA_prelim);
   }
 }
 
 let getPointNOAA = function (url) {
   return axios.get(url)
     .then(point => {
-      let weatherUrl = point.data.properties.forecast
-      return axios.get(weatherUrl)
+      let url_NOAA_final = point.data.properties.forecast
+      return axios.get(url_NOAA_final)
     })
 }
 
 let sendRequestsNOAA = function (req, res, next) {
   let promisesArray = []
-  for (let i = 0; i < req.trip.way_points.length; i++) {
-    promisesArray.push(getPointNOAA(req.grid_pts_urls[i]))
+  for (let i = 0; i < req.factory.way_points.length; i++) {
+    promisesArray.push(getPointNOAA(req.factory.urls_NOAA[i]))
   }
   return Promise.allSettled(promisesArray);
 }
@@ -35,23 +35,24 @@ function getDataNOAA(req, res, next) {
 }
 
 function createUrlsOWM(req) {
-  req.urls_OWM = [];
+  req.factory.urls_OWM = [];
   let url;
-  for (let i = 0; i < req.trip.way_points.length; i++) {
+  for (let i = 0; i < req.factory.way_points.length; i++) {
+
     url =
       'https://api.openweathermap.org/data/2.5/onecall?lat='
-      + req.trip.way_points[i][0] + '&lon='
-      + req.trip.way_points[i][1]
+      + req.factory.way_points[i][0] + '&lon='
+      + req.factory.way_points[i][1]
       + '&exclude=minutely,hourly&units=imperial&appid='
       + keys.OWMkey;
-    req.urls_OWM.push(url);
+    req.factory.urls_OWM.push(url);
   }
 }
 
 const sendRequestsOWM = (req, res, next) => {
   let promisesArray = []
-  for (let i = 0; i < req.trip.way_points.length; i++) {
-    promisesArray.push(axios.get(req.urls_OWM[i]))
+  for (let i = 0; i < req.factory.way_points.length; i++) {
+    promisesArray.push(axios.get(req.factory.urls_OWM[i]))
   }
   return Promise.all(promisesArray);
 }
@@ -155,14 +156,14 @@ const getWeatherData = (req, res, next) => {
   return getDataOWM(req, res, next)
     .then(dataOWM => {
       for (let i = 0; i < dataOWM.length; i++) {
-        req.trip.weather.push(AddPointForecastOWM(dataOWM[i]));
+        req.payload.data.trip.weather.push(AddPointForecastOWM(dataOWM[i]));
       }
       return getDataNOAA(req, res, next)
         .then(dataNOAA => {
           for (let i = 0; i < dataNOAA.length; i++) {
             console.log('dataNOAA[i].status :>> ', dataNOAA[i].status);
-            req.trip.weather[i].statusNOAA = dataNOAA[i].status;
-            req.trip.weather[i].forecast12hour = (AddPointForecastNOAA(dataNOAA[i]));
+            req.payload.data.trip.weather[i].statusNOAA = dataNOAA[i].status;
+            req.payload.data.trip.weather[i].forecast12hour = (AddPointForecastNOAA(dataNOAA[i]));
           }
           return req;
         })

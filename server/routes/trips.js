@@ -7,9 +7,9 @@ router.route('/trips')
   .post(controllers.trips.createTrip)
 
 router.route('/trips/:id')
-  .get(controllers.trips.getTripByIdController)
-  .patch(controllers.trips.updateTripController)
-  .put(controllers.trips.updateTripController)
-  .delete(controllers.trips.deleteTripController)
+  .get(controllers.trips.getTripById)
+  .patch(controllers.trips.updateTrip)
+  .put(controllers.trips.updateTrip)
+  .delete(controllers.trips.deleteTrip)
 
 module.exports = router

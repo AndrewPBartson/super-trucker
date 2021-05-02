@@ -24,7 +24,7 @@ export class TripSummaryComponent implements OnInit {
 
   ngOnInit() {
     this.trip = {
-      "params": {
+      "overview": {
         "origin": "Elk City OK",
         "end_point": "Holbrook AZ",
         "start_time": 1612317375705,

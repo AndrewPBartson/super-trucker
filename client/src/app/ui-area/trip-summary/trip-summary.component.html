@@ -1,8 +1,9 @@
 <div class="row d-flex">
   <div class="mat-app-background basic-container">
     <div class="col h3">
-      Trip Plan - {{ trip.params.origin }} to {{ trip.params.end_point }} via
-      {{ trip.params.summary }} {{ trip.nodes[0].parent }}
+      Trip Plan - {{ trip.overview.origin }} to
+      {{ trip.overview.end_point }} via
+      {{ trip.overview.summary }}
     </div>
     <button mat-raised-button (click)="allExpandState = true">
       Expand All
@@ -37,7 +38,7 @@
               </mat-panel-title>
               <mat-panel-description>
                 <p *ngIf="node.type === 'end_trip'">
-                  Total miles - {{ trip.params.total_mi }}
+                  Total miles - {{ trip.overview.total_mi }}
                 </p>
               </mat-panel-description>
             </mat-expansion-panel-header>

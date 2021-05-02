@@ -1,11 +1,11 @@
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const keys = require('../../config/keys')
+const keys = require('../../config/keys');
+// load User model
 const User = require('../models/User');
-// let model = require('../models');
 
-// @route    POST /register
+// @route    POST /users/register
 // @desc     Register user
 // @access   Public
 const register = (req, res, next) => {
@@ -43,7 +43,7 @@ const register = (req, res, next) => {
     .catch(err => console.log(err))
 }
 
-// @route    POST /login
+// @route    POST /users/login
 // @desc     Login user / return JWT token
 // @access   Public
 const login = (req, res, next) => {

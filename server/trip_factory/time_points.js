@@ -1,4 +1,4 @@
-const { secondsToTimeString } = require('./trip_path');
+const { secondsToTimeString } = require('./trip_nodes');
 
 function setTimePointData(timeStamp, label, node_data) {
    return {
@@ -40,15 +40,15 @@ function setNextStartTime(end_time, drive_time_msec, midnight) {
    return start_time;
 }
 const calcNextMidnight = (start_time, timezone) => {
-   let midnight_0 = new Date(start_time);
-   midnight_0.setHours(0);
-   midnight_0.setMinutes(0);
-   midnight_0.setSeconds(0);
-   midnight_0.setMilliseconds(0);
-   let midnight = midnight_0.getTime();
+   let midnight = new Date(start_time);
+   midnight.setHours(0);
+   midnight.setMinutes(0);
+   midnight.setSeconds(0);
+   midnight.setMilliseconds(0);
+   let midnight_improved = midnight.getTime();
    // convert to next midnight
-   midnight += 86400000;
-   return midnight;
+   midnight_improved += 86400000;
+   return midnight_improved;
 }
 /* 
 let hours_6 = 21600000
@@ -61,7 +61,7 @@ let hours_24 = 86400000
 function createTimePoints(req, res, next) {
    // at outset, time_points and day_nodes are empty [ ]. How does day_nodes work?
    let { nodes, time_points, day_nodes } = req.payload.data.trip;
-   let { start_time, break_period, drive_time_msec, timezone_id_user, intervals_per_day } = req.payload.data.trip.params;
+   let { start_time, break_period, drive_time_msec, timezone_id_user, intervals_per_day } = req.payload.data.trip.overview;
    let midnight = calcNextMidnight(start_time, timezone_id_user);
    // keep running totals during loop
    let day_count = 0;
@@ -80,8 +80,8 @@ function createTimePoints(req, res, next) {
       midnight += 86400000;
    }
    let day_start_time = timer;
-   let end_time; // for calculating start time for next day
-   let next_start_time;
+   // vars for calculating start time for next day
+   let end_time, next_start_time, rest_stop_msec;
    let status; // start_trip, start_day, enroute, end_day, end_trip
    let interval_count = 0;
 
@@ -121,8 +121,8 @@ function createTimePoints(req, res, next) {
                nodes[node_count].day_start_time = day_start_time;
                node_count++;
             }
-            else { // done driving for the day, not end of trip
-               // part 1 - create first timepoint - end_day
+            else { // done driving for the day, not end of trip, aka 'rest_stop'
+               // rest stop, part 1 - create first time point at this location - ""end_day"
                status = "end_day";
                timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
@@ -136,15 +136,16 @@ function createTimePoints(req, res, next) {
                nodes[node_count].miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
                   + ' miles'
                nodes[node_count].hours_today = secondsToTimeString((timer - day_start_time) / 1000);
-               // don't increment nodes - layover at same way_point
+               // rest stop, part 2 - create second time point at this location - "start_day"
+               // don't increment nodes - layover at same node
                end_time = timer;
                next_start_time = setNextStartTime(end_time, drive_time_msec, midnight)
                // get number of milliseconds between end_time and next_start_time
-               stop_over_msec = next_start_time - end_time;
+               rest_stop_msec = next_start_time - end_time;
                // increment midnight to next day:
                midnight += 86400000;
                status = "start_day";
-               timer += stop_over_msec;
+               timer += rest_stop_msec;
                interval_count = 0; // begin first driving period of new day
                day_count++;
                day_start_meters = current_meters;

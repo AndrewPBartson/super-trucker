@@ -1,3 +1,28 @@
+function viewFactoryReport(factory) {
+  console.log(`
+      ******************** Trip Factory Report ****************
+      total_meters -  ${factory.total_meters}
+      meters_per_day -  ${factory.meters_per_day}
+      length of second leg -  ${factory.leg_distances[1]}
+      total miles -  ${factory.total_meters / 1609.34}
+      all_points.length -  ${factory.all_points.length}  
+      meter_counts.length -  ${factory.meter_counts.length}
+      num_segments -  ${factory.num_segments}
+      way_points :
+        ${factory.way_points}
+      way_points.length -  ${factory.way_points.length}
+      leg_distances.length -  ${factory.leg_distances.length}
+      num_legs -  ${factory.num_legs}
+      num_legs_round -  ${factory.num_legs_round}
+      segments_per_leg -  ${factory.segments_per_leg}
+      segments_per_leg_round -  ${factory.segments_per_leg_round}
+      'leftover' segments -  ${factory.leftovers}
+      ${factory.segments_per_leg_round}  *  ${factory.num_legs_round - 1}  +  ${factory.leftovers}  =  ${factory.num_segments}
+      ******************************************************
+   `)
+  return factory;
+}
+
 function formatTime(timeStamp) {
   let dateTime = new Date(Math.round(timeStamp))
   let month = dateTime.getMonth() + 1; // getMonth is zero-based index
@@ -32,11 +57,12 @@ function getTimeForTimezone(ts, tz) {
 }
 
 const nailPointTimeData = (req, res, next) => {
+  // viewFactoryReport(req.factory);
   console.log('nailPointTimeData() is working');
   console.log('**test convert tz :>> ', getTimeForTimezone(new Date(1611864000000), 'GMT-07:00'))
 
   let { nodes, weather } = req.payload.data.trip;
-  let tz_user = req.payload.data.trip.params.timezone_id_user;
+  let tz_user = req.payload.data.trip.overview.timezone_id_user;
   let tz_local;
   let current_time;
 

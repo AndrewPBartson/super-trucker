@@ -1,5 +1,5 @@
 # top secret stuff
-/config
+/config/keys.js
 
 # compiled output
 /dist
@@ -9,9 +9,6 @@
 # dependencies
 /node_modules
 /client/node_modules
-
-# testing
-/coverage
 
 # vs code and other settings
 /.vscode
@@ -28,7 +25,8 @@
 .env.test.local
 .env.production.local
 
-# Testing
+# testing
+/coverage
 /tests_output
 /tests_assets
 *.log

@@ -1,21 +1,21 @@
 const express = require('express')
 const router = express.Router()
-const userControllers = require('../user_controllers')
+const controllers = require('../controllers')
 
 router.route('/users')
-  .get(userControllers.users.getAllUsersController)
-  .post(userControllers.users.createUserController)
+  .get(controllers.users.getAllUsersController)
+  .post(controllers.users.createUserController)
 
 router.route('/users/:id')
-  .get(userControllers.users.getUserByIdController)
-  .patch(userControllers.users.updateUserController)
-  .put(userControllers.users.updateUserController)
-  .delete(userControllers.users.deleteUserController)
+  .get(controllers.users.getUserByIdController)
+  .patch(controllers.users.updateUserController)
+  .put(controllers.users.updateUserController)
+  .delete(controllers.users.deleteUserController)
 
 router.route('/register')
-  .post(userControllers.users.register)  
+  .post(controllers.users.register)
 
 router.route('/login')
-  .post(userControllers.users.login)  
+  .post(controllers.users.login)
 
 module.exports = router

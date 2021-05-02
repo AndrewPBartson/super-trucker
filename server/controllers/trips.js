@@ -1,5 +1,5 @@
 const Trip = require('../models/Trip');
-let { build_trip } = require('./trip_builder');
+let { build_trip } = require('../trip_factory/trip_builder');
 
 
 function randomStr(length) {
@@ -11,6 +11,9 @@ function randomStr(length) {
   return result;
 }
 
+// @route   POST api/posts/comment/:id
+// @desc    Add comment to post
+// @access  Private
 function getAllTrips(req, res, next) {
   model.trips.getAllTrips()
     .then((result) => {
@@ -18,12 +21,12 @@ function getAllTrips(req, res, next) {
     })
 }
 
-function getTripByIdController(req, res, next) {
+function getTripById(req, res, next) {
   if (isNaN(req.params.id)) {
     return next({ message: 'Invalid ID, not a number' });
   }
   else {
-    model.trips.getTripById(req.params.id)
+  l.trips.getTripById(req.params.id)
       .then((result) => {
         if (result) {
           res.status(200).json(result);
@@ -44,21 +47,9 @@ function createTrip(req, res, next) {
     .catch(function (error) {
       console.log(error);
     })
-  // .finally(req => {
-  //   const newTrip = new Trip({
-  //     name: req.body.name ? req.body.name : randomStr(4),
-  //     notes: req.body.notes,
-  //     origin: req.body.origin,
-  //     end_point: req.body.end_point,
-  //     hrs_driving: req.body.hrs_driving,
-  //     avg_speed: req.body.avg_speed,
-  //     miles_per_day: req.body.miles_per_day
-  //   })
-  //   newTrip.save()
-  // })
 }
 
-function updateTripController(req, res, next) {
+function updateTrip(req, res, next) {
   if (isNaN(req.params.id)) {
     return next({ message: 'Invalid ID, not a number' });
   }
@@ -73,7 +64,7 @@ function updateTripController(req, res, next) {
   }
 }
 
-function deleteTripController(req, res, next) {
+function deleteTrip(req, res, next) {
   if (isNaN(req.params.id)) {
     return next({ message: 'Invalid ID, not a number' });
   }
@@ -93,15 +84,8 @@ function deleteTripController(req, res, next) {
 
 module.exports = {
   getAllTrips,
-  getTripByIdController,
+  getTripById,
   createTrip,
-  updateTripController,
-  deleteTripController
+  updateTrip,
+  deleteTrip
 }
-
-
-
-
-// console.log('object :>> ', object);
-// https://api.weather.gov/points/38.6860,-101.9331/forecast
-// https://api.weather.gov/points/35.0695,-104.2121/forecast
