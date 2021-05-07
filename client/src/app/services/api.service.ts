@@ -39,7 +39,7 @@ export class ApiService {
 
   sendTripRequest(tripSettings) {
     console.log('input.service - sendTripRequest() w/ tripSettings :', tripSettings);
-    this.httpClient.post(`${this.apiURL}/trips`, tripSettings)
+    this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
       .subscribe(value => {
         this.football = value;
         console.log('response! OMG!', value);

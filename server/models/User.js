@@ -24,6 +24,9 @@ const UserSchema = new Schema({
   },
   superpower: {
     type: String
+  },
+  timezone: {
+    type: String
   }
 })
 

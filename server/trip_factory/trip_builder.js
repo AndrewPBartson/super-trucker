@@ -19,7 +19,8 @@ function build_trip(req, res, next) {
       return fixWayPoints(req, res, next)
 
         .then(req => {
-
+          // get 7-day forecasts for each way_point
+          // console.log(' 1 - req.factory.way_points.length :>> ', req.factory.way_points.length);
           return getWeatherData(req, res, next)
 
             // .then(req => {
@@ -33,7 +34,9 @@ function build_trip(req, res, next) {
             // })
 
             .then(req => {
+              // console.log(' 2 - req.factory.way_points.length :>> ', req.factory.way_points.length);
               createNodes(req, res, next);
+
               // add times for locations along route -
               createTimePoints(req, res, next);
               return nailPointTimeData(req, res, next);

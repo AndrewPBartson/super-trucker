@@ -41,9 +41,11 @@
     "trip",
     "planning",
     "planner",
+    "schedule",
     "road",
     "interstate",
     "travel",
+    "weather",
     "trucker"
   ]
 }

@@ -52,13 +52,14 @@ function createNodes(req, res, next) {
          "timezone_id_local": payload.weather[i].timezone_id_local
       });
       // add last way_point (waypoints.length = legs.length + 1)
+
       if (i === legs.length - 1) {
          payload.nodes.push({
             "cityState": getCityString(legs[i].end_address),
             "address": legs[i].end_address,
             "latLng": legs[i].end_location,
-            "time_points": [],
-            "timezone_id_local": payload.weather[i + 1].timezone_id_local
+            "time_points": [] //,
+            //"timezone_id_local": payload.weather[i + 1].timezone_id_local
          })
 
          // cityState = getCityString(legs[i].end_address);

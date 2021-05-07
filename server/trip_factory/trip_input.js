@@ -31,6 +31,8 @@ const formatTimezoneId = (incoming) => {
   }
   // insert colon (GMT-0700 becomes GMT-07:00)
   let timezoneId = tz_id.slice(0, 6) + ':' + tz_id.slice(6);
+  // todo: create helper function:
+  // saveUserTimeZone() to save timezoneId as user.timezone
   return timezoneId;
 }
 

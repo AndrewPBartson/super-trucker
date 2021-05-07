@@ -37,6 +37,7 @@ function createTestUrl(factory) {
   }
   factory.test_url = `${factory.test_url}&key=${keys.GMkey}`;
   // console.log('factory.test_url (for checking waypoints):>> ', factory.test_url);
+  console.log(' factory.way_points.length :>> ', factory.way_points.length);
   return factory.test_url;
 }
 
@@ -235,6 +236,7 @@ const fixWayPoints = async (req, res, next) => {
       overview.total_mi = Math.round(overview.total_meters / 1609.34);
       overview.intervals_per_day = req.factory.intervals_per_day;
       req.factory.legs = response.data.routes[0].legs;
+
       createTestUrl(req.factory); // url for debugging
     }
   }

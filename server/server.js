@@ -1,17 +1,25 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
+const passport = require('passport');
 const port = process.env.PORT || 8880;
 const morgan = require('morgan');
 const cors = require('cors');
-const routes = require('./routes');
-const mongoose = require('mongoose');
+const users = require('./routes/api/users');
+const trips = require('./routes/api/trips');
 
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(cors());
+// convert incoming data to json if needed -
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 
+// passport init
+app.use(passport.initialize());
+require('../config/passport')(passport);
+
+// db config
 const dbURI = require('../config/keys').mongoURI;
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -25,14 +33,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(routes.users);
-app.use(routes.trips);
-
-// it seems that angular handles root requests, because this
-// doesn't get called:
-// app.get('/', (req, res, next) => {
-//   res.send(`Hello from Earth!`)
-// })
+app.use('/api/users', users);
+app.use('/api/trips', trips);
+app.get('/', (req, res) => res.send('This is IT!'));
 
 // last middleware (except error MW) handles req w/ no matching route
 app.use((req, res, next) => {

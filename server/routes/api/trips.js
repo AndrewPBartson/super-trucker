@@ -1,5 +1,8 @@
-const Trip = require('../models/Trip');
-let { build_trip } = require('../trip_factory/trip_builder');
+const express = require('express');
+const router = express.Router();
+const mongoose = require('mongoose');
+const Trip = require('../../models/Trip');
+let { build_trip } = require('../../trip_factory/trip_builder');
 
 
 function randomStr(length) {
@@ -11,9 +14,6 @@ function randomStr(length) {
   return result;
 }
 
-// @route   POST api/posts/comment/:id
-// @desc    Add comment to post
-// @access  Private
 function getAllTrips(req, res, next) {
   model.trips.getAllTrips()
     .then((result) => {
@@ -21,12 +21,15 @@ function getAllTrips(req, res, next) {
     })
 }
 
+// @route   POST api/trips/:id
+// @desc    Get trip by id
+// @access  Private (should be)
 function getTripById(req, res, next) {
   if (isNaN(req.params.id)) {
     return next({ message: 'Invalid ID, not a number' });
   }
   else {
-  l.trips.getTripById(req.params.id)
+    model.trips.getTripById(req.params.id)
       .then((result) => {
         if (result) {
           res.status(200).json(result);
@@ -39,7 +42,10 @@ function getTripById(req, res, next) {
   }
 }
 
-function createTrip(req, res, next) {
+// @route   POST api/trips
+// @desc    Create trip
+// @access  Public
+router.post('/', (req, res, next) => {
   build_trip(req, res, next)
     .then(req => {
       res.json(req.payload);
@@ -47,7 +53,7 @@ function createTrip(req, res, next) {
     .catch(function (error) {
       console.log(error);
     })
-}
+})
 
 function updateTrip(req, res, next) {
   if (isNaN(req.params.id)) {
@@ -82,10 +88,4 @@ function deleteTrip(req, res, next) {
   }
 }
 
-module.exports = {
-  getAllTrips,
-  getTripById,
-  createTrip,
-  updateTrip,
-  deleteTrip
-}
+module.exports = router;
