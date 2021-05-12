@@ -1,5 +1,6 @@
 const axios = require('axios');
 const keys = require('../../config/keys');
+// important variables for creating way_points are defined in trip_input.js
 
 function checkLegDistances(leg_distances) { // for debugging
   let total = 0;
@@ -37,12 +38,11 @@ function createTestUrl(factory) {
   }
   factory.test_url = `${factory.test_url}&key=${keys.GMkey}`;
   // console.log('factory.test_url (for checking waypoints):>> ', factory.test_url);
-  console.log(' factory.way_points.length :>> ', factory.way_points.length);
   return factory.test_url;
 }
 
 function getMeterCounts(factory) {
-  // Create an array of estimated meter accumulation at each all_point
+  // Create array of estimated meter accumulation at each all_point
   // based on num_segments_in_leg_array
   let { segments_per_leg_round, num_legs_round, leg_distances } = factory;
   factory.meter_counts = [0];
@@ -61,11 +61,9 @@ function getMeterCounts(factory) {
   }
   return factory
 }
-// Announcement ->
-// all variables for creating way_points should be defined in one place!
 
 function calibrateMeterCounts(factory) {
-  // compensates for minor compounding inaccuracy
+  // compensate for minor compounding inaccuracy
   let { total_meters, meter_counts } = factory;
   let correction_factor;
   if (total_meters > meter_counts[meter_counts.length - 1]) {
@@ -168,7 +166,7 @@ function getExtraWayPoints(factory) {
 
 function isResultFinal(result, old_A, old_B, old_C) {
   // Often calculation of way points doesn't stabilize 
-  // Rather they keep flipping between two or three very similar solutions.
+  // Rather they keep flipping between two or three very similar solutions
   // Thus it's necessary to compare current solution to 
   // the TWO previous solutions
   let answer = false;
@@ -195,6 +193,7 @@ function savePreviousData(f) { // to determine if done yet
 function pullDataFromResponse(response, leg_distances) {
   // pull out current leg distances from response
   let leg_set = response.data.routes[0].legs
+  console.log('waypoints.js - pull data - leg_set.length :>> ', leg_set.length);
   for (let i = 0; i < leg_set.length; i++) {
     leg_distances.push(leg_set[i].distance.value)
   }
@@ -240,6 +239,8 @@ const fixWayPoints = async (req, res, next) => {
       createTestUrl(req.factory); // url for debugging
     }
   }
+  console.log('waypoints.js - req.factory.way_points.length :>> ', req.factory.way_points.length);
+  console.log('waypoints.js - req.factory.legs.length :>> ', req.factory.legs.length);
   return req;
 }
 

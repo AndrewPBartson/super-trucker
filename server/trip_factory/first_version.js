@@ -44,14 +44,13 @@ function setIntervalsPerDay(meters_per_day, total_meters) {
 }
 
 function getSimpleData(req, response_1) {
-  let { total_meters, polylinePts, all_points, num_segments_in_leg_array, way_pts_indexes, legs } = req.factory;
+  let { total_meters, polylinePts, all_points, num_segments_in_leg_array, way_pts_indexes } = req.factory;
   req.factory.total_meters = response_1.data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_meters = response_1.data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_mi_text = response_1.data.routes[0].legs[0].distance.text;
   polylinePts = response_1.data.routes[0].overview_polyline.points;
   // convert G_maps trip summary polyline to array of lat/lng coordinates
   req.factory.all_points = polyline.decode(polylinePts)
-  legs = response_1.data.routes[0].legs;
 }
 
 function calcFirstTripVariables(factory) {
@@ -98,10 +97,10 @@ function calcFirstWayPoints(factory) {
 }
 
 function getInitialTripData(req, res, next) {
-  let format_origin = req.body.origin.split(" ").join("+")
-  let format_end_point = req.body.end_point.split(" ").join("+");
+  let origin = req.payload.data.trip.overview.origin.trim().split(" ").join("+")
+  let end_point = req.payload.data.trip.overview.end_point.trim().split(" ").join("+");
   let first_url = `https://maps.googleapis.com/maps/api/directions/json?origin=
-    ${format_origin}&destination=${format_end_point}
+    ${origin}&destination=${end_point}
     &key=${keys.GMkey}`
   return axios.get(first_url)
     .then(response_1 => {

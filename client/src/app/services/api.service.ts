@@ -17,7 +17,7 @@ export class ApiService {
     end_point: '',
     miles_per_day: 0,
     timezone_user: '',
-    time_str_user: ''
+    time_user_str: ''
   };
 
   constructor(private httpClient: HttpClient) { }

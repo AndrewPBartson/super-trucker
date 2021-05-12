@@ -1,3 +1,5 @@
+const { getTimeForTimezone } = require('./utilities');
+
 function viewFactoryReport(factory) {
   console.log(`
       ******************** Trip Factory Report ****************
@@ -23,77 +25,55 @@ function viewFactoryReport(factory) {
   return factory;
 }
 
-function formatTime(timeStamp) {
-  let dateTime = new Date(Math.round(timeStamp))
-  let month = dateTime.getMonth() + 1; // getMonth is zero-based index
-  let date = dateTime.getDate();
-  let hour = dateTime.getHours();
-  let minutes = dateTime.getMinutes().toString();
-  if (minutes.length === 1) {
-    minutes = '0' + minutes;
-  }
-  let time_text = `${hour}:${minutes}`;
-  let date_text = `${month}/${date}`;
-}
-
-function getTimeForTimezone(ts, tz) {
-  let offsetStr = tz.replace(/:/g, '');
-  let reverseOffset = offsetStr.replace(/[-+]/, sign => sign === '+' ? '-' : '+');
-  let time = new Date(ts);
-  let timeStr = time.toUTCString().replace('GMT', reverseOffset);
-
-  time = new Date(Date.parse(timeStr));
-  timeStr = time.toLocaleString('en-US', {
-    timeZone: 'UTC', // Don't change from UTC
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    // year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-    // second: '2-digit'
-  }) //+ ' ' + tz;
-  return timeStr;
-}
-
+// previous step - store all weather forecasts for all nodes in payload
+// next select and save relevant weather data for timestamp(s) in each node: 
 const nailPointTimeData = (req, res, next) => {
   // viewFactoryReport(req.factory);
-  console.log('nailPointTimeData() is working');
-  console.log('**test convert tz :>> ', getTimeForTimezone(new Date(1611864000000), 'GMT-07:00'))
 
   let { nodes, weather } = req.payload.data.trip;
-  let tz_user = req.payload.data.trip.overview.timezone_id_user;
-  let tz_local;
-  let current_time;
+  let tz_user = req.payload.data.trip.overview.timezone_user;
+  let timestamp;
+  console.log('weather.length :>> ', weather.length);
+  console.log('nodes.length :>> ', nodes.length);
 
   for (let k = 0; k < nodes.length; k++) {
+    nodes[k].timezone_local = weather[k].timezone_local;
+    nodes[k].timezone_local_str = weather[k].timezone_local_str;
+    // loop through time_points for this node (has 1 or 2 time_points)
     for (let x = 0; x < nodes[k].time_points.length; x++) {
-      tz_local = nodes[k].timezone_id_local;
-      // get timestamp of time_point
-      let timestamp = nodes[k].time_points[x].timestamp;
-      // create local time string with date and time am/pm
-      // create home time string with date and time am/pm
-      console.log('At this time => ', nodes[k].time_points[x].status);
+      timestamp = nodes[k].time_points[x].timestamp;
+      // convert timestamp to string 1) for local timezone 2) for user home timezone
+      nodes[k].time_points[x].time_local = getTimeForTimezone(new Date(timestamp), nodes[k].timezone_local);
+      nodes[k].time_points[x].time_user = getTimeForTimezone(new Date(timestamp), tz_user);
+      // Fun test =>
+      console.log(nodes[k].time_points[x].time_user + '  =>  '
+        + nodes[k].time_points[x].status + '  =>  '
+        + nodes[k].cityState); // + '  =>  ' + nodes[k].next_leg.duration.text);
 
+      // each node has set of weather forecasts (7 days of NOAA data, 8 days of OWM data)
+      // loop through set of multi-day weather forecasts (NOAA and OWM) for this node 
       for (let j = 0; j < weather.length; j++) {
+        // loop through NOAA weather forecasts (12 hour increments)
         for (let y = 0; y < weather[j].forecast12hour.length; y++) {
-          // get NOAA data for this timestamp 
+          // pull out NOAA data for this time_point and copy to node
           if (timestamp >= weather[j].forecast12hour[y].start
             && timestamp < weather[j].forecast12hour[y].end) {
             nodes[k].time_points[x].weather.forecast12hour = weather[j].forecast12hour[y];
           }
         }
+        // loop through OWM weather forecasts (24 hour increments)
         for (let z = 0; z < weather[j].forecast24hour.length; z++) {
-          // get OWM data for this timestamp 
+          // pull out OWM data for this time_point and copy to node
           if (timestamp >= weather[j].forecast24hour[z].start
             && timestamp < weather[j].forecast24hour[z].end) {
             nodes[k].time_points[x].weather.forecast24hour = weather[j].forecast24hour[z];
+            // OWM temperature is in 6 hour increments
             for (let a = 0; a < weather[j].forecast24hour[z].temps.length; a++) {
-              // select temperature for this timestamp
+              // pull out OWM temperature for this timestamp and copy to node
               if (timestamp >= weather[j].forecast24hour[z].temps[a].start
                 && timestamp < weather[j].forecast24hour[z].temps[a].end) {
                 nodes[k].time_points[x].weather.temperature = weather[j].forecast24hour[z].temps[a].temp;
-                nodes[k].time_points[x].weather.temp_time_check = weather[j].forecast24hour[z].temps[a].name;
+                nodes[k].time_points[x].weather.temperature_time_check = weather[j].forecast24hour[z].temps[a].name;
               }
             }
           }
@@ -104,8 +84,15 @@ const nailPointTimeData = (req, res, next) => {
   return req;
 }
 
+const finalizePayload = (req, res, next) => {
+  console.log('finalizePayload() working!')
+  return req;
+}
+
+
 module.exports = {
-  nailPointTimeData
+  nailPointTimeData,
+  finalizePayload
 }
 
 

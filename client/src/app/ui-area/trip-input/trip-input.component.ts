@@ -46,8 +46,8 @@ export class TripInputComponent implements OnInit {
     hours_driving: null,
     depart_time: null,
     timezone_user: null,
-    time_str_user: null,
-    weather: null
+    time_user_str: null
+    //weather: null
   };
 
   presets = {
@@ -76,6 +76,7 @@ export class TripInputComponent implements OnInit {
   constructor(public apiService: ApiService, public inputService: InputService) { }
 
   ngOnInit() {
+    //this.tripForm.minDate = 0
     this.tripForm = new FormGroup({
       weather: new FormControl(true),
       hotels: new FormControl(null),
@@ -93,21 +94,22 @@ export class TripInputComponent implements OnInit {
       ]),
       avg_speed: new FormControl(null),
       hours_driving: new FormControl(null),
-      //depart_time: new FormControl(moment().format('MM/DD/YYYY')),
       depart_time: new FormControl(moment().toDate()),
+      depart_time_2: new FormControl(moment().format('MMMM Do, h:mm a')),
+      depart_time_3: new FormControl(moment().format('MMMM Do, h:mm a')),
       timezone_user: new FormControl(tz.guess())
     });
   }
 
   onGetRoute() {
+    //this.tripForm.get('depart_time').setValue(new FormControl(moment().toDate().value));
     console.log('onGetRoute() - this.tripForm :', this.tripForm);
     Object.entries(this.tripForm.value)
       .forEach(([key, inputValue]) => {
         this.input[key] = inputValue;
       });
     // add time string from user's machine
-    this.input.time_str_user =
-      this.tripForm.value.depart_time.toString();
+    this.input.time_user_str = this.tripForm.value.depart_time.toString();
     this.apiService.sendTripRequest(this.input);
   }
 

@@ -6,7 +6,7 @@ export interface InputModel {
   miles_per_day: number;
   depart_time?: Date;
   timezone_user: string;
-  time_str_user: string;
+  time_user_str: string;
   defaultOpt?: boolean;
   cycle_24_hour?: boolean;
   avg_speed?: number;

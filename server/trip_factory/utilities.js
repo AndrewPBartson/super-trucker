@@ -1,0 +1,50 @@
+// convert 'seconds' (from google maps api) to text 
+function secondsToTimeString(seconds) {
+  let num_hours = Math.floor(seconds / 60 / 60);
+  let hours_text = num_hours === 1 ? ' hour ' : ' hours ';
+  let num_minutes = Math.round((seconds / 60) % 60);
+  let minutes_text = num_minutes === 1 ? ' min' : ' mins';
+  return num_hours + hours_text + num_minutes + minutes_text;
+}
+
+function formatTime(timeStamp) {
+  let dateTime = new Date(Math.round(timeStamp))
+  let month = dateTime.getMonth() + 1; // getMonth is zero-based index
+  let date = dateTime.getDate();
+  let hour = dateTime.getHours();
+  let minutes = dateTime.getMinutes().toString();
+  if (minutes.length === 1) {
+    minutes = '0' + minutes;
+  }
+  let time_text = `${hour}:${minutes}`;
+  let date_text = `${month}/${date}`;
+  // return time_text;
+  return date_text;
+}
+
+// 'timezone' argument must be formatted like this: 'GMT-07:00'
+function getTimeForTimezone(timestamp, timezone) {
+  let offsetStr = timezone.replace(/:/g, '');
+  let reverseOffset = offsetStr.replace(/[-+]/, sign => sign === '+' ? '-' : '+');
+  let time = new Date(timestamp);
+  let timeStr = time.toUTCString().replace('GMT', reverseOffset);
+
+  time = new Date(Date.parse(timeStr));
+  timeStr = time.toLocaleString('en-US', {
+    timeZone: 'UTC', // Don't change from UTC
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    // year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+    // second: '2-digit'
+  })
+  return timeStr;
+}
+
+module.exports = {
+  secondsToTimeString,
+  formatTime,
+  getTimeForTimezone
+}

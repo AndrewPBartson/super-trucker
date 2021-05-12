@@ -1,4 +1,4 @@
-const { secondsToTimeString } = require('./trip_nodes');
+const { secondsToTimeString } = require('./utilities');
 
 function setTimePointData(timeStamp, label, node_data) {
    return {
@@ -61,8 +61,8 @@ let hours_24 = 86400000
 function createTimePoints(req, res, next) {
    // at outset, time_points and day_nodes are empty [ ]. How does day_nodes work?
    let { nodes, time_points, day_nodes } = req.payload.data.trip;
-   let { start_time, break_period, drive_time_msec, timezone_id_user, intervals_per_day } = req.payload.data.trip.overview;
-   let midnight = calcNextMidnight(start_time, timezone_id_user);
+   let { start_time, break_period, drive_time_msec, timezone_user, intervals_per_day } = req.payload.data.trip.overview;
+   let midnight = calcNextMidnight(start_time, timezone_user);
    // keep running totals during loop
    let day_count = 0;
    let current_meters = 0; // accumulate distance traveled in meters

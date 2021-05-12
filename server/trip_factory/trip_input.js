@@ -1,39 +1,27 @@
 const { Collection } = require('mongoose');
 
-function isValidTripInput(req) {
-  req.ok = true;
-  // incoming request must have -
-  // origin, end_point, miles_per_day, timezone_user, time_str_user.
-  // set other essential values - avg_speed and hours_driving
-  // default for avg_speed should be 60 (check)
-  // and then calculate hours_driving based 
-  // on miles_per_day and default value for avg_speed 
-  return true;
-}
-
 function calcBreakPeriod(hours_driving) {
-  // determine break_period in milliseconds -
+  // calculate break_period in milliseconds
   let break_period = (24 - hours_driving) * 3600000;
-  // limit break_period to max ten hours -
+  // limit break_period to max ten hours
   if (break_period > 36000000) {
     break_period = 36000000;
   }
   return break_period;
 }
 
-const formatTimezoneId = (incoming) => {
+// fix timezone created by browser/angular
+const formatTimezoneUser = (tz_user, time_user_str) => {
   let tz_id;
   // if timezone_user begins with "GMT" 
-  if (incoming.timezone_user.toString().substring(0, 3) === "GMT") {
-    tz_id = incoming.timezone_user.substring(0, 8);
-  } else { // else use time_str_user
-    tz_id = incoming.time_str_user.toString().split(' ')[5];
+  if (tz_user.toString().substring(0, 3) === "GMT") {
+    tz_id = tz_user.substring(0, 8);
+  } else { // else use time_user_str
+    tz_id = time_user_str.toString().split(' ')[5];
   }
   // insert colon (GMT-0700 becomes GMT-07:00)
-  let timezoneId = tz_id.slice(0, 6) + ':' + tz_id.slice(6);
-  // todo: create helper function:
-  // saveUserTimeZone() to save timezoneId as user.timezone
-  return timezoneId;
+  let tz_id_final = tz_id.slice(0, 6) + ':' + tz_id.slice(6);
+  return tz_id_final;
 }
 
 function setupForCalculations(req, res, next) {
@@ -74,13 +62,12 @@ function setupForCalculations(req, res, next) {
 }
 
 const setupPayload = (req, res, next) => {
-  let { depart_time, origin, end_point, hours_driving, avg_speed,
-    miles_per_day, timezone_user, hotels, truck_stops, weather } = req.body;
+  let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
+    origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
   // convert date object to milliseconds
   let start_time;
   depart_time ? start_time = new Date(depart_time) : start_time = newDate();
   let start_time_msec = start_time.getTime();
-  console.log('test');
   req.payload = {
     "data": {
       "trip": {
@@ -93,8 +80,8 @@ const setupPayload = (req, res, next) => {
           "avg_speed": avg_speed,
           "miles_per_day": miles_per_day,
           "break_period": calcBreakPeriod(hours_driving),
-          "timezone_user": timezone_user,
-          "timezone_id_user": formatTimezoneId(req.body),
+          "timezone_user_str": timezone_user,
+          "timezone_user": formatTimezoneUser(timezone_user, time_user_str),
           "total_meters": null,
           "total_mi": null,
           "total_mi_text": null,
@@ -118,7 +105,6 @@ const setupPayload = (req, res, next) => {
 }
 
 module.exports = {
-  isValidTripInput,
   setupForCalculations,
   setupPayload
 }

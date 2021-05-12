@@ -1,17 +1,11 @@
-function secondsToTimeString(seconds) {
-   let num_hours = Math.floor(seconds / 60 / 60);
-   let hours_text = num_hours === 1 ? ' hour ' : ' hours ';
-   let num_minutes = Math.round((seconds / 60) % 60);
-   let minutes_text = num_minutes === 1 ? ' min' : ' mins';
-   return num_hours + hours_text + num_minutes + minutes_text;
-}
+const { secondsToTimeString } = require('./utilities');
 
 function getCityString(address) {
    let components = address.split(",");
    let city = components[components.length - 3].trim();
    let statePlusZip = components[components.length - 2].trim();
    components = statePlusZip.split(' ');
-   // consider adding properties for zipCode and country
+   // optional - add properties for zipCode and country
    let state = components[0]
    let result = city + " " + state;
    return result;
@@ -48,28 +42,21 @@ function createNodes(req, res, next) {
          "address": legs[i].start_address,
          "latLng": legs[i].start_location,
          "time_points": [],
-         "next_leg": next_leg,
-         "timezone_id_local": payload.weather[i].timezone_id_local
+         "next_leg": next_leg
       });
-      // add last way_point (waypoints.length = legs.length + 1)
 
+      // add last way_point (waypoints.length = legs.length + 1)
       if (i === legs.length - 1) {
          payload.nodes.push({
             "cityState": getCityString(legs[i].end_address),
             "address": legs[i].end_address,
             "latLng": legs[i].end_location,
-            "time_points": [] //,
-            //"timezone_id_local": payload.weather[i + 1].timezone_id_local
+            "time_points": []
          })
-
-         // cityState = getCityString(legs[i].end_address);
-         // payload.nodes.push({ "cityState": cityState });
-         // payload.nodes[i + 1].address = legs[i].end_address;
-         // payload.nodes[i + 1].latLng = legs[i].end_location;
-         // payload.nodes[i + 1].time_points = [];
-         // payload.nodes[i + 1].timezone_id_local = payload.weather[i + 1].timezone_id_local
       }
    })
+   console.log('trip_nodes.js - legs.length :>> ', legs.length);
+   console.log(`trip_nodes.js - payload.nodes.length`, payload.nodes.length)
    return req;
 }
 

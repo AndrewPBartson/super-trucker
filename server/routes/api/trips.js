@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const validateTripInput = require('../../validation/trip');
 const Trip = require('../../models/Trip');
 let { build_trip } = require('../../trip_factory/trip_builder');
 
@@ -46,6 +47,13 @@ function getTripById(req, res, next) {
 // @desc    Create trip
 // @access  Public
 router.post('/', (req, res, next) => {
+  console.log('req.body.time_user_str :>> ', req.body.time_user_str);
+  const { errors, isValid } = validateTripInput(req.body);
+  if (!isValid) {
+    // If any errors, send 400 with errors object
+    return res.status(400).json(errors);
+  }
+
   build_trip(req, res, next)
     .then(req => {
       res.json(req.payload);
