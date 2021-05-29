@@ -13,8 +13,8 @@ import { UiAreaComponent } from './ui-area/ui-area.component';
 import { HeaderComponent } from './ui-area/header/header.component';
 import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
 import { TripSummaryComponent } from './ui-area/trip-summary/trip-summary.component';
-// want to put api key in separate file that is git ignored:
-const gmKey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
+import { LoginRegisterComponent } from './ui-area/login-register/login-register.component';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,8 @@ const gmKey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
     TripInputComponent,
     UiAreaComponent,
     HeaderComponent,
-    TripSummaryComponent
+    TripSummaryComponent,
+    LoginRegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +31,7 @@ const gmKey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
     HttpClientModule,
     AppRoutingModule,
     AgmCoreModule.forRoot({
-      apiKey: gmKey
+      apiKey: environment.gmKey
     }),
     PopoverModule.forRoot(),
     BrowserAnimationsModule,

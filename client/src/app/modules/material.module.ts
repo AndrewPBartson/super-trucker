@@ -1,48 +1,49 @@
 import { NgModule } from '@angular/core';
-import {  MatButtonModule,
-          MatExpansionModule,
-          MatCardModule,
-          MatFormFieldModule,
-          MatNativeDateModule } from '@angular/material';
+import {
+  MatButtonModule,
+  MatCardModule,
+  MatExpansionModule,
+  MatDividerModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatListModule,
+  MatNativeDateModule,
+  MatTabsModule
+} from '@angular/material';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
-import { NgxMatDatetimePickerModule, 
-         NgxMatTimepickerModule, 
-         NgxMatNativeDateModule } from '@angular-material-components/datetime-picker';
+import {
+  NgxMatDatetimePickerModule,
+  NgxMatTimepickerModule,
+  NgxMatNativeDateModule
+} from '@angular-material-components/datetime-picker';
 import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
 
+const material = [
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatDatepickerModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatNativeDateModule,
+  MatRadioModule,
+  MatSliderModule,
+  NgxMatDatetimePickerModule,
+  NgxMatMomentModule,
+  NgxMatTimepickerModule
+]
+
 @NgModule({
-  imports: [
-    MatButtonModule,
-    MatExpansionModule,
-    MatInputModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    NgxMatDatetimePickerModule,
-    NgxMatTimepickerModule,
-    NgxMatMomentModule,
-    MatNativeDateModule
-  ],
-  exports: [
-    MatButtonModule,
-    MatSliderModule,
-    MatExpansionModule,
-    MatInputModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    NgxMatDatetimePickerModule,
-    NgxMatMomentModule,
-    NgxMatTimepickerModule,
-  ]
+  imports: [material],
+  exports: [material]
 })
 
-export class MaterialModule {}
+export class MaterialModule { }

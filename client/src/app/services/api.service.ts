@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InputModel } from '../models/input.model';
 import { Observable } from 'rxjs';
+import { ITripObject } from 'src/app/models/itrip-object';
 // import { inputSubmitted } from '../ui-area/trip-input/trip-input.component';
 
 @Injectable({
@@ -29,29 +30,16 @@ export class ApiService {
   setInput(input: InputModel) {
   }
 
-  tellTheOthers(value) {
-    const hailMary = new Observable(observer => {
-      console.log('*****   api.service.tellTheOthers()');
-      observer.next(value);
-    });
-    return hailMary;
-  }
-
-  sendTripRequest(tripSettings) {
-    console.log('input.service - sendTripRequest() w/ tripSettings :', tripSettings);
-    this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
-      .subscribe(value => {
-        this.football = value;
-        console.log('response! OMG!', value);
-        const x = this.tellTheOthers(value);
-        console.log('*****   Observable threw football! ', this.football);
-        console.log('*****   x! ', x);
-        return x;
-      }, err => {
-        console.log('Observer got an error: ' + err)
-      }, () => {
-        console.log('Observer is complete!');
-      });
+  sendTripRequest(tripSettings): Observable<ITripObject> {
+    console.log('api.service - sendTripRequest() w/ tripSettings :', tripSettings);
+    return this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
+    // .subscribe(value => {
+    //   console.log('response! OMG!', value);
+    // }, err => {
+    //   console.log('Observer got an error: ' + err)
+    // }, () => {
+    //   console.log('Observer is complete!');
+    // });
   }
 
 }

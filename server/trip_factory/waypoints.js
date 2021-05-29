@@ -193,7 +193,6 @@ function savePreviousData(f) { // to determine if done yet
 function pullDataFromResponse(response, leg_distances) {
   // pull out current leg distances from response
   let leg_set = response.data.routes[0].legs
-  console.log('waypoints.js - pull data - leg_set.length :>> ', leg_set.length);
   for (let i = 0; i < leg_set.length; i++) {
     leg_distances.push(leg_set[i].distance.value)
   }
@@ -211,7 +210,6 @@ const fixWayPoints = async (req, res, next) => {
     savePreviousData(req.factory)
     // fetch data for recalculating way_points
     // need distances between most recent way_points
-    // console.log('req.factory.url_Gmap :>> ', req.factory);
     let response = await axios.get(req.factory.trip_url)
     pullDataFromResponse(response, req.factory.leg_distances);
     getMeterCounts(req.factory)
@@ -239,8 +237,6 @@ const fixWayPoints = async (req, res, next) => {
       createTestUrl(req.factory); // url for debugging
     }
   }
-  console.log('waypoints.js - req.factory.way_points.length :>> ', req.factory.way_points.length);
-  console.log('waypoints.js - req.factory.legs.length :>> ', req.factory.legs.length);
   return req;
 }
 

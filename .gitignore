@@ -1,5 +1,6 @@
 # top secret stuff
 /config/keys.js
+/client/src/environments/*
 
 # compiled output
 /dist

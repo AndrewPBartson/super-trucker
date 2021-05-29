@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { tz } from 'moment-timezone';
 import { ThemePalette } from '@angular/material/core';
 
-import { InputModel } from '../../models/input.model';
+import { ITripInput } from '../../models/itrip-input';
 import { ApiService } from '../../services/api.service';
 import { InputService } from '../../services/input.service';
 
@@ -15,10 +15,7 @@ import { InputService } from '../../services/input.service';
   providers: []
 })
 export class TripInputComponent implements OnInit {
-  @Output() inputSubmitted = new EventEmitter<{
-    enableInput: boolean,
-    showSummary: boolean
-  }>();
+  @Output() tripSubmitted = new EventEmitter();
 
   @ViewChild('picker', { static: true }) picker: any;
   tripForm: FormGroup;
@@ -38,7 +35,7 @@ export class TripInputComponent implements OnInit {
 
   advInputVisible = false;
 
-  input: InputModel = {
+  input: ITripInput = {
     origin: '',
     end_point: '',
     miles_per_day: 0,
@@ -72,11 +69,9 @@ export class TripInputComponent implements OnInit {
     tz.guess(), "GMT-0800 (PST)", "GMT-0700 (PDT MST)", "GMT-0600 (MDT CST)", "GMT-0500 (CDT EST)", "GMT-0400 (EDT)"
   ]
 
-  // should the service (injected) be private?
-  constructor(public apiService: ApiService, public inputService: InputService) { }
+  constructor(private apiService: ApiService, private inputService: InputService) { }
 
   ngOnInit() {
-    //this.tripForm.minDate = 0
     this.tripForm = new FormGroup({
       weather: new FormControl(true),
       hotels: new FormControl(null),
@@ -95,22 +90,21 @@ export class TripInputComponent implements OnInit {
       avg_speed: new FormControl(null),
       hours_driving: new FormControl(null),
       depart_time: new FormControl(moment().toDate()),
-      depart_time_2: new FormControl(moment().format('MMMM Do, h:mm a')),
-      depart_time_3: new FormControl(moment().format('MMMM Do, h:mm a')),
       timezone_user: new FormControl(tz.guess())
     });
   }
 
-  onGetRoute() {
-    //this.tripForm.get('depart_time').setValue(new FormControl(moment().toDate().value));
-    console.log('onGetRoute() - this.tripForm :', this.tripForm);
+  onTripSubmitted() {
+    // convert form to clean data
+    console.log('onTripSubmitted() - user input :', this.tripForm);
     Object.entries(this.tripForm.value)
       .forEach(([key, inputValue]) => {
         this.input[key] = inputValue;
       });
     // add time string from user's machine
     this.input.time_user_str = this.tripForm.value.depart_time.toString();
-    this.apiService.sendTripRequest(this.input);
+    console.log('onTripSubmitted() - fixed input :', this.input);
+    this.tripSubmitted.emit(this.input);
   }
 
   showMoreLess() {

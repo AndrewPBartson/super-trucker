@@ -47,7 +47,6 @@ function getTripById(req, res, next) {
 // @desc    Create trip
 // @access  Public
 router.post('/', (req, res, next) => {
-  console.log('req.body.time_user_str :>> ', req.body.time_user_str);
   const { errors, isValid } = validateTripInput(req.body);
   if (!isValid) {
     // If any errors, send 400 with errors object
@@ -62,6 +61,23 @@ router.post('/', (req, res, next) => {
       console.log(error);
     })
 })
+
+// @route   POST api/trips/save
+// @desc    Save trip to db
+// @access  Private
+
+// const newTrip = new Trip({
+//   name: req.body.name,
+//   notes: req.body.notes,
+//   origin: req.body.origin,
+//   end_point: req.body.end_point,
+//   hours_driving: req.body.hours_driving,
+//   avg_speed: req.body.avg_speed,
+//   miles_per_day: req.body.miles_per_day,
+//   user: req.user.id
+// });
+
+// newPost.save().then(post => res.json(post));
 
 function updateTrip(req, res, next) {
   if (isNaN(req.params.id)) {

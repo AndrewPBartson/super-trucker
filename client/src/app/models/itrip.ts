@@ -1,4 +1,4 @@
-export interface InputModel {
+export interface ITrip {
   avg_speed?: number;
   depart_time?: Date;
   end_point: string;
@@ -10,10 +10,4 @@ export interface InputModel {
   timezone_user: string;
   truck_stops?: boolean;
   weather?: boolean;
-  // defaultOpt?: boolean;
-  // cycle_24_hour?: boolean;
-  // resume_time?: Time;
-  // hours_rest?: number;
-  // meters_per_day?: number;
-  // delay_time?: number;
 }

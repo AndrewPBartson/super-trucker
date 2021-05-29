@@ -149,7 +149,4 @@ export class InputService {
     });
     return;
   }
-  adjustDateTime(tForm)  {
-    console.log('testing adjustDateTime() as injected service');
-  }
 }

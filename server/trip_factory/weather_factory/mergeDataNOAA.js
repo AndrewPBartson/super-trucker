@@ -3,7 +3,6 @@ const addSnapshot12 = (pointNOAA) => {
   let snapshot = {
     "start": Date.parse(pointNOAA.startTime),
     "end": Date.parse(pointNOAA.endTime),
-    "isDaytime": pointNOAA.isDaytime,
     "temperature": pointNOAA.temperature,
     "windSpeed": pointNOAA.windSpeed,
     "icon_NOAA": pointNOAA.icon,

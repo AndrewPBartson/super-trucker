@@ -3,7 +3,7 @@ const { secondsToTimeString } = require('./utilities');
 function setTimePointData(timeStamp, label, node_data) {
    return {
       "timestamp": timeStamp,
-      "city_state": node_data.cityState, // extra - reality check - ok to delete for production
+      "city_state": node_data.cityState, // extra - reality check - delete for production
       "status": label,
       "weather": {}
    }
@@ -59,7 +59,8 @@ let hours_18 = 28800000
 let hours_24 = 86400000
 */
 function createTimePoints(req, res, next) {
-   // at outset, time_points and day_nodes are empty [ ]. How does day_nodes work?
+   // at outset, time_points and day_nodes are empty [ ]
+   // day_nodes are used on frontend to aggregate data for each day
    let { nodes, time_points, day_nodes } = req.payload.data.trip;
    let { start_time, break_period, drive_time_msec, timezone_user, intervals_per_day } = req.payload.data.trip.overview;
    let midnight = calcNextMidnight(start_time, timezone_user);
@@ -87,14 +88,14 @@ function createTimePoints(req, res, next) {
 
    for (let node_count = 0; node_count < nodes.length;) {
       status = "";
-      // first time_point
+      // first time_point, first node
       if (node_count === 0) {
          // don't add to running totals (timer & meters)
          status = "start_trip";
-         // explain me what day_nodes is for?
+         // day_nodes - tracks intervals for each day, for UI display purposes
          day_nodes.push([node_count]);
          // save time_points twice  1) to req.payload.data.trip.nodes.time_points  
-         // 2) to req.payload.data.trip.time_points
+         // 2) (during development only) to req.payload.data.trip.time_points
          time_points.push(setTimePointData(timer, status, nodes[node_count]));
          nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
          nodes[node_count].type = status;
@@ -122,7 +123,7 @@ function createTimePoints(req, res, next) {
                node_count++;
             }
             else { // done driving for the day, not end of trip, aka 'rest_stop'
-               // rest stop, part 1 - create first time point at this location - ""end_day"
+               // rest stop, part 1 - create first time point at this location - "end_day"
                status = "end_day";
                timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;

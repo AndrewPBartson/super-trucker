@@ -1,5 +1,5 @@
 <div class="row d-flex">
-  <div class="mat-app-background basic-container">
+  <div *ngIf="trip" class="mat-app-background basic-container">
     <div class="col h3">
       Trip Plan - {{ trip.overview.origin }} to
       {{ trip.overview.end_point }} via
@@ -37,62 +37,86 @@
                 </ng-container>
               </mat-panel-title>
               <mat-panel-description>
-                <p *ngIf="node.type === 'end_trip'">
-                  Total miles - {{ trip.overview.total_mi }}
-                </p>
+                <span *ngIf="node.type === 'end_trip'">
+                  <p>
+                    Arriving
+                    {{ trip.nodes[i + k].time_points[0].date_local_long }},
+                    {{ trip.nodes[i + k].time_points[0].time_local }} - Total
+                    miles - {{ trip.overview.total_mi }}
+                  </p>
+                </span>
               </mat-panel-description>
             </mat-expansion-panel-header>
-            <!-- create card for each time_point of the day -->
-            <ng-container *ngFor="let day of trip.day_nodes[j]; index as k2">
-              <ng-container
-                *ngFor="let time of trip.nodes[i + k2].time_points; index as n"
-              >
-                <mat-card
-                  *ngIf="
-                    trip.nodes[i + k2].type === 'start_trip' ||
-                    (trip.nodes[i + k2].type === 'rest_stop' && n === 1) ||
-                    trip.nodes[i + k2].type === 'enroute'
+            <mat-list>
+              <!-- create card for each time_point of the day -->
+              <ng-container *ngFor="let day of trip.day_nodes[j]; index as k2">
+                <ng-container
+                  *ngFor="
+                    let time of trip.nodes[i + k2].time_points;
+                    index as n
                   "
                 >
-                  <p>
-                    {{ time.time_text }} - {{ trip.nodes[i + k2].cityState }}
-                  </p>
-                  <p *ngIf="node.type !== 'end_trip'">
-                    {{ trip.nodes[i].next_leg.distance.text_mi }},
-                    {{ trip.nodes[i].next_leg.duration.text }}
-                  </p>
-                </mat-card>
-                <!-- edge case - show arrival for overnight stop -->
-                <mat-card
-                  *ngIf="
-                    trip.nodes[i + k2].type === 'enroute' &&
-                    k2 === trip.day_nodes[j].length - 1
-                  "
-                >
-                  <p>
-                    {{ trip.nodes[i + k2 + 1].time_points[0].time_text }} -
-                    {{ trip.nodes[i + k2 + 1].cityState }}
-                  </p>
-                </mat-card>
+                  <mat-list-item
+                    *ngIf="
+                      trip.nodes[i + k2].type === 'start_trip' ||
+                      (trip.nodes[i + k2].type === 'rest_stop' && n === 1) ||
+                      trip.nodes[i + k2].type === 'enroute'
+                    "
+                  >
+                    <mat-icon
+                      *ngIf="trip.nodes[i + k2].type === 'start_trip'"
+                      matListIcon
+                    >
+                      outlined_flag
+                    </mat-icon>
+                    <mat-icon
+                      *ngIf="trip.nodes[i + k2].type === 'enroute'"
+                      matListIcon
+                    >
+                      fast_forward
+                    </mat-icon>
+                    <mat-icon
+                      *ngIf="trip.nodes[i + k2].type === 'rest_stop' && n === 1"
+                      matListIcon
+                    >
+                      alarm
+                    </mat-icon>
+                    <h3 matLine>
+                      {{ time.time_local }} ({{ time.time_user }})
+                      {{ trip.nodes[i + k2].cityState }}
+                    </h3>
+                  </mat-list-item>
+                  <!-- edge case - show arrival for overnight stop -->
+                  <mat-list-item
+                    *ngIf="
+                      trip.nodes[i + k2].type === 'enroute' &&
+                      k2 === trip.day_nodes[j].length - 1
+                    "
+                  >
+                    <mat-icon
+                      *ngIf="trip.nodes[i + k2 + 1].type !== 'end_trip'"
+                      matListIcon
+                    >
+                      hotel
+                    </mat-icon>
+                    <mat-icon
+                      *ngIf="trip.nodes[i + k2 + 1].type === 'end_trip'"
+                      matListIcon
+                    >
+                      flag
+                    </mat-icon>
+                    <h3 matLine>
+                      {{ trip.nodes[i + k2 + 1].time_points[0].time_local }}
+                      ({{ trip.nodes[i + k2 + 1].time_points[0].time_user }})
+                      {{ trip.nodes[i + k2 + 1].cityState }}
+                    </h3>
+                  </mat-list-item>
+                </ng-container>
               </ng-container>
-            </ng-container>
+            </mat-list>
           </mat-expansion-panel>
         </ng-container>
       </ng-container>
     </ng-container>
-
-    <mat-expansion-panel
-      [expanded]="allExpandState"
-      (opened)="panelOpenState = true"
-      (closed)="panelOpenState = false"
-    >
-      <mat-expansion-panel-header>
-        <mat-panel-title> Self aware panel </mat-panel-title>
-        <mat-panel-description>
-          Currently I am {{ panelOpenState ? "open" : "closed" }}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <p>I'm visible because I am open</p>
-    </mat-expansion-panel>
   </div>
 </div>

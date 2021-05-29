@@ -27,19 +27,14 @@ function createNodes(req, res, next) {
             "text_mi": legs[i].distance.text
          },
          "duration": {
-            // add duration as estimated by google api
-            "seconds_est": legs[i].duration.value,
-            "text_est": legs[i].duration.text,
-            // add duration as calculated from user input
+            // duration as calculated from user input
             "seconds": Math.round(duration_in_seconds),
             "msec": Math.round(duration_in_seconds * 1000),
-            // add duration as string
             "text": secondsToTimeString(duration_in_seconds)
          }
       }
       payload.nodes.push({
          "cityState": cityState,
-         "address": legs[i].start_address,
          "latLng": legs[i].start_location,
          "time_points": [],
          "next_leg": next_leg
@@ -49,7 +44,6 @@ function createNodes(req, res, next) {
       if (i === legs.length - 1) {
          payload.nodes.push({
             "cityState": getCityString(legs[i].end_address),
-            "address": legs[i].end_address,
             "latLng": legs[i].end_location,
             "time_points": []
          })

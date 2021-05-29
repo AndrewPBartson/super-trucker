@@ -1,3 +1,5 @@
+// OWM date/time comes back in milliseconds,
+// multiply by 1000 to convert to seconds
 const addSnapshot24 = (pointOWM) => {
   // OWM data is in 24 hour increments except
   // temperature which is in 6 hour increments
@@ -9,7 +11,7 @@ const addSnapshot24 = (pointOWM) => {
     "icon_OWM": 'http://openweathermap.org/img/wn/' + pointOWM.weather[0].icon + '@2x.png',
     "min": Math.round(pointOWM.temp.min),
     "max": Math.round(pointOWM.temp.max),
-    "wind_speed": pointOWM.wind_speed,
+    "wind_speed": Math.round(pointOWM.wind_speed),
     "clouds": pointOWM.clouds,
     "ppt": pointOWM.pop,
     "rain_amt": pointOWM.rain,
@@ -18,6 +20,7 @@ const addSnapshot24 = (pointOWM) => {
     "sunset": pointOWM.sunset * 1000,
     "noon": pointOWM.dt * 1000,
     "temps": [
+      // 'name' property for testing, remove for production
       {
         "start": (pointOWM.dt * 1000) - 43200000,
         "end": (pointOWM.dt * 1000) - 32400000,
@@ -53,12 +56,12 @@ const addSnapshot24 = (pointOWM) => {
   return snapshot;
 }
 
-// OWM provides timezone! prevents additional api call!
+// OWM provides timezone, prevents additional api call!
 // fix timezone given by OWM
 const formatTimezoneOWM = (timezone_raw) => {
   let tz_new = (timezone_raw / 36);
   tz_new = tz_new.toString();
-  // may need to add leading zero: -700 becomes -0700
+  // usually need to add leading zero: -700 becomes -0700
   if (tz_new.length === 4) {
     tz_new = tz_new.slice(0, 1) + '0' + tz_new.slice(1)
   }
@@ -68,7 +71,7 @@ const formatTimezoneOWM = (timezone_raw) => {
 
 const AddPointForecastOWM = (dataOWM) => {
   // initialize set of weather forecasts for one node
-  // prefer to initialize here because it's easier to add timezone
+  // prefer to initialize here because timezone is from OWM
   let weather = {
     "timezone_local_str": dataOWM.data.timezone,
     "timezone_local": formatTimezoneOWM(dataOWM.data.timezone_offset),

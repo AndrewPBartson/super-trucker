@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ITripObject } from 'src/app/models/itrip-object';
 import { ApiService } from '../services/api.service';
 
 @Component({
@@ -7,28 +8,22 @@ import { ApiService } from '../services/api.service';
   styleUrls: ['./ui-area.component.css']
 })
 export class UiAreaComponent implements OnInit {
-  @Input() enableInput = true;
-  @Input() showSummary = true;
-
-  testData = { msg: 'testData' }
+  tripObject: ITripObject;
 
   constructor(private apiService: ApiService) { }
 
-  ngOnInit() {
-    const apiObservable = this.apiService.tellTheOthers(this.testData);
-    apiObservable.subscribe(data => {
-      this.doStuffWithData(data);
-    });
+  ngOnInit() { }
+
+  fixRawData(data) {
+    let tripData = data.data.trip;
+    console.log(`tripData`, tripData)
+    return tripData
   }
 
-  onInputSubmitted(newUiSettings: { enableInput: boolean, showSummary: boolean }) {
-    this.enableInput = newUiSettings.enableInput;
-    this.showSummary = newUiSettings.showSummary;
-  }
-
-  doStuffWithData(data) {
-    // if request comes back successfully,
-    // hide input form and show trip summary with data
-    console.log('*****   doStuffWithData() working! ', data);
+  callTripService(tripSettings) {
+    this.apiService.sendTripRequest(tripSettings)
+      .subscribe(rawData => {
+        this.tripObject = this.fixRawData(rawData);
+      })
   }
 }

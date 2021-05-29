@@ -30,9 +30,10 @@ function setupForCalculations(req, res, next) {
     meters_per_day: miles_per_day * 1609.34,
     meters_per_second: avg_speed / 2.237,
     meters_per_interval: null,
-    total_meters: 0,
+    total_meters: null,
     legs: [],
     all_points: [],
+    polylinePts: null,
     leg_distances: [],
     meter_counts: [],
     num_legs: null,
@@ -64,38 +65,42 @@ function setupForCalculations(req, res, next) {
 const setupPayload = (req, res, next) => {
   let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
     origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
+  // make sure start_time is not in the past
+  let start_time = new Date(depart_time);
+  let current_time = new Date();
+  if (current_time > start_time) {
+    start_time = current_time;
+  }
   // convert date object to milliseconds
-  let start_time;
-  depart_time ? start_time = new Date(depart_time) : start_time = newDate();
   let start_time_msec = start_time.getTime();
   req.payload = {
     "data": {
       "trip": {
+        "day_nodes": [],
+        "nodes": [],
         "overview": {
-          "origin": origin,
-          "end_point": end_point,
-          "start_time": start_time_msec,
+          "avg_speed": avg_speed,
+          "bounds": {},
+          "break_period": calcBreakPeriod(hours_driving),
           "drive_time_hours": hours_driving,
           "drive_time_msec": parseFloat(hours_driving) * 3600000,
-          "avg_speed": avg_speed,
+          "end_point": end_point,
+          "intervals_per_day": null,
           "miles_per_day": miles_per_day,
-          "break_period": calcBreakPeriod(hours_driving),
-          "timezone_user_str": timezone_user,
-          "timezone_user": formatTimezoneUser(timezone_user, time_user_str),
-          "total_meters": null,
-          "total_mi": null,
-          "total_mi_text": null,
-          "summary": null,
+          "origin": origin,
           "services": {
             "hotels": hotels,
             "truck_stops": truck_stops,
             "weather": weather
           },
-          "bounds": {},
-          "intervals_per_day": null
+          "start_time": start_time_msec,
+          "summary": null,
+          "timezone_user": formatTimezoneUser(timezone_user, time_user_str),
+          "timezone_user_str": timezone_user,
+          "total_meters": null,
+          "total_mi": null,
+          "total_mi_text": null
         },
-        "nodes": [],
-        "day_nodes": [],
         "time_points": [],
         "weather": []
       }

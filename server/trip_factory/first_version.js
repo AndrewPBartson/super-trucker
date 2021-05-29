@@ -44,7 +44,7 @@ function setIntervalsPerDay(meters_per_day, total_meters) {
 }
 
 function getSimpleData(req, response_1) {
-  let { total_meters, polylinePts, all_points, num_segments_in_leg_array, way_pts_indexes } = req.factory;
+  let { total_meters, polylinePts, all_points } = req.factory;
   req.factory.total_meters = response_1.data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_meters = response_1.data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_mi_text = response_1.data.routes[0].legs[0].distance.text;
@@ -61,11 +61,12 @@ function calcFirstTripVariables(factory) {
   factory.num_segments = factory.all_points.length - 1
   // calculate number of legs to destination (usually several legs per day)
   factory.num_legs = factory.total_meters / factory.meters_per_interval
-  // determine number of segments that should be in each leg
-  factory.segments_per_leg = factory.num_segments / factory.num_legs
-  // convert to int for iteration: segments_per_leg and num_legs
-  factory.segments_per_leg_round = Math.floor(factory.segments_per_leg);
+  // convert num_legs to int
   factory.num_legs_round = Math.ceil(factory.num_legs)
+  // calculate number of segments that should be in each leg
+  factory.segments_per_leg = factory.num_segments / factory.num_legs
+  // convert segments_per_leg to int for iteration
+  factory.segments_per_leg_round = Math.floor(factory.segments_per_leg);
   // calculate number of 'leftover' segments in final driving period
   factory.leftovers = factory.num_segments - ((factory.num_legs_round - 1) * factory.segments_per_leg_round)
 }

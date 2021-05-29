@@ -16,7 +16,7 @@ const TripSchema = new Schema({
   end_point: {
     type: String
   },
-  hrs_driving: {
+  hours_driving: {
     type: Number
   },
   avg_speed: {
