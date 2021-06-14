@@ -14,7 +14,6 @@ function createUrlsOWM(req) {
       + keys.OWMkey;
     req.factory.urls_OWM.push(url);
   }
-  console.log('req.factory.urls_OWM.length :>> ', req.factory.urls_OWM.length);
 }
 
 const sendRequestsOWM = (req, res, next) => {

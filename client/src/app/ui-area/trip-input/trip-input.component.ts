@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, ViewChild, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, ViewChild, Output, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators, ControlContainer } from '@angular/forms';
 import * as moment from 'moment';
 import { tz } from 'moment-timezone';
@@ -16,6 +16,7 @@ import { InputService } from '../../services/input.service';
 })
 export class TripInputComponent implements OnInit {
   @Output() tripSubmitted = new EventEmitter();
+  isVisible: boolean;
 
   @ViewChild('picker', { static: true }) picker: any;
   tripForm: FormGroup;
@@ -72,6 +73,7 @@ export class TripInputComponent implements OnInit {
   constructor(private apiService: ApiService, private inputService: InputService) { }
 
   ngOnInit() {
+    this.isVisible = true;
     this.tripForm = new FormGroup({
       weather: new FormControl(true),
       hotels: new FormControl(null),
@@ -94,7 +96,8 @@ export class TripInputComponent implements OnInit {
     });
   }
 
-  onTripSubmitted() {
+  onTripSubmitted(e, tForm, presets) {
+    this.inputService.adjustFormValues(e, tForm, presets)
     // convert form to clean data
     console.log('onTripSubmitted() - user input :', this.tripForm);
     Object.entries(this.tripForm.value)
@@ -106,6 +109,13 @@ export class TripInputComponent implements OnInit {
     console.log('onTripSubmitted() - fixed input :', this.input);
     this.tripSubmitted.emit(this.input);
   }
+
+  // when login button is clicked, open login component
+  showLoginForm() {
+    // probably needs to be in ui component
+    // 
+  }
+
 
   showMoreLess() {
     if (!this.advInputVisible) {

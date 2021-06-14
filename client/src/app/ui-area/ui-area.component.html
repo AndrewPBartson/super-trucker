@@ -1,5 +1,6 @@
 <div class="ui-area">
   <app-header></app-header>
-  <app-trip-input (tripSubmitted)="callTripService($event)"> </app-trip-input>
-  <app-trip-summary [trip]="tripObject"> </app-trip-summary>
+  <app-trip-input (tripSubmitted)="callTripService($event)" *ngIf="showForm">
+  </app-trip-input>
+  <app-trip-summary [trip]="tripObject" *ngIf="!showForm"> </app-trip-summary>
 </div>

@@ -5,12 +5,11 @@
       {{ trip.overview.end_point }} via
       {{ trip.overview.summary }}
     </div>
-    <button mat-raised-button (click)="allExpandState = true">
-      Expand All
+    <button mat-raised-button (click)="allExpandState = !allExpandState">
+      {{ allExpandState ? "Collapse All" : "Expand All" }}
     </button>
-    <button mat-raised-button (click)="allExpandState = false">
-      Collapse All
-    </button>
+
+    <button mat-raised-button (click)="toggleUI()">Start a New Trip</button>
 
     <ng-container *ngFor="let node of trip.nodes; index as i">
       <ng-container *ngFor="let group of trip.day_nodes; index as j">

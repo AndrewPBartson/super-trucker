@@ -1,4 +1,8 @@
-<form [formGroup]="tripForm" (ngSubmit)="onTripSubmitted()" class="inputForm">
+<form
+  [formGroup]="tripForm"
+  (ngSubmit)="onTripSubmitted(e, this.tripForm, this.presets)"
+  class="inputForm"
+>
   <div class="item_AA">
     <button id="login_btn" type="button" mat-raised-button>
       Login/Register

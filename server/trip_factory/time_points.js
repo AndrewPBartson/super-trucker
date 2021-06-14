@@ -61,6 +61,9 @@ let hours_24 = 86400000
 function createTimePoints(req, res, next) {
    // at outset, time_points and day_nodes are empty [ ]
    // day_nodes are used on frontend to aggregate data for each day
+   // refactor - nodes & time_points are now in req.factory
+   // refactor - remove day_nodes[]
+   // instead implement days[] later in the code
    let { nodes, time_points, day_nodes } = req.payload.data.trip;
    let { start_time, break_period, drive_time_msec, timezone_user, intervals_per_day } = req.payload.data.trip.overview;
    let midnight = calcNextMidnight(start_time, timezone_user);

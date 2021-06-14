@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ITripObject } from 'src/app/models/itrip-object';
+import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
   selector: 'app-trip-summary',
@@ -9,12 +10,19 @@ import { ITripObject } from 'src/app/models/itrip-object';
 export class TripSummaryComponent implements OnInit {
 
   @Input() trip: ITripObject;
+  isVisible: boolean;
 
   showDetails = true;
   panelOpenState: boolean = false;
   allExpandState = false;
 
-  constructor() { }
+  constructor(private viewManagerService: ViewManagerService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.isVisible = false;
+  }
+
+  toggleUI() {
+    this.viewManagerService.toggleView.emit(!this.isVisible)
+  }
 }

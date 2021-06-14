@@ -3,7 +3,7 @@ function secondsToTimeString(seconds) {
   let num_hours = Math.floor(seconds / 60 / 60);
   let hours_text = num_hours === 1 ? ' hour ' : ' hours ';
   let num_minutes = Math.round((seconds / 60) % 60);
-  return num_hours + hours_text + num_minutes + 'min';
+  return num_hours + hours_text + num_minutes + ' min';
 }
 // for reference, not using
 function formatTimeOld(timeStamp) {
@@ -27,7 +27,7 @@ function formatTimeOld(timeStamp) {
   return date_text;
 }
 
-// 'timezone' argument must be formatted like this: 'GMT-07:00'
+// required format for 'timezone' argument: 'GMT-07:00'
 function getTimeForTimezone(timestamp, timezone) {
   let timeStr = '';
   if (timestamp && timezone) {
@@ -53,6 +53,5 @@ function getTimeForTimezone(timestamp, timezone) {
 
 module.exports = {
   secondsToTimeString,
-  formatTimeOld,
   getTimeForTimezone
 }

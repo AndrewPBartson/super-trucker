@@ -1,5 +1,3 @@
-const { Collection } = require('mongoose');
-
 function calcBreakPeriod(hours_driving) {
   // calculate break_period in milliseconds
   let break_period = (24 - hours_driving) * 3600000;
@@ -24,7 +22,7 @@ const formatTimezoneUser = (tz_user, time_user_str) => {
   return tz_id_final;
 }
 
-function setupForCalculations(req, res, next) {
+function setupTripFactory(req, res, next) {
   let { miles_per_day, avg_speed, hotels, truck_stops, weather } = req.body;
   req.factory = {
     meters_per_day: miles_per_day * 1609.34,
@@ -44,6 +42,11 @@ function setupForCalculations(req, res, next) {
     num_segments_in_leg_array: [],
     leftovers: null,
     trip_url: '',
+    // move nodes[] from payload to here
+    nodes: [],
+    // move weather[] from payload to here
+    weather: [],
+    // move time_points[] from payload to here
     urls_NOAA: [],
     urls_OWM: [],
 
@@ -62,10 +65,24 @@ function setupForCalculations(req, res, next) {
   return req;
 }
 
+const createTripOverview = (req, res, next) => {
+  //  create trip overview in separate function
+  // save as payload.overview
+  return req;
+}
+
+// properties in final payload - overview{}, days[].
+// day_nodes[] will be removed
+// other payload properties (nodes, time_points, weather) 
+// will be integrated into payload.days[]
+// however for testing during development they are included 
+// as separate arrays in payload, payload.nodes[] etc
 const setupPayload = (req, res, next) => {
   let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
     origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
   // make sure start_time is not in the past
+  // is this working?
+  // date/time picker should refresh and not show times in the past
   let start_time = new Date(depart_time);
   let current_time = new Date();
   if (current_time > start_time) {
@@ -76,7 +93,10 @@ const setupPayload = (req, res, next) => {
   req.payload = {
     "data": {
       "trip": {
+        // "days": [],
+        // delete day_nodes[]
         "day_nodes": [],
+        // move nodes[], time_points[], weather[] to req.factory
         "nodes": [],
         "overview": {
           "avg_speed": avg_speed,
@@ -110,6 +130,7 @@ const setupPayload = (req, res, next) => {
 }
 
 module.exports = {
-  setupForCalculations,
+  createTripOverview,
+  setupTripFactory,
   setupPayload
 }

@@ -43,7 +43,7 @@ const formatDate = (dateObj) => {
   return dateStr;
 }
 
-const logTestString = (node, x) => {
+const logTestString = (testString, node, x) => {
   testString = node.time_points[x].time_user + '  =>  '
     + node.time_points[x].status + '  =>  '
     + node.cityState;
@@ -87,7 +87,7 @@ const nailPointTimeData = (req, res, next) => {
       nodes[k].time_points[x].date_local = formatDate(timestampObj);
       nodes[k].time_points[x].date_user = formatDate(timestampObj);
       // Check overall accuracy =>
-      logTestString(nodes[k], x);
+      logTestString(testString, nodes[k], x);
       // each node has set of weather forecasts (7 days of NOAA data, 8 days of OWM data)
       // loop through set of multi-day weather forecasts (NOAA and OWM) for this node 
       for (let j = 0; j < weather.length; j++) {

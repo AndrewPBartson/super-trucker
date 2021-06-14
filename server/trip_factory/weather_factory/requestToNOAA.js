@@ -11,8 +11,6 @@ function createUrlsNOAA(req) {
       + req.factory.way_points[i][1];
     req.factory.urls_NOAA.push(url_NOAA_prelim);
   }
-  console.log('req.factory.urls_NOAA.length :>> ', req.factory.urls_NOAA.length);
-  console.log('req.factory.way_points.length :>> ', req.factory.way_points.length);
 }
 
 let getPointNOAA = function (url) {

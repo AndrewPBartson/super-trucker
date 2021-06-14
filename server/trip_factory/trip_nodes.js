@@ -5,13 +5,14 @@ function getCityString(address) {
    let city = components[components.length - 3].trim();
    let statePlusZip = components[components.length - 2].trim();
    components = statePlusZip.split(' ');
-   // optional - add properties for zipCode and country
+   // option - add properties for zipCode and country
    let state = components[0]
    let result = city + " " + state;
    return result;
 }
 
 function createNodes(req, res, next) {
+   // refactor to build nodes in req.factory
    let payload = req.payload.data.trip;
    let legs = req.factory.legs;
    let cityState;
@@ -27,7 +28,6 @@ function createNodes(req, res, next) {
             "text_mi": legs[i].distance.text
          },
          "duration": {
-            // duration as calculated from user input
             "seconds": Math.round(duration_in_seconds),
             "msec": Math.round(duration_in_seconds * 1000),
             "text": secondsToTimeString(duration_in_seconds)
@@ -49,8 +49,6 @@ function createNodes(req, res, next) {
          })
       }
    })
-   console.log('trip_nodes.js - legs.length :>> ', legs.length);
-   console.log(`trip_nodes.js - payload.nodes.length`, payload.nodes.length)
    return req;
 }
 
