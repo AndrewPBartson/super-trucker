@@ -1,6 +1,6 @@
 <form
   [formGroup]="tripForm"
-  (ngSubmit)="onTripSubmitted(e, this.tripForm, this.presets)"
+  (ngSubmit)="onTripSubmitted($event, this.tripForm, this.presets)"
   class="inputForm"
 >
   <div class="item_AA">

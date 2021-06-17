@@ -73,6 +73,8 @@ const AddPointForecastOWM = (dataOWM) => {
   // initialize set of weather forecasts for one node
   // prefer to initialize here because timezone is from OWM
   let weather = {
+    // save local timezone in weather object
+    // later local tz will be in time_point object but time_points don't exist yet. 
     "timezone_local_str": dataOWM.data.timezone,
     "timezone_local": formatTimezoneOWM(dataOWM.data.timezone_offset),
     "forecast24hour": [],
@@ -87,9 +89,9 @@ const AddPointForecastOWM = (dataOWM) => {
 
 const injectDataOWM = (dataOWM, req) => {
   for (let i = 0; i < dataOWM.length; i++) {
-    // add weather data to req.factory
-
-    // also add to payload for testing
+    // add OWM data to req.factory
+    req.factory.weather.push(AddPointForecastOWM(dataOWM[i]));
+    // optional - add OWM data to payload for testing
     req.payload.data.trip.weather.push(AddPointForecastOWM(dataOWM[i]));
   }
   return req;

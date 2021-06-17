@@ -121,12 +121,11 @@ export class InputService {
           spdTemp = 103;
         }
         // Corner case - when last value changed is "miles_per_day", recalc hours
-        if (e.srcElement.id === 'miles_per_day') {
+        if (e.target.id === 'miles_per_day') {
           miTemp = Math.ceil(tForm.value.miles_per_day);
           if (miTemp > 2472) {
             miTemp = 2472;
           }
-          // console.log('e.srcElement.id :', e.srcElement.id);
           hrsTemp = (Math.round((miTemp / spdTemp) / 0.25)) * 0.25;
           if (hrsTemp > 24) {
             hrsTemp = 24;

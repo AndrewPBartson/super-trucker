@@ -1,13 +1,27 @@
-const { secondsToTimeString } = require('./utilities');
+const {
+   secondsToTimeString,
+   getTimeForTimezone,
+   formatTime,
+   formatDateLong,
+   formatDate
+} = require('./utilities');
 
-function setTimePointData(timeStamp, label, node_data) {
-   return {
-      "timestamp": timeStamp,
-      "city_state": node_data.cityState, // extra - reality check - delete for production
-      "status": label,
-      "weather": {}
-   }
+function pushTimePoint(req, next_data, idx) {
+   let { nodes, time_points, weather } = req.factory;
+   time_points.push({
+      city_state: nodes[idx].cityState,
+      latLng: nodes[idx].latLng,
+      next_leg: nodes[idx].next_leg,
+      status: next_data.status,
+      timestamp: next_data.timer,
+      miles_today: next_data.miles_today,
+      hours_today: next_data.hours_today,
+      timezone_local: weather[idx].timezone_local,
+      timezone_local_str: weather[idx].timezone_local_str,
+      weather: {}
+   })
 }
+
 function setNextStartTime(end_time, drive_time_msec, midnight) {
    let start_time;
    // if driving period is less than 14 hours
@@ -39,6 +53,7 @@ function setNextStartTime(end_time, drive_time_msec, midnight) {
    }
    return start_time;
 }
+
 const calcNextMidnight = (start_time, timezone) => {
    let midnight = new Date(start_time);
    midnight.setHours(0);
@@ -50,6 +65,29 @@ const calcNextMidnight = (start_time, timezone) => {
    midnight_improved += 86400000;
    return midnight_improved;
 }
+
+const adjustTripStartTime = (start_time, break_period, next_leg_msec, midnight) => {
+   let fixed_start_time;
+   if (start_time + next_leg_msec < midnight) {
+      fixed_start_time = start_time;
+   } else { // edge case - start time is too close to midnight,
+      // delay start time until midnight plus break_period
+      if (break_period < 21600000) { fixed_start_time = midnight + break_period; }
+      // delay start time until next morning at 6:00 am
+      else { fixed_start_time = midnight + 21600000; }
+   }
+   return fixed_start_time;
+}
+
+const logTestString = (testString, time_point) => {
+   testString = time_point.time_user + '  =>  '
+      + time_point.status + '  =>  '
+      + time_point.cityState;
+   if (time_point.next_leg) {
+      testString += '  =>  ' + time_point.next_leg.duration.text;
+   }
+   console.log(testString);
+}
 /* 
 let hours_6 = 21600000
 let hours_10 = 36000000
@@ -58,130 +96,156 @@ let hours_14 = 50400000
 let hours_18 = 28800000
 let hours_24 = 86400000
 */
+
 function createTimePoints(req, res, next) {
-   // at outset, time_points and day_nodes are empty [ ]
-   // day_nodes are used on frontend to aggregate data for each day
-   // refactor - nodes & time_points are now in req.factory
-   // refactor - remove day_nodes[]
-   // instead implement days[] later in the code
-   let { nodes, time_points, day_nodes } = req.payload.data.trip;
+   let nodes = req.factory.nodes;
+   // next_data holds data for next time_point
+   let next_data = {
+      timer: null, // accumulator for each drive time and/or break period
+      status: '',  // start_trip, start_day, enroute, end_day, end_trip
+      miles_today: null,
+      hours_today: null
+   }
    let { start_time, break_period, drive_time_msec, timezone_user, intervals_per_day } = req.payload.data.trip.overview;
    let midnight = calcNextMidnight(start_time, timezone_user);
-   // keep running totals during loop
-   let day_count = 0;
-   let current_meters = 0; // accumulate distance traveled in meters
-   let day_start_meters = 0;
-   let timer; // accumulator for each drive time and/or break period 
-   // set time to start trip on day 1 -
-   if (start_time + nodes[0].next_leg.duration.msec < midnight) {
-      timer = start_time;
-   } else { // edge case - start time is too close to midnight,
-      // delay start time until midnight plus break_period
-      if (break_period < 21600000) { timer = midnight + break_period; }
-      // delay start time until next morning at 6:00 am
-      else { timer = midnight + 21600000; }
-      // increment midnight to next day:
+   next_data.timer = adjustTripStartTime(start_time, break_period, nodes[0].next_leg.duration.msec, midnight);
+   //  increment midnight to next day if needed
+   if (midnight < next_data.timer) {
       midnight += 86400000;
    }
-   let day_start_time = timer;
+   let day_start_time = next_data.timer;
    // vars for calculating start time for next day
    let end_time, next_start_time, rest_stop_msec;
-   let status; // start_trip, start_day, enroute, end_day, end_trip
-   let interval_count = 0;
 
-   for (let node_count = 0; node_count < nodes.length;) {
-      status = "";
-      // first time_point, first node
-      if (node_count === 0) {
-         // don't add to running totals (timer & meters)
-         status = "start_trip";
-         // day_nodes - tracks intervals for each day, for UI display purposes
-         day_nodes.push([node_count]);
-         // save time_points twice  1) to req.payload.data.trip.nodes.time_points  
-         // 2) (during development only) to req.payload.data.trip.time_points
-         time_points.push(setTimePointData(timer, status, nodes[node_count]));
-         nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
-         nodes[node_count].type = status;
-         nodes[node_count].meter_count = current_meters;
-         nodes[node_count].day_start_meters = day_start_meters;
-         nodes[node_count].day_start_time = day_start_time;
+   for (let node_count = 0,
+      day_count = 0,
+      current_meters = 0,
+      day_start_meters = 0,
+      interval_count = 0;
+      node_count < nodes.length;) {
+      next_data.status = "";
+      if (node_count === 0) { // first time_point, first node
+         // don't add to running totals (next_data.timer & current_meters)
+         next_data.status = "start_trip";
+         pushTimePoint(req, next_data, node_count)
          node_count++;
       } else { // not first node
-         // for nodes that are not first node, add just completed drive time to timer
+         // add just completed drive time to next_data.timer
          if (!(node_count === nodes.length - 1)) { // if not last node of trip
-            // if not done driving for the day, and enough time for next interval before midnight -
+            // if not done driving for the day, and if enough time for next interval before midnight
             if (interval_count < intervals_per_day &&
-               timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec < midnight) {
-               status = "enroute";
-               timer += nodes[node_count - 1].next_leg.duration.msec;
+               next_data.timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec < midnight) {
+               next_data.status = "enroute";
+               next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
                interval_count++;
-               day_nodes[day_count].push(node_count);
-               time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               nodes[node_count].type = status;
-               nodes[node_count].meter_count = current_meters;
-               nodes[node_count].day_start_meters = day_start_meters;
-               nodes[node_count].day_start_time = day_start_time;
+               pushTimePoint(req, next_data, node_count)
                node_count++;
             }
-            else { // done driving for the day, not end of trip, aka 'rest_stop'
-               // rest stop, part 1 - create first time point at this location - "end_day"
-               status = "end_day";
-               timer += nodes[node_count - 1].next_leg.duration.msec;
+            else { // rest stop - done driving for the day, not end of trip
+               // rest stop, part 1 - create 1st time point at this location - "end_day"
+               next_data.status = "end_day";
+               next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
                interval_count++;
-               time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               nodes[node_count].type = "rest_stop";
-               nodes[node_count].meter_count = current_meters;
-               nodes[node_count].day_start_meters = day_start_meters;
-               nodes[node_count].day_start_time = day_start_time;
-               nodes[node_count].miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
+               pushTimePoint(req, next_data, node_count)
+               next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
                   + ' miles'
-               nodes[node_count].hours_today = secondsToTimeString((timer - day_start_time) / 1000);
-               // rest stop, part 2 - create second time point at this location - "start_day"
+               next_data.hours_today = secondsToTimeString((next_data.timer - day_start_time) / 1000);
+               // rest stop, part 2 - create 2nd time point at this location - "start_day"
                // don't increment nodes - layover at same node
-               end_time = timer;
+               end_time = next_data.timer;
                next_start_time = setNextStartTime(end_time, drive_time_msec, midnight)
                // get number of milliseconds between end_time and next_start_time
                rest_stop_msec = next_start_time - end_time;
                // increment midnight to next day:
                midnight += 86400000;
-               status = "start_day";
-               timer += rest_stop_msec;
+               next_data.status = "start_day";
+               next_data.timer += rest_stop_msec;
                interval_count = 0; // begin first driving period of new day
                day_count++;
+               next_data.miles_today = null;
+               next_data.hours_today = null;
                day_start_meters = current_meters;
-               day_start_time = timer;
-               day_nodes.push([node_count]);
-               time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
-               node_count++ // now leaving this way_point in the morning
+               day_start_time = next_data.timer;
+               pushTimePoint(req, next_data, node_count)
+               node_count++ // now leaving this node in the morning
             }
-
-         } else {  // if last way_point of trip
-            status = "end_trip";
-            timer += nodes[node_count - 1].next_leg.duration.msec;
+         } else {  // if last node of trip
+            next_data.status = "end_trip";
+            next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
             current_meters += nodes[node_count - 1].next_leg.distance.meters;
             interval_count++;
-            day_nodes.push([node_count]);
-            time_points.push(setTimePointData(timer, status, nodes[node_count]));
-            nodes[node_count].time_points.push(setTimePointData(timer, status, nodes[node_count]));
-            nodes[node_count].type = status;
-            nodes[node_count].meter_count = current_meters;
-            nodes[node_count].day_start_meters = day_start_meters;
-            nodes[node_count].day_start_time = day_start_time;
-            nodes[node_count].miles_today = Math.round((current_meters - day_start_meters) * 0.000621371) + ' miles'
-            nodes[node_count].hours_today = secondsToTimeString((timer - day_start_time) / 1000);
+            next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371) + ' miles'
+            next_data.hours_today = secondsToTimeString((next_data.timer - day_start_time) / 1000);
+            pushTimePoint(req, next_data, node_count)
             node_count++;
-
          }
       }
    }
    return req;
 }
 
+const sortWeatherData = (req, res, next) => {
+   let { nodes, weather } = req.factory;
+   let time_points = req.factory.time_points;
+   let tz_user = req.payload.data.trip.overview.timezone_user;
+   let timestamp;
+   let local_str;
+   let user_str;
+   let timestampObj;
+   let testString;
+
+   for (let x = 0; x < time_points.length; x++) {
+      timestamp = time_points[x].timestamp;
+      timestampObj = new Date(timestamp);
+      // create date/time strings for 1) local timezone 2) user home timezone
+      local_str = getTimeForTimezone(timestampObj, time_points[x].timezone_local);
+      user_str = getTimeForTimezone(timestampObj, tz_user)
+      time_points[x].date_time_local = local_str;
+      time_points[x].date_time_user = user_str;
+      time_points[x].time_local = formatTime(local_str);
+      time_points[x].time_user = formatTime(user_str);
+      time_points[x].date_local_long = formatDateLong(local_str);
+      time_points[x].date_user_long = formatDateLong(user_str);
+      time_points[x].date_local = formatDate(timestampObj);
+      time_points[x].date_user = formatDate(timestampObj);
+      // Check overall accuracy =>
+      logTestString(testString, time_points[x]);
+      // each node has set of weather forecasts (7 days of NOAA data, 8 days of OWM data)
+      // loop through set of multi-day weather forecasts (NOAA and OWM) for this node 
+      for (let j = 0; j < weather.length; j++) {
+         // loop through NOAA weather forecasts (12 hour increments)
+         for (let y = 0; y < weather[j].forecast12hour.length; y++) {
+            // pull out NOAA data for this timestamp and save to time_point 
+            if (timestamp >= weather[j].forecast12hour[y].start
+               && timestamp < weather[j].forecast12hour[y].end) {
+               time_points[x].weather.forecast12hour = weather[j].forecast12hour[y];
+            }
+         }
+         // loop through OWM weather forecasts (24 hour increments)
+         for (let z = 0; z < weather[j].forecast24hour.length; z++) {
+            // pull out OWM data for this timestamp and save to time_point
+            if (timestamp >= weather[j].forecast24hour[z].start
+               && timestamp < weather[j].forecast24hour[z].end) {
+               time_points[x].weather.forecast24hour = weather[j].forecast24hour[z];
+               // OWM temperature comes in 6 hour increments
+               // don't worry about timezone, timestamp is not effected by timezone
+               for (let a = 0; a < weather[j].forecast24hour[z].temps.length; a++) {
+                  // pull out OWM temperature for this timestamp and copy to node
+                  if (timestamp >= weather[j].forecast24hour[z].temps[a].start
+                     && timestamp < weather[j].forecast24hour[z].temps[a].end) {
+                     time_points[x].weather.temperature = weather[j].forecast24hour[z].temps[a].temp;
+                     time_points[x].weather.temperature_time_check = weather[j].forecast24hour[z].temps[a].name;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
 module.exports = {
-   createTimePoints
+   createTimePoints,
+   sortWeatherData
 }

@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { InputModel } from '../models/input.model';
 import { Observable } from 'rxjs';
 import { ITripObject } from 'src/app/models/itrip-object';
-// import { inputSubmitted } from '../ui-area/trip-input/trip-input.component';
 
 @Injectable({
   providedIn: 'root'
@@ -33,13 +32,6 @@ export class ApiService {
   sendTripRequest(tripSettings): Observable<ITripObject> {
     console.log('api.service - sendTripRequest() w/ tripSettings :', tripSettings);
     return this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
-    // .subscribe(value => {
-    //   console.log('response! OMG!', value);
-    // }, err => {
-    //   console.log('Observer got an error: ' + err)
-    // }, () => {
-    //   console.log('Observer is complete!');
-    // });
   }
 
 }

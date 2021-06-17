@@ -1,6 +1,6 @@
 const axios = require('axios');
 const keys = require('../../config/keys');
-// important variables for creating way_points are defined in trip_input.js
+// important variables for creating way_points are defined in first_setup.js
 
 function checkLegDistances(leg_distances) { // for debugging
   let total = 0;

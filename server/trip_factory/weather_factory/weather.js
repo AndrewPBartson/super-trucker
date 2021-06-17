@@ -3,7 +3,7 @@ const { fetchDataNOAA } = require('./requestToNOAA')
 const { injectDataOWM } = require('./mergeDataOWM')
 const { injectDataNOAA } = require('./mergeDataNOAA')
 
-const getWeatherData = (req, res, next) => {
+const getWeather = (req, res, next) => {
   return fetchDataOWM(req, res, next)
     .then(dataOWM => {
       injectDataOWM(dataOWM, req);
@@ -19,5 +19,5 @@ const getWeatherData = (req, res, next) => {
 }
 
 module.exports = {
-  getWeatherData
+  getWeather
 }
