@@ -5,7 +5,7 @@ const { searchForServicesSet } = require('./services');
 const { getWeather } = require('./weather_factory/weather');
 const { createNodes } = require('./nodes');
 const { createTimePoints, sortWeatherData } = require('./time_points');
-const { createDaysArray, finalizePayload } = require('./days');
+const { createDaysArray } = require('./days');
 
 function build_trip(req, res, next) {
   setupPayload(req, res, next);
@@ -24,8 +24,7 @@ function build_trip(req, res, next) {
               // find relevant weather for each time_point
               sortWeatherData(req, res, next);
               // group time_points into a series of days
-              createDaysArray(req, res, next);
-              return finalizePayload(req, res, next);
+              return createDaysArray(req, res, next);
             })
         })
     })

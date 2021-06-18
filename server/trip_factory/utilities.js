@@ -41,7 +41,6 @@ function getTimeForTimezone(timestamp, timezone) {
       timeZone: 'UTC', // Don't change from UTC
       weekday: 'short',
       month: 'short',
-      // month: '2-digit',
       day: 'numeric',
       // year: 'numeric',
       hour: '2-digit',
@@ -49,9 +48,35 @@ function getTimeForTimezone(timestamp, timezone) {
       // second: '2-digit'
     })
   }
-  console.log('timeStr :>> ', timeStr);
+
   return timeStr;
 }
+
+// consider making this DRY... but how to return multiple results?
+function getTimeForTimezone2(timestamp, timezone) {
+  // same as getTimeForTimezone() except 2-digit month
+  let timeStr = '';
+  if (timestamp && timezone) {
+    let offsetStr = timezone.replace(/:/g, '');
+    let reverseOffset = offsetStr.replace(/[-+]/, sign => sign === '+' ? '-' : '+');
+    let time = new Date(timestamp);
+    timeStr = time.toUTCString().replace('GMT', reverseOffset);
+
+    time = new Date(Date.parse(timeStr));
+    timeStr = time.toLocaleString('en-US', {
+      timeZone: 'UTC', // Don't change from UTC
+      weekday: 'short',
+      month: '2-digit',
+      day: 'numeric',
+      // year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+      // second: '2-digit'
+    })
+  }
+  return timeStr;
+}
+
 
 const formatTime = (dateTime) => {
   let timeStr = dateTime.slice(dateTime.length - 8);
@@ -65,21 +90,19 @@ const formatDateLong = (dateTime) => {
   let dateStr = dateTime.slice(0, dateTime.length - 10);
   return dateStr;
 }
-
-const formatDate = (dateObj) => {
-  let dateStr = (dateObj.getMonth() + 1) + '/' + dateObj.getDate();
+const formatDateShort = (dateTime) => {
+  let dateStr = dateTime.slice(5, dateTime.length - 10);
+  if (dateStr[0] === '0') {
+    dateStr = dateStr.slice(1);
+  }
   return dateStr;
-}
-
-function convertTZ(date, tzString) {
-  return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", { timeZone: tzString }));
 }
 
 module.exports = {
   secondsToTimeString,
   getTimeForTimezone,
+  getTimeForTimezone2,
   formatTime,
   formatDateLong,
-  formatDate,
-  convertTZ
+  formatDateShort
 }

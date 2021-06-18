@@ -25,12 +25,8 @@ const AddPointForecastNOAA = (dataNOAA) => {
 const injectDataNOAA = (dataNOAA, req) => {
   for (let i = 0; i < dataNOAA.length; i++) {
     console.log('dataNOAA[i].status :>> ', dataNOAA[i].status);
-    // add NOAA data to req.factory
     req.factory.weather[i].statusNOAA = dataNOAA[i].status;
     req.factory.weather[i].forecast12hour = (AddPointForecastNOAA(dataNOAA[i]));
-    // optional - add NOAA data to payload for testing
-    req.payload.data.trip.weather[i].statusNOAA = dataNOAA[i].status;
-    req.payload.data.trip.weather[i].forecast12hour = (AddPointForecastNOAA(dataNOAA[i]));
   }
   return req;
 }

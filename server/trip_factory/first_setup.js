@@ -22,22 +22,12 @@ const formatTimezoneUser = (tz_user, time_user_str) => {
   return tz_id_final;
 }
 
-// payload.day_nodes[] will be refactored out
-// properties in final payload - overview{}, days[].
-// 
-// other payload properties (nodes, time_points, weather) 
-// will be integrated into payload.days[]
-// however for testing they are included 
-// as separate arrays in payload: payload.nodes[] etc
 const setupPayload = (req, res, next) => {
   req.payload = {
     "data": {
       "trip": {
         "days": [],
-        // duplicates of nodes[], weather[] are in req.factory
-        "nodes": [],
-        "overview": {},
-        "weather": []
+        "overview": {}
       }
     }
   }
@@ -57,7 +47,7 @@ const createTripOverview = (req, res, next) => {
   }
   // convert date object to milliseconds
   let start_time_msec = start_time.getTime();
-  // save in payload
+
   req.payload.data.trip.overview = {
     "avg_speed": avg_speed,
     "bounds": {},
@@ -105,13 +95,9 @@ function setupTripFactory(req, res, next) {
     num_segments_in_leg_array: [],
     leftovers: null,
     trip_url: '',
-    // duplicate days[]
     days: [],
-    // duplicate nodes[]
     nodes: [],
-    // duplicate time_points[]
     time_points: [],
-    // duplicate weather[]
     weather: [],
     urls_NOAA: [],
     urls_OWM: [],

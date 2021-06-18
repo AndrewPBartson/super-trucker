@@ -12,11 +12,7 @@ function getCityString(address) {
 }
 
 function createNodes(req, res, next) {
-   // saving nodes to req.factory.nodes for production but
-   // still refactoring to use instead of payload nodes  
-   // saving nodes to req.payload.data.trip.nodes for testing
    let factory = req.factory;
-   let payload = req.payload.data.trip;
    let legs = req.factory.legs;
    let cityState;
    let meters_per_second = req.factory.meters_per_second;
@@ -36,12 +32,6 @@ function createNodes(req, res, next) {
             "text": secondsToTimeString(duration_in_seconds)
          }
       }
-      payload.nodes.push({
-         "cityState": cityState,
-         "latLng": legs[i].start_location,
-         "time_points": [],
-         "next_leg": next_leg
-      });
       factory.nodes.push({
          "cityState": cityState,
          "latLng": legs[i].start_location,
@@ -50,11 +40,6 @@ function createNodes(req, res, next) {
       });
       // add last way_point (waypoints.length = legs.length + 1)
       if (i === legs.length - 1) {
-         payload.nodes.push({
-            "cityState": getCityString(legs[i].end_address),
-            "latLng": legs[i].end_location,
-            "time_points": []
-         })
          factory.nodes.push({
             "cityState": getCityString(legs[i].end_address),
             "latLng": legs[i].end_location,

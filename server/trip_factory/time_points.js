@@ -1,9 +1,10 @@
 const {
    secondsToTimeString,
    getTimeForTimezone,
+   getTimeForTimezone2,
    formatTime,
    formatDateLong,
-   formatDate
+   formatDateShort
 } = require('./utilities');
 
 function pushTimePoint(req, next_data, idx) {
@@ -18,6 +19,7 @@ function pushTimePoint(req, next_data, idx) {
       hours_today: next_data.hours_today,
       timezone_local: weather[idx].timezone_local,
       timezone_local_str: weather[idx].timezone_local_str,
+      weather_idx: idx,
       weather: {}
    })
 }
@@ -125,17 +127,18 @@ function createTimePoints(req, res, next) {
       node_count < nodes.length;) {
       next_data.status = "";
       if (node_count === 0) { // first time_point, first node
-         // don't add to running totals (next_data.timer & current_meters)
+         // don't add to running totals
          next_data.status = "start_trip";
          pushTimePoint(req, next_data, node_count)
          node_count++;
       } else { // not first node
-         // add just completed drive time to next_data.timer
+         // add just completed drive time and distance to running totals
          if (!(node_count === nodes.length - 1)) { // if not last node of trip
             // if not done driving for the day, and if enough time for next interval before midnight
             if (interval_count < intervals_per_day &&
                next_data.timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec < midnight) {
                next_data.status = "enroute";
+               // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
                interval_count++;
@@ -145,15 +148,17 @@ function createTimePoints(req, res, next) {
             else { // rest stop - done driving for the day, not end of trip
                // rest stop, part 1 - create 1st time point at this location - "end_day"
                next_data.status = "end_day";
+               // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
                interval_count++;
-               pushTimePoint(req, next_data, node_count)
                next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
                   + ' miles'
                next_data.hours_today = secondsToTimeString((next_data.timer - day_start_time) / 1000);
+               pushTimePoint(req, next_data, node_count)
                // rest stop, part 2 - create 2nd time point at this location - "start_day"
-               // don't increment nodes - layover at same node
+               // layover at same node so
+               // don't increment nodes, don't add distance to current_meters
                end_time = next_data.timer;
                next_start_time = setNextStartTime(end_time, drive_time_msec, midnight)
                // get number of milliseconds between end_time and next_start_time
@@ -173,6 +178,7 @@ function createTimePoints(req, res, next) {
             }
          } else {  // if last node of trip
             next_data.status = "end_trip";
+            // add just completed drive time and distance to running totals
             next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
             current_meters += nodes[node_count - 1].next_leg.distance.meters;
             interval_count++;
@@ -187,57 +193,65 @@ function createTimePoints(req, res, next) {
 }
 
 const sortWeatherData = (req, res, next) => {
-   let { nodes, weather } = req.factory;
+   let weather = req.factory.weather;
    let time_points = req.factory.time_points;
    let tz_user = req.payload.data.trip.overview.timezone_user;
    let timestamp;
    let local_str;
    let user_str;
+   let local_str2;
+   let user_str2;
    let timestampObj;
    let testString;
+   let idx;
 
    for (let x = 0; x < time_points.length; x++) {
       timestamp = time_points[x].timestamp;
       timestampObj = new Date(timestamp);
-      // create date/time strings for 1) local timezone 2) user home timezone
+      idx = time_points[x].weather_idx;
+      // local timezone
       local_str = getTimeForTimezone(timestampObj, time_points[x].timezone_local);
-      user_str = getTimeForTimezone(timestampObj, tz_user)
       time_points[x].date_time_local = local_str;
-      time_points[x].date_time_user = user_str;
       time_points[x].time_local = formatTime(local_str);
-      time_points[x].time_user = formatTime(user_str);
       time_points[x].date_local_long = formatDateLong(local_str);
+      // get alternate format for date - 2-digit e.g. 6/17
+      local_str_2 = getTimeForTimezone2(timestampObj, time_points[x].timezone_local);
+      time_points[x].date_local = formatDateShort(local_str_2);
+      // user home timezone
+      user_str = getTimeForTimezone(timestampObj, tz_user)
+      time_points[x].date_time_user = user_str;
+      time_points[x].time_user = formatTime(user_str);
       time_points[x].date_user_long = formatDateLong(user_str);
-      time_points[x].date_local = formatDate(timestampObj);
-      time_points[x].date_user = formatDate(timestampObj);
-      // Check overall accuracy =>
+      user_str_2 = getTimeForTimezone2(timestampObj, tz_user)
+      time_points[x].date_user = formatDateShort(user_str_2);
+
       logTestString(testString, time_points[x]);
-      // each node has set of weather forecasts (7 days of NOAA data, 8 days of OWM data)
-      // loop through set of multi-day weather forecasts (NOAA and OWM) for this node 
-      for (let j = 0; j < weather.length; j++) {
-         // loop through NOAA weather forecasts (12 hour increments)
-         for (let y = 0; y < weather[j].forecast12hour.length; y++) {
-            // pull out NOAA data for this timestamp and save to time_point 
-            if (timestamp >= weather[j].forecast12hour[y].start
-               && timestamp < weather[j].forecast12hour[y].end) {
-               time_points[x].weather.forecast12hour = weather[j].forecast12hour[y];
-            }
+
+      // save status of NOAA request/promise - rejected or fulfilled
+      time_points[x].weather.status = weather[idx].statusNOAA;
+      // each time_point has index for weather data for that location 
+      // which is a set of weather forecasts (7 days NOAA data, 8 days OWM data)
+      for (let y = 0; y < weather[idx].forecast12hour.length; y++) {
+         // NOAA weather forecasts in 12 hour increments
+         // pull data for this timestamp and save to time_point 
+         if (timestamp >= weather[idx].forecast12hour[y].start
+            && timestamp < weather[idx].forecast12hour[y].end) {
+            time_points[x].weather.forecast12hour = weather[idx].forecast12hour[y];
          }
-         // loop through OWM weather forecasts (24 hour increments)
-         for (let z = 0; z < weather[j].forecast24hour.length; z++) {
-            // pull out OWM data for this timestamp and save to time_point
-            if (timestamp >= weather[j].forecast24hour[z].start
-               && timestamp < weather[j].forecast24hour[z].end) {
-               time_points[x].weather.forecast24hour = weather[j].forecast24hour[z];
-               // OWM temperature comes in 6 hour increments
-               // don't worry about timezone, timestamp is not effected by timezone
-               for (let a = 0; a < weather[j].forecast24hour[z].temps.length; a++) {
-                  // pull out OWM temperature for this timestamp and copy to node
-                  if (timestamp >= weather[j].forecast24hour[z].temps[a].start
-                     && timestamp < weather[j].forecast24hour[z].temps[a].end) {
-                     time_points[x].weather.temperature = weather[j].forecast24hour[z].temps[a].temp;
-                     time_points[x].weather.temperature_time_check = weather[j].forecast24hour[z].temps[a].name;
-                  }
+      }
+      for (let z = 0; z < weather[idx].forecast24hour.length; z++) {
+         // OWM weather forecasts in 24 hour increments
+         // pull data for this timestamp and save to time_point
+         if (timestamp >= weather[idx].forecast24hour[z].start
+            && timestamp < weather[idx].forecast24hour[z].end) {
+            time_points[x].weather.forecast24hour = weather[idx].forecast24hour[z];
+            // OWM temperature comes in 6 hour increments
+            for (let a = 0; a < weather[idx].forecast24hour[z].temps.length; a++) {
+               // pull temperature for this timestamp and save to time_point
+               if (timestamp >= weather[idx].forecast24hour[z].temps[a].start
+                  && timestamp < weather[idx].forecast24hour[z].temps[a].end) {
+                  time_points[x].weather.temperature = weather[idx].forecast24hour[z].temps[a].temp;
+                  time_points[x].weather.temperature_time_check = weather[idx].forecast24hour[z].temps[a].name;
                }
             }
          }

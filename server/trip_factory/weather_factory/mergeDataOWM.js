@@ -89,10 +89,7 @@ const AddPointForecastOWM = (dataOWM) => {
 
 const injectDataOWM = (dataOWM, req) => {
   for (let i = 0; i < dataOWM.length; i++) {
-    // add OWM data to req.factory
     req.factory.weather.push(AddPointForecastOWM(dataOWM[i]));
-    // optional - add OWM data to payload for testing
-    req.payload.data.trip.weather.push(AddPointForecastOWM(dataOWM[i]));
   }
   return req;
 }

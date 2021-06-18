@@ -1,5 +1,3 @@
-const { getTimeForTimezone } = require('./utilities');
-
 function viewFactoryReport(factory) {
   console.log(`
       ******************** Trip Factory Report ****************
@@ -25,28 +23,10 @@ function viewFactoryReport(factory) {
   return factory;
 }
 
-const calcTotals = (params) => {
-  let dayTotals = {
-    miles_today: 2,
-    hours_today: 3,
-
-    day_start_time: 123,
-    day_start_meters: 456
-  }
-  return dayTotals;
-}
-
 const createDaysArray = (req, res, next) => {
   // viewFactoryReport(req.factory);
-  let { nodes, weather } = req.factory;
   let time_points = req.factory.time_points;
   let days = req.payload.data.trip.days;
-  let tz_user = req.payload.data.trip.overview.timezone_user;
-  let timestamp;
-  let local_str;
-  let user_str;
-  let timestampObj;
-  let testString;
   let emptyDay;
   let dayTotals = {};
   let day_count = 0;
@@ -63,33 +43,18 @@ const createDaysArray = (req, res, next) => {
     if (time_points[i].status === "start_day") {
       day_count++;
     }
+    if (time_points[i].status === "end_day" || time_points[i].status === "end_trip") {
+      days[day_count].totals.miles_today = time_points[i].miles_today;
+      days[day_count].totals.hours_today = time_points[i].hours_today;
+    }
     // add time_point to time_points[] of current day
     days[day_count].time_points.push(time_points[i])
-    if (time_points[i].status === "end_day" || time_points[i].status === "end_trip") {
-      // end of day - calculate totals
-      dayTotals = {
-        miles_today: 2,
-        hours_today: 3,
-        day_start_time: 123,
-        day_start_meters: 456
-      }
-      days[day_count].totals = dayTotals;
-    }
   }
-}
-
-const finalizePayload = (req, res, next) => {
-  console.log('finalizePayload() working!')
-  // to do: remove duplicate data used during development:
-  // payload.time_points
-  // payload.weather
-  // nodes.time_points.cityName
   return req;
 }
 
 module.exports = {
-  createDaysArray,
-  finalizePayload
+  createDaysArray
 }
 
 
