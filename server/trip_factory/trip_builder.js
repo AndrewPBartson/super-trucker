@@ -1,11 +1,13 @@
-const { createTripOverview, setupTripFactory, setupPayload } = require('./first_setup');
+const { setupPayload, createTripOverview, setupTripFactory } = require('./first_setup');
 const { getInitialTripData } = require('./first_version');
 const { fixWayPoints, getExtraWayPoints } = require('./waypoints');
 const { searchForServicesSet } = require('./services');
-const { getWeather } = require('./weather_factory/weather');
 const { createNodes } = require('./nodes');
-const { createTimePoints, sortWeatherData } = require('./time_points');
+const { getWeather } = require('./weather_factory/weather_builder');
+const { createTimePoints } = require('./time_points');
+const { integrateWeather } = require('./integrateWeather');
 const { createDaysArray } = require('./days');
+const { reviewWaypointCalcs } = require('./devDataCheck');
 
 function build_trip(req, res, next) {
   setupPayload(req, res, next);
@@ -15,6 +17,7 @@ function build_trip(req, res, next) {
     .then(req => {
       return fixWayPoints(req, res, next)
         .then(req => {
+          // reviewWaypointCalcs(req.factory);
           createNodes(req, res, next);
           // get 7-day forecasts for each node
           return getWeather(req, res, next)
@@ -22,8 +25,8 @@ function build_trip(req, res, next) {
               // calculate times for locations along route
               createTimePoints(req, res, next);
               // find relevant weather for each time_point
-              sortWeatherData(req, res, next);
-              // group time_points into a series of days
+              integrateWeather(req, res, next);
+              // allocate each time_point to a day
               return createDaysArray(req, res, next);
             })
         })

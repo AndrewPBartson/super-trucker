@@ -5,16 +5,6 @@ const validateTripInput = require('../../validation/trip');
 const Trip = require('../../models/Trip');
 let { build_trip } = require('../../trip_factory/trip_builder');
 
-
-function randomStr(length) {
-  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  var result = '';
-  for (var i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
 function getAllTrips(req, res, next) {
   model.trips.getAllTrips()
     .then((result) => {
@@ -52,9 +42,10 @@ router.post('/', (req, res, next) => {
     // If any errors, send 400 with errors object
     return res.status(400).json(errors);
   }
-
+  // res.json(trip_I40);
   build_trip(req, res, next)
     .then(req => {
+      //console.log('  =====   ========== req.factory :>> ', req.factory);
       res.json(req.payload);
     })
     .catch(function (error) {

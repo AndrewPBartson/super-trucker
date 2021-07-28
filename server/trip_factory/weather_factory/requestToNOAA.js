@@ -1,5 +1,4 @@
 const axios = require('axios');
-const keys = require('../../../config/keys');
 
 function createUrlsNOAA(req) {
   req.factory.urls_NOAA = [];

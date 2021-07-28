@@ -58,18 +58,23 @@ const createTripOverview = (req, res, next) => {
     "intervals_per_day": null,
     "miles_per_day": miles_per_day,
     "origin": origin,
+    "start_time": start_time_msec,
+    "timezone_user": formatTimezoneUser(timezone_user, time_user_str),
+    "timezone_user_str": timezone_user,
     "services": {
       "hotels": hotels,
       "truck_stops": truck_stops,
       "weather": weather
     },
-    "start_time": start_time_msec,
+
+    "end_time": null,
     "summary": null,
-    "timezone_user": formatTimezoneUser(timezone_user, time_user_str),
-    "timezone_user_str": timezone_user,
     "total_meters": null,
     "total_mi": null,
-    "total_mi_text": null
+    "total_mi_text": null,
+    "total_hrs_text": null,
+    "time_points": [],
+    "weather": []
   }
   return req;
 }
@@ -99,8 +104,9 @@ function setupTripFactory(req, res, next) {
     nodes: [],
     time_points: [],
     weather: [],
-    urls_NOAA: [],
     urls_OWM: [],
+    urls_NOAA: [],
+    patch_data: {},
 
     way_points: [],
     way_points_B: [],

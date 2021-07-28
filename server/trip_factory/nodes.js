@@ -1,4 +1,4 @@
-const { secondsToTimeString } = require('./utilities');
+const { secondsToHoursStr } = require('./utilities');
 
 function getCityString(address) {
    let components = address.split(",");
@@ -29,7 +29,7 @@ function createNodes(req, res, next) {
          "duration": {
             "seconds": Math.round(duration_in_seconds),
             "msec": Math.round(duration_in_seconds * 1000),
-            "text": secondsToTimeString(duration_in_seconds)
+            "text": secondsToHoursStr(duration_in_seconds)
          }
       }
       factory.nodes.push({
@@ -52,5 +52,5 @@ function createNodes(req, res, next) {
 
 module.exports = {
    createNodes,
-   secondsToTimeString
+   secondsToHoursStr
 }

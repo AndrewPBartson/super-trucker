@@ -104,7 +104,7 @@ router.get(
   '/current',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    // passport added user data to req behind th scenes
+    // passport added user data to req behind the scenes
     res.json({
       id: req.user.id,
       name: req.user.name,

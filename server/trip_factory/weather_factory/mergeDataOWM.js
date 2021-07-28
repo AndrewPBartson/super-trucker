@@ -1,13 +1,15 @@
-// OWM date/time comes back in milliseconds,
+const { capitalize1stChar } = require('../utilities');
+// OWM date/time is given in milliseconds,
 // multiply by 1000 to convert to seconds
 const addSnapshot24 = (pointOWM) => {
   // OWM data is in 24 hour increments except
-  // temperature which is in 6 hour increments
+  // temperature is in 6 hour increments
+
   let snapshot = {
-    "start": (pointOWM.dt * 1000) - 43200000,
-    "end": (pointOWM.dt * 1000) + 43200000,
+    "start_24": (pointOWM.dt * 1000) - 43200000,
+    "end_24": (pointOWM.dt * 1000) + 43200000,
     "text24short": pointOWM.weather[0].main,
-    "text24": pointOWM.weather[0].description,
+    "text24": capitalize1stChar(pointOWM.weather[0].description),
     "icon_OWM": 'http://openweathermap.org/img/wn/' + pointOWM.weather[0].icon + '@2x.png',
     "min": Math.round(pointOWM.temp.min),
     "max": Math.round(pointOWM.temp.max),
@@ -56,7 +58,7 @@ const addSnapshot24 = (pointOWM) => {
   return snapshot;
 }
 
-// OWM provides timezone, prevents additional api call!
+// OWM provides timezone, prevents additional api call
 // fix timezone given by OWM
 const formatTimezoneOWM = (timezone_raw) => {
   let tz_new = (timezone_raw / 36);
@@ -69,31 +71,34 @@ const formatTimezoneOWM = (timezone_raw) => {
   return tz_new;
 }
 
-const AddPointForecastOWM = (dataOWM) => {
+const addForecastObjectOWM = (dataOWM) => {
   // initialize set of weather forecasts for one node
   // prefer to initialize here because timezone is from OWM
-  let weather = {
-    // save local timezone in weather object
-    // later local tz will be in time_point object but time_points don't exist yet. 
+  let node_weather = {
+    // save local timezone in node_weather object
+    // later local tz will be in time_points[x] but time_points don't exist yet 
     "timezone_local_str": dataOWM.data.timezone,
     "timezone_local": formatTimezoneOWM(dataOWM.data.timezone_offset),
     "forecast24hour": [],
     "forecast12hour": [],
-    "statusNOAA": ""
+    "statusNOAA": "none",
+    "hasOWMData": (dataOWM.data.daily.length !== 0)
   }
   for (let i = 0; i < dataOWM.data.daily.length; i++) {
-    weather.forecast24hour.push(addSnapshot24(dataOWM.data.daily[i]));
+    node_weather.forecast24hour.push(addSnapshot24(dataOWM.data.daily[i]));
   }
-  return weather;
+  node_weather.hasOWMData = node_weather.forecast24hour.length !== 0
+  return node_weather;
 }
 
-const injectDataOWM = (dataOWM, req) => {
+const saveDataOWM = (dataOWM, req) => {
+
   for (let i = 0; i < dataOWM.length; i++) {
-    req.factory.weather.push(AddPointForecastOWM(dataOWM[i]));
+    req.factory.weather.push(addForecastObjectOWM(dataOWM[i]));
   }
   return req;
 }
 
 module.exports = {
-  injectDataOWM
+  saveDataOWM
 }

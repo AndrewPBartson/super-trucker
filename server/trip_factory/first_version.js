@@ -43,12 +43,12 @@ function setIntervalsPerDay(meters_per_day, total_meters) {
   return divide_by;
 }
 
-function getSimpleData(req, response_1) {
-  let { total_meters, polylinePts, all_points } = req.factory;
-  req.factory.total_meters = response_1.data.routes[0].legs[0].distance.value;
-  req.payload.data.trip.overview.total_meters = response_1.data.routes[0].legs[0].distance.value;
-  req.payload.data.trip.overview.total_mi_text = response_1.data.routes[0].legs[0].distance.text;
-  polylinePts = response_1.data.routes[0].overview_polyline.points;
+function getSimpleData(req, response_0) {
+  let polylinePts = req.factory.polylinePts;
+  req.factory.total_meters = response_0.data.routes[0].legs[0].distance.value;
+  req.payload.data.trip.overview.total_meters = response_0.data.routes[0].legs[0].distance.value;
+  req.payload.data.trip.overview.total_mi_text = response_0.data.routes[0].legs[0].distance.text;
+  polylinePts = response_0.data.routes[0].overview_polyline.points;
   // convert G_maps trip summary polyline to array of lat/lng coordinates
   req.factory.all_points = polyline.decode(polylinePts)
 }
@@ -73,7 +73,7 @@ function calcFirstTripVariables(factory) {
 
 function calcFirstWayPoints(factory) {
   for (let t = 0; t < factory.num_legs_round; t++) {
-    // if last leg, push number of "leftover" segments into last leg of factory
+    // if last leg, push number of "leftover" segments into last leg
     if (t === factory.num_legs_round - 1) {
       factory.num_segments_in_leg_array.push(factory.leftovers)
     }
@@ -93,7 +93,7 @@ function calcFirstWayPoints(factory) {
   factory.way_points.push(factory.all_points[factory.all_points.length - 1])
   factory.way_pts_indexes.push(factory.all_points.length - 1);
   // now way_points are first approximation of where stopping places should be
-  console.log('factory.way_points', factory.way_points)
+  console.log('1st way_points', factory.way_points)
   return factory;
 }
 
@@ -104,8 +104,8 @@ function getInitialTripData(req, res, next) {
     ${origin}&destination=${end_point}
     &key=${keys.GMkey}`
   return axios.get(first_url)
-    .then(response_1 => {
-      getSimpleData(req, response_1)
+    .then(response_0 => {
+      getSimpleData(req, response_0)
       calcFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)
       return req;
