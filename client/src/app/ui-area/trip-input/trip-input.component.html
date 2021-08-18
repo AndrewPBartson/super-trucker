@@ -4,7 +4,12 @@
   class="inputForm"
 >
   <div class="item_AA">
-    <button id="login_btn" type="button" mat-raised-button>
+    <button
+      (click)="showLogin()"
+      id="login_btn"
+      type="button"
+      mat-raised-button
+    >
       Login/Register
     </button>
   </div>
@@ -183,7 +188,6 @@
       matInput
       [ngxMatDatetimePicker]="picker"
       placeholder="Departure Date/Time"
-      [min]="currentTime"
       id="depart_time"
       formControlName="depart_time"
     />

@@ -1,13 +1,14 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { getTimestampFromStr } = require('../utilities');
+const { getTimestampFromStr, getTimeForTimezone, calcMidnight } = require('../utilities');
 
 // calls to NOAA api often fail. failed requests
-// are noted and fixed by scraping NOAA website (html, not api)
+// are noted and fixed by scraping NOAA html (not api)
 
 const createUrlsForGaps = (req) => {
   let url;
-  let { patch_data, weather, nodes } = req.factory;
+  let { patch_data, nodes } = req.factory;
+  let weather = req.payload.data.trip.weather;
   patch_data.indexes = [];
   patch_data.urls = [];
   patch_data.timezones = [];
@@ -35,15 +36,15 @@ const beginForecast = ($, timezone) => {
   // pull weather data and date string from NOAA html
   let valid_date = $('a:contains("Forecast Valid")');
   let date_str = valid_date.parent().next().text();
-  let begin_day_midnight = getTimestampFromStr(date_str, timezone);
+  console.log('should be begin day midnight: [date_str] :>> ', date_str);
+  let begin_day_midnight = calcMidnight(getTimestampFromStr(date_str, timezone));
   let data_1 = {
     forecast_rows: $('div.row-forecast'),
     main_panels: $('div.tombstone-container'),
     valid_date: valid_date,
     date_str: date_str,
     // set 1st time period (start and end) for this location
-    // periods run from 6 am to 6 pm, and from 6 pm to 6 am
-    // 1st period is edge case bc it starts at 6 pm on previous day
+    // 12 hr periods run from 6 am to 6 pm, and from 6 pm to 6 am
     begin_day_midnight: begin_day_midnight,
     period_start: begin_day_midnight - 21600000,
     period_end: begin_day_midnight + 21600000
@@ -51,14 +52,9 @@ const beginForecast = ($, timezone) => {
   return data_1;
 }
 
-// figure out how to update period start and end while also passing it in
-
-
-
-
 const buildForecastArray = ($, data) => {
   // create snapshots (weather data for place at time) and
-  // push to array for 12-hour periods for this location
+  // push to array of 12-hour periods for this location
   let forecast12hour = [];
   let period_start = data.period_start;
   let period_end = data.period_end;
@@ -77,13 +73,21 @@ const buildForecastArray = ($, data) => {
       } else {
         text_short = $(data.main_panels[j]).find('p.short-desc').text();
       }
-      console.log('text_short :>>       ', text_short);
     } else {  // no main_panel, create text_short from forecast_row
+      // reformat this text if it's more than 'medium' sized - 
+      // remove leading 'A '
+      // replace ' percent' with '%'
+      // replace ' possibly a ' with ' possible '
+      // replace 'Thunderstorm' with 'T-storm'
+      // replace ' and/And ' with '&'
+      // truncate when encounter these:
+      //  ', with'     ', mainly'    ' between'    ' before'   ' after'
+      // capitalize 1st letters
       text_short = text_long.substring(0, 25);
     }
     snapshot = {
-      start: period_start,
-      end: period_end,
+      start_12: period_start,
+      end_12: period_end,
       "icon_NOAA": ('https://forecast.weather.gov/' + icon),
       "text12": text_long,
       "text12short": text_short
@@ -104,10 +108,10 @@ const patchMissingData = (gaps, req) => {
       if (gaps[i].value.status === 200) {
         const $ = cheerio.load(gaps[i].value.data);
         data_1 = beginForecast($, req.factory.patch_data.timezones[i]);
-        req.factory.weather[req.factory.patch_data.indexes[i]].forecast12hour =
+        req.payload.data.trip.weather[req.factory.patch_data.indexes[i]].forecast12hour =
           buildForecastArray($, data_1);;
-        req.factory.weather[req.factory.patch_data.indexes[i]].hasNOAAHtml =
-          req.factory.weather[req.factory.patch_data.indexes[i]].forecast12hour.length !== 0;
+        req.payload.data.trip.weather[req.factory.patch_data.indexes[i]].hasNOAAHtml =
+          req.payload.data.trip.weather[req.factory.patch_data.indexes[i]].forecast12hour.length !== 0;
       }
     }
   }

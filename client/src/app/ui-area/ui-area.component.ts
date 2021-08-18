@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ITripObject } from 'src/app/models/itrip-object';
+import { ITripObject } from '../models/itrip-object';
 import { ApiService } from '../services/api.service';
 import { ViewManagerService } from '../services/view-manager.service';
-import { trip_I40 } from '../../../../junkyard/data_response_json/test_trip';
 
 @Component({
   selector: 'app-ui-area',
@@ -11,17 +10,19 @@ import { trip_I40 } from '../../../../junkyard/data_response_json/test_trip';
 })
 export class UiAreaComponent implements OnInit {
   tripObject: ITripObject;
-  showForm: boolean;
+  viewMode: string;
 
   constructor(private apiService: ApiService, private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
-    this.showForm = true
-    this.viewManagerService.toggleView
-      .subscribe(status => this.showForm = status);
+    this.viewMode = 'form'
+    this.viewManagerService.setViewMode
+      .subscribe(mode => {
+        this.viewMode = mode
+      });
   }
 
-  doStuffWithRawData(data) {
+  handleResponse(data) {
     let tripData = data.data.trip;
     // let tripData = trip_I40.data.trip;
     console.log('tripData :>> ', tripData);
@@ -31,8 +32,8 @@ export class UiAreaComponent implements OnInit {
   callTripService(tripSettings) {
     this.apiService.sendTripRequest(tripSettings)
       .subscribe(rawData => {
-        this.tripObject = this.doStuffWithRawData(rawData);
-        this.showForm = false;
+        this.tripObject = this.handleResponse(rawData);
+        this.viewMode = 'summary';
       })
   }
 }

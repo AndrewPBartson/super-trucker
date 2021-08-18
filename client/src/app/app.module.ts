@@ -16,6 +16,8 @@ import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
 import { TripSummaryComponent } from './ui-area/trip-summary/trip-summary.component';
 import { LoginRegisterComponent } from './ui-area/login-register/login-register.component';
 import { environment } from 'src/environments/environment';
+import { LoginComponent } from './ui-area/login-register/login/login.component';
+import { RegisterComponent } from './ui-area/login-register/register/register.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import { environment } from 'src/environments/environment';
     UiAreaComponent,
     HeaderComponent,
     TripSummaryComponent,
-    LoginRegisterComponent
+    LoginRegisterComponent,
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

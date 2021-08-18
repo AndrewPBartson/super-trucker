@@ -5,8 +5,8 @@ import { tz } from 'moment-timezone';
 import { ThemePalette } from '@angular/material/core';
 
 import { ITripInput } from '../../models/itrip-input';
-import { ApiService } from '../../services/api.service';
 import { InputService } from '../../services/input.service';
+import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
   selector: 'app-trip-input',
@@ -15,11 +15,13 @@ import { InputService } from '../../services/input.service';
   providers: []
 })
 export class TripInputComponent implements OnInit {
-  @Output() tripSubmitted = new EventEmitter();
-  isVisible: boolean;
-
-  @ViewChild('picker', { static: true }) picker: any;
   tripForm: FormGroup;
+  advInputVisible = false;
+  // intervalId - (may be unnecessary) for cancelling update of date time field
+  intervalId = null;
+
+  @Output() tripSubmitted = new EventEmitter();
+  @ViewChild('picker', { static: true }) picker: any;
 
   public showSpinners = true;
   public showSeconds = false;
@@ -33,8 +35,6 @@ export class TripInputComponent implements OnInit {
   public stepHours = [1, 2, 3, 4, 5];
   public stepMinutes = [1, 5, 10, 15, 20, 25];
   public stepSeconds = [1, 5, 10, 15, 20, 25];
-
-  advInputVisible = false;
 
   input: ITripInput = {
     origin: '',
@@ -70,14 +70,14 @@ export class TripInputComponent implements OnInit {
     tz.guess(), "GMT-0800 (PST)", "GMT-0700 (PDT MST)", "GMT-0600 (MDT CST)", "GMT-0500 (CDT EST)", "GMT-0400 (EDT)"
   ]
 
-  constructor(private apiService: ApiService, private inputService: InputService) { }
+  constructor(private inputService: InputService, private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
-    this.isVisible = true;
+
     this.tripForm = new FormGroup({
       weather: new FormControl(true),
-      hotels: new FormControl(null),
-      truck_stops: new FormControl(null),
+      hotels: new FormControl({ value: null, disabled: true }),
+      truck_stops: new FormControl({ value: null, disabled: true }),
       origin: new FormControl('', [
         Validators.required,
         this.inputService.checkCityName.bind(this)
@@ -94,6 +94,15 @@ export class TripInputComponent implements OnInit {
       depart_time: new FormControl(moment().toDate()),
       timezone_user: new FormControl(tz.guess())
     });
+    // so far, depart_time is refreshed every 6 seconds 
+    // to do: when refreshing depart_time, set it
+    // about 10 minutes ahead of current time
+    // 10 minutes = 600000 milliseconds
+    this.intervalId = setInterval(this.refreshDateTime, 6000, this.tripForm, 600000);
+  }
+
+  refreshDateTime(form, increment) {
+    form.get('depart_time').setValue(moment().toDate())
   }
 
   onTripSubmitted(e, tForm, presets) {
@@ -107,15 +116,13 @@ export class TripInputComponent implements OnInit {
     // add time string from user's machine
     this.input.time_user_str = this.tripForm.value.depart_time.toString();
     console.log('onTripSubmitted() - fixed input :', this.input);
+
     this.tripSubmitted.emit(this.input);
   }
 
-  // when login button is clicked, open login component
-  showLoginForm() {
-    // probably needs to be in ui component
-    // 
+  showLogin() {
+    this.viewManagerService.setViewMode.emit('login')
   }
-
 
   showMoreLess() {
     if (!this.advInputVisible) {
@@ -133,3 +140,5 @@ export class TripInputComponent implements OnInit {
     });
   }
 }
+
+export declare type NgxMatDateFormats = { parse: { dateInput: any; }; display: { dateInput: any; monthYearLabel: any; dateA11yLabel: any; monthYearA11yLabel: any; }; };

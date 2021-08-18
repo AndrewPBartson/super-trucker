@@ -1,20 +1,24 @@
-const { secondsToHoursStr } = require('./utilities');
+const { secondsToHoursStr, calcMidnight } = require('./utilities');
 
 function pushTimePoint(req, next_data, idx) {
-   let { nodes, time_points, weather } = req.factory;
-   time_points.push({
-      city_state: nodes[idx].cityState,
-      latLng: nodes[idx].latLng,
-      next_leg: nodes[idx].next_leg,
-      status: next_data.status,
-      timestamp: next_data.timer,
-      miles_today: next_data.miles_today,
-      hours_today: next_data.hours_today,
-      timezone_local: weather[idx].timezone_local,
-      timezone_local_str: weather[idx].timezone_local_str,
-      weather_idx: idx,
-      weather: {}
-   })
+   let { nodes } = req.factory;
+   let weather = req.payload.data.trip.weather;
+   let { time_points } = req.payload.data.trip;
+   if (idx < weather.length) {
+      time_points.push({
+         city_state: nodes[idx].cityState,
+         latLng: nodes[idx].latLng,
+         next_leg: nodes[idx].next_leg,
+         status: next_data.status,
+         timestamp: next_data.timer,
+         miles_today: next_data.miles_today,
+         hours_today: next_data.hours_today,
+         timezone_local: weather[idx].timezone_local,
+         timezone_local_str: weather[idx].timezone_local_str,
+         weather_idx: idx,
+         weather: {}
+      })
+   }
 }
 
 function setNextStartTime(end_time, drive_time_msec, midnight) {
@@ -49,7 +53,7 @@ function setNextStartTime(end_time, drive_time_msec, midnight) {
    return start_time;
 }
 
-const calcNextMidnight = (start_time, timezone) => {
+const calcNextMidnight = (start_time) => {
    let midnight = new Date(start_time);
    midnight.setHours(0);
    midnight.setMinutes(0);
@@ -93,7 +97,7 @@ function createTimePoints(req, res, next) {
       hours_today: null
    }
    let { start_time, break_period, drive_time_msec, timezone_user, intervals_per_day } = req.payload.data.trip.overview;
-   let midnight = calcNextMidnight(start_time, timezone_user);
+   let midnight = calcMidnight(start_time) + 86400000; // convert to next midnight
    next_data.timer = adjustTripStartTime(start_time, break_period, nodes[0].next_leg.duration.msec, midnight);
    //  increment midnight to next day if needed
    if (midnight < next_data.timer) {
@@ -140,9 +144,11 @@ function createTimePoints(req, res, next) {
                   + ' miles'
                next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
                pushTimePoint(req, next_data, node_count)
-               // rest stop, part 2 - create 2nd time point at this location - "start_day"
-               // layover at same node so
-               // don't increment nodes, don't add distance to current_meters
+               // rest stop, part 2 - "start_day"
+               // layover at same node so:
+               // - create 2nd time point at this location
+               // - don't increment nodes
+               // - don't add distance to current_meters
                end_time = next_data.timer;
                next_start_time = setNextStartTime(end_time, drive_time_msec, midnight)
                // get number of milliseconds between end_time and next_start_time

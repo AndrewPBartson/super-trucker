@@ -3,15 +3,24 @@
     <mat-card>
       <mat-card-header class="col h3">
         <mat-card-title class="trip_title">
-          <span class="title_prefix">Trip Plan - </span>
-          {{ trip.overview.origin }} => {{ trip.overview.end_point }} via
-          {{ trip.overview.summary }}
+          <span class="title_lite">Trip Plan: </span>
+          {{ trip.overview.origin }} <span class="title_medium"> to </span>
+          {{ trip.overview.end_point }}
+          <span class="title_lite"> via {{ trip.overview.summary }}</span>
         </mat-card-title>
       </mat-card-header>
-      <button mat-raised-button (click)="allExpandState = !allExpandState">
-        {{ allExpandState ? "Collapse All" : "Expand All" }}
-      </button>
-      <button mat-raised-button (click)="toggleUI()">Start a New Trip</button>
+      <div class="btn_wrapper">
+        <button
+          mat-raised-button
+          class="btn_center"
+          (click)="allExpandState = !allExpandState"
+        >
+          {{ allExpandState ? "Collapse All" : "Expand All" }}
+        </button>
+        <button mat-raised-button class="btn_center" (click)="showForm()">
+          Start New Trip
+        </button>
+      </div>
     </mat-card>
 
     <ng-container *ngFor="let day of trip.days; index as i">
@@ -45,7 +54,12 @@
                 outlined_flag
               </mat-icon>
               <mat-icon *ngIf="time_point.status === 'enroute'" matListIcon>
-                fast_forward
+                <img
+                  class="truck_icon"
+                  width="32"
+                  height="32"
+                  src="../../assets/images/goFast.jpg"
+                />
               </mat-icon>
               <mat-icon *ngIf="time_point.status === 'end_day'" matListIcon>
                 hotel
@@ -56,7 +70,7 @@
               <mat-icon *ngIf="time_point.status === 'end_trip'" matListIcon>
                 flag
               </mat-icon>
-              <h3 matLine>
+              <h3 matLine class="time_place_title">
                 {{ time_point.time_local }} ({{ time_point.time_user }})<br />
                 {{ time_point.city_state }}
               </h3>
@@ -64,7 +78,9 @@
                 <div class="wrapper">
                   <span class="temperature">
                     {{ time_point.weather.temperature }}
-                    <span class="deg_F"> &#8457;</span>
+                    <span *ngIf="time_point.weather.temperature" class="deg_F">
+                      &#8457;</span
+                    >
                   </span>
                   <span *ngIf="time_point.weather.forecast12hour" class="text">
                     {{ time_point.weather.forecast12hour.text12short }}
@@ -105,7 +121,7 @@
       </mat-expansion-panel>
       <ng-container *ngIf="i === trip.days.length - 1">
         <!-- show arrival time -->
-        <mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true" class="summary_footer">
           <mat-expansion-panel-header>
             <mat-panel-title>
               <p>

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
+import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
   selector: 'app-login-register',
@@ -7,9 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginRegisterComponent implements OnInit {
 
-  constructor() { }
+  constructor(private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
   }
-
 }

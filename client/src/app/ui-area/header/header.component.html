@@ -1,5 +1,27 @@
-<div id="header">
+<div id="header" [ngSwitch]="view_status">
   <img class="truckIcon" src="../../assets/images/truck.gif" />
   <h1 id="main_title">SUPER TRUCKER</h1>
-  <h3>Weather on Your Route</h3>
+  <h3 *ngSwitchCase="'form'" class="header_cell">Weather on Your Route</h3>
+  <div *ngSwitchCase="'login'" class="header_cell">
+    <button
+      (click)="showForm()"
+      id="login_btn"
+      type="button"
+      mat-raised-button
+      class="header_btn"
+    >
+      Continue as Guest
+    </button>
+  </div>
+  <div *ngSwitchCase="'summary'" class="header_cell">
+    <button
+      (click)="showLogin()"
+      id="login_btn"
+      type="button"
+      mat-raised-button
+      class="header_btn"
+    >
+      Login
+    </button>
+  </div>
 </div>

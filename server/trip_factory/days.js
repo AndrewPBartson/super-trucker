@@ -6,8 +6,7 @@ const {
 } = require('./devDataCheck');
 
 const createDaysArray = (req, res, next) => {
-  let time_points = req.factory.time_points;
-  let days = req.payload.data.trip.days;
+  let { time_points, days } = req.payload.data.trip;
   let emptyDay;
   let day_count = 0;
 
@@ -31,7 +30,7 @@ const createDaysArray = (req, res, next) => {
     days[day_count].time_points.push(time_points[i])
   }
   // testWeatherDates(days);
-  checkTimeStrings(days, req.payload.data.trip.overview.timezone_user);
+  // checkTimeStrings(days, req.payload.data.trip.overview.timezone_user);
   // checkDistanceDuration(days, req.payload.data.trip.overview);
   // checkDataSources(days);
 
@@ -41,5 +40,3 @@ const createDaysArray = (req, res, next) => {
 module.exports = {
   createDaysArray
 }
-
-

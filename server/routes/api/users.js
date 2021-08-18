@@ -15,6 +15,7 @@ const validateLoginInput = require('../../validation/login');
 // @access   Public
 router.post('/register', (req, res, next) => {
   const { errors, isValid } = validateRegisterInput(req.body);
+
   if (!isValid) {
     return res.status(400).json(errors);
   }

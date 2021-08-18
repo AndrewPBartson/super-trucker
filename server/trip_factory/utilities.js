@@ -37,14 +37,6 @@ function getType(elem) {
   }
 }
 
-// convert 'seconds' (from google maps api) to text 
-function secondsToHoursStr(seconds) {
-  let num_hours = Math.floor(seconds / 60 / 60);
-  let hours_text = num_hours === 1 ? ' hour ' : ' hours ';
-  let num_minutes = Math.round((seconds / 60) % 60);
-  return num_hours + hours_text + num_minutes + ' min';
-}
-
 // for reference, not using
 function formatTimeOld(timeStamp) {
   let dateTime = new Date(Math.round(timeStamp))
@@ -67,9 +59,24 @@ function formatTimeOld(timeStamp) {
   return date_text;
 }
 
-// required format for 'timezone' argument: 'GMT-07:00'
+const capitalize1stChar = (str) => {
+  return str.split(' ')
+    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(' ')
+}
+
+function secondsToHoursStr(seconds) {
+  // input - seconds from google maps api
+  // output example - '2 hours 45 min' 
+  let num_hours = Math.floor(seconds / 60 / 60);
+  let hours_text = num_hours === 1 ? ' hour ' : ' hours ';
+  let num_minutes = Math.round((seconds / 60) % 60);
+  return num_hours + hours_text + num_minutes + ' min';
+}
+
 function getTimeForTimezone(timestamp, timezone) {
-  // example output - Sat, Jul 24, 10:31 AM
+  // input - required format for 'timezone' argument: 'GMT-07:00'
+  // output example - Sat, Jul 24, 10:31 AM
   if (!timezone) {
     timezone = 'GMT-07:00';
   }
@@ -124,7 +131,6 @@ function getOtherTimeForTimezone(timestamp, timezone) {
   return timeStr;
 }
 
-
 const formatTime = (dateTime) => {
   // example input - Sun, Jul 18, 04:06 PM
   // example output - 4:06 PM
@@ -176,10 +182,15 @@ const getTimestampFromStr = (str, timezone) => {
   return Date.parse(date_str);;
 }
 
-const capitalize1stChar = (str) => {
-  return str.split(' ')
-    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-    .join(' ')
+const calcMidnight = (input_time) => {
+  // output - previous midnight from input_time
+  let midnight = new Date(input_time);
+  midnight.setHours(0);
+  midnight.setMinutes(0);
+  midnight.setSeconds(0);
+  midnight.setMilliseconds(0);
+  let midnight_improved = midnight.getTime();
+  return midnight_improved;
 }
 
 module.exports = {
@@ -190,5 +201,6 @@ module.exports = {
   formatDateLong,
   formatDateShort,
   getTimestampFromStr,
-  capitalize1stChar
+  capitalize1stChar,
+  calcMidnight
 }

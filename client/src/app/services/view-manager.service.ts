@@ -7,5 +7,5 @@ export class ViewManagerService {
 
   constructor() { }
 
-  toggleView: EventEmitter<boolean> = new EventEmitter<boolean>()
+  setViewMode: EventEmitter<string> = new EventEmitter<string>()
 }

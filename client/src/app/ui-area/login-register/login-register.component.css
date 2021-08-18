@@ -1,20 +1,20 @@
-.login-page {
+.auth_wrapper {
   top: 0;
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   display: block;
-  background-color: #303f9f;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
   overflow: hidden;
 }
 
+span .auth_titles {
+  /* font-family: "Titillium Web", sans-serif; */
+  color: red;
+}
+
 mat-card {
-  width: 30%;
-  margin: 10% auto;
+  margin: 2rem;
   border-radius: 8px;
 }
 mat-form-field,
@@ -27,9 +27,19 @@ mat-card-content {
   margin-top: 20px;
 }
 
-.login-button {
+.auth-button {
   margin-top: 20px;
   display: block;
   width: 80%;
   margin: 20px auto;
+}
+.tab_title {
+  font-weight: 400;
+  font-size: 1.3rem;
+  font-family: "Titillium Web", sans-serif;
+  text-shadow: 1px 3px 2px #b3bcf9;
+  color: black;
+}
+::ng-deep .mat-tab-label.mat-tab-label-active {
+  opacity: 1;
 }

@@ -27,7 +27,10 @@ const setupPayload = (req, res, next) => {
     "data": {
       "trip": {
         "days": [],
-        "overview": {}
+        "overview": {},
+        // remove time_points[] and weather[] before send response
+        "time_points": [],
+        "weather": []
       }
     }
   }
@@ -72,9 +75,7 @@ const createTripOverview = (req, res, next) => {
     "total_meters": null,
     "total_mi": null,
     "total_mi_text": null,
-    "total_hrs_text": null,
-    "time_points": [],
-    "weather": []
+    "total_hrs_text": null
   }
   return req;
 }
@@ -102,8 +103,6 @@ function setupTripFactory(req, res, next) {
     trip_url: '',
     days: [],
     nodes: [],
-    time_points: [],
-    weather: [],
     urls_OWM: [],
     urls_NOAA: [],
     patch_data: {},

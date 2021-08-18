@@ -1,16 +1,37 @@
 .basic-container {
   margin: 15px;
 }
+.btn_wrapper {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  max-width: 417px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.btn_wrapper button {
+  width: 125px;
+}
 .leg_details {
   margin-right: 1rem;
 }
-.title_prefix {
-  font-size: 0.95rem;
-}
 .trip_title {
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 700;
   font-family: "Titillium Web", sans-serif;
+  color: #000199;
+}
+.title_lite {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.title_medium {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-weight: 500;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 .day_panel .day_title {
   background-color: #e1e1e1;
@@ -52,4 +73,19 @@
 .temperature {
   font-size: 1.5rem;
   padding: 0;
+}
+.truck_icon {
+  position: relative;
+  right: 5px;
+  bottom: 5px;
+}
+.time_place_title {
+  max-width: 180px;
+}
+.summary_footer {
+  min-height: 52px;
+}
+.btn_center {
+  margin-left: auto;
+  margin-right: auto;
 }

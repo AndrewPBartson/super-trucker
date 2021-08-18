@@ -1,6 +1,11 @@
-<div class="ui-area">
-  <app-header></app-header>
-  <app-trip-input (tripSubmitted)="callTripService($event)" *ngIf="showForm">
+<div class="ui-area" [ngSwitch]="viewMode">
+  <app-header [view_status]="viewMode"></app-header>
+  <app-trip-input
+    *ngSwitchCase="'form'"
+    (tripSubmitted)="callTripService($event)"
+  >
   </app-trip-input>
-  <app-trip-summary [trip]="tripObject" *ngIf="!showForm"> </app-trip-summary>
+  <app-trip-summary *ngSwitchCase="'summary'" [trip]="tripObject">
+  </app-trip-summary>
+  <app-login-register *ngSwitchCase="'login'"> </app-login-register>
 </div>

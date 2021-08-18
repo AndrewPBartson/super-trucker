@@ -22,17 +22,13 @@ const addNodeForecastNOAA = (dataNOAA) => {
   return forecast12hour;
 }
 
-const saveDataNOAA = (dataNOAA, req) => {
+const saveDataNOAA = (dataNOAA, weather) => {
   for (let i = 0; i < dataNOAA.length; i++) {
     console.log('NOAA promise[' + i + '] :>> ', dataNOAA[i].status);
-    req.factory.weather[i].statusNOAA = dataNOAA[i].status;
-    // set boolean for whether this location has set of NOAA forecasts
-    // but set only includes 7 or 8 days 
-    // how to handle requests for day 9 or 10?
-    req.factory.weather[i].forecast12hour = (addNodeForecastNOAA(dataNOAA[i]));
-    req.factory.weather[i].hasNOAAData = req.factory.weather[i].forecast12hour.length !== 0
+    weather[i].statusNOAA = dataNOAA[i].status;
+    weather[i].forecast12hour = (addNodeForecastNOAA(dataNOAA[i]));
+    weather[i].hasNOAAData = weather[i].forecast12hour.length !== 0
   }
-  return req;
 }
 
 module.exports = {

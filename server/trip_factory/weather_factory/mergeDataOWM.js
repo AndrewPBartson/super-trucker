@@ -1,16 +1,79 @@
 const { capitalize1stChar } = require('../utilities');
-// OWM date/time is given in milliseconds,
-// multiply by 1000 to convert to seconds
-const addSnapshot24 = (pointOWM) => {
-  // OWM data is in 24 hour increments except
-  // temperature is in 6 hour increments
+/* 
+  OWM data - 
+    - is in 24 hour increments
+    - except temperature is in 6 hour increments
+    - date/time is in milliseconds
+    - multiply by 1000 to convert to seconds
+*/
+const assignIcon = (code) => {
+  const icons = {
+    '200': 'https://www.weather.gov/images/nws/newicons/sn.png', // thunderstorm with light rain
+    '201': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm with rain
+    '202': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm with heavy rain
+    '210': 'https://www.weather.gov/images/nws/newicons/tsra.png', // light thunderstorm
+    '211': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm
+    '212': 'https://www.weather.gov/images/nws/newicons/tsra.png', // heavy thunderstorm
+    '221': 'https://www.weather.gov/images/nws/newicons/tsra.png', // ragged thunderstorm	
+    '230': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm with light drizzle
+    '231': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm with drizzle
+    '232': 'https://www.weather.gov/images/nws/newicons/tsra.png', // thunderstorm with heavy drizzle
+    '300': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // light intensity drizzle
+    '301': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // drizzle
+    '302': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // heavy intensity drizzle
+    '310': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // light intensity drizzle rain
+    '311': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // drizzle rain
+    '312': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // heavy intensity drizzle rain
+    '313': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // shower rain and drizzle
+    '314': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // heavy shower rain and drizzle
+    '321': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // shower drizzle
+    '500': 'https://www.weather.gov/images/nws/newicons/minus_ra.png', // light rain
+    '501': 'https://www.weather.gov/images/nws/newicons/ra.png', // moderate rain
+    '502': 'https://www.weather.gov/images/nws/newicons/ra.png', // heavy intensity rain
+    '503': 'https://www.weather.gov/images/nws/newicons/ra.png', // very heavy rain
+    '504': 'https://www.weather.gov/images/nws/newicons/ra.png', // extreme rain
+    '511': 'https://www.weather.gov/images/nws/newicons/shra.png', // freezing rain
+    '520': 'https://www.weather.gov/images/nws/newicons/shra.png', // light intensity shower rain
+    '521': 'https://www.weather.gov/images/nws/newicons/shra.png', // shower rain
+    '522': 'https://www.weather.gov/images/nws/newicons/shra.png', // heavy intensity shower rain
+    '531': 'https://www.weather.gov/images/nws/newicons/shra.png', // ragged shower rain
+    '600': 'https://www.weather.gov/images/nws/newicons/sn.png', // light snow
+    '601': 'https://www.weather.gov/images/nws/newicons/sn.png', // Snow
+    '602': 'https://www.weather.gov/images/nws/newicons/sn.png', // Heavy snow
+    '611': 'https://www.weather.gov/images/nws/newicons/raip.png', // Sleet
+    '612': 'https://www.weather.gov/images/nws/newicons/raip.png', // Light shower sleet
+    '613': 'https://www.weather.gov/images/nws/newicons/raip.png', // Shower sleet
+    '615': 'https://www.weather.gov/images/nws/newicons/ra_sn.png', // Light rain and snow
+    '616': 'https://www.weather.gov/images/nws/newicons/ra_sn.png', // Rain and snow
+    '620': 'https://www.weather.gov/images/nws/newicons/sn.png', // Light shower snow
+    '621': 'https://www.weather.gov/images/nws/newicons/sn.png', // Shower snow
+    '622': 'https://www.weather.gov/images/nws/newicons/sn.png', // Heavy shower snow
+    '701': 'https://www.weather.gov/images/nws/newicons/fg.png', // mist
+    '711': 'https://www.weather.gov/images/nws/newicons/fu.png', // Smoke
+    '721': 'https://www.weather.gov/images/nws/newicons/hz.png', // Haze
+    '731': 'https://www.weather.gov/images/nws/newicons/du.png', // sand/ dust whirls
+    '741': 'https://www.weather.gov/images/nws/newicons/fg.png', // fog
+    '751': 'https://www.weather.gov/images/nws/newicons/du.png', // sand
+    '761': 'https://www.weather.gov/images/nws/newicons/du.png', // dust
+    '762': 'https://www.weather.gov/images/nws/newicons/du.png', // volcanic ash
+    '771': 'https://www.weather.gov/images/nws/newicons/wind_few.png', // squalls
+    '781': 'https://www.weather.gov/images/nws/newicons/tor.png', // tornado
+    '800': 'https://www.weather.gov/images/nws/newicons/skc.png', // clear sky
+    '801': 'https://www.weather.gov/images/nws/newicons/few.png', // few clouds 11-25%
+    '802': 'https://www.weather.gov/images/nws/newicons/sct.png', // scattered clouds 25-50%
+    '803': 'https://www.weather.gov/images/nws/newicons/bkn.png', // broken clouds 51-84%
+    '804': 'https://www.weather.gov/images/nws/newicons/ovc.png'  // overcast clouds 85-100%
+  }
+  return icons[code];
+}
 
+const addSnapshot24 = (pointOWM) => {
   let snapshot = {
     "start_24": (pointOWM.dt * 1000) - 43200000,
     "end_24": (pointOWM.dt * 1000) + 43200000,
     "text24short": pointOWM.weather[0].main,
     "text24": capitalize1stChar(pointOWM.weather[0].description),
-    "icon_OWM": 'http://openweathermap.org/img/wn/' + pointOWM.weather[0].icon + '@2x.png',
+    "icon_OWM": assignIcon('' + pointOWM.weather[0].id),
     "min": Math.round(pointOWM.temp.min),
     "max": Math.round(pointOWM.temp.max),
     "wind_speed": Math.round(pointOWM.wind_speed),
@@ -58,7 +121,6 @@ const addSnapshot24 = (pointOWM) => {
   return snapshot;
 }
 
-// OWM provides timezone, prevents additional api call
 // fix timezone given by OWM
 const formatTimezoneOWM = (timezone_raw) => {
   let tz_new = (timezone_raw / 36);
@@ -75,8 +137,8 @@ const addForecastObjectOWM = (dataOWM) => {
   // initialize set of weather forecasts for one node
   // prefer to initialize here because timezone is from OWM
   let node_weather = {
-    // save local timezone in node_weather object
-    // later local tz will be in time_points[x] but time_points don't exist yet 
+    // save local timezone in node_weather{}
+    // later local tz will be in time_points[x] when time_points exist 
     "timezone_local_str": dataOWM.data.timezone,
     "timezone_local": formatTimezoneOWM(dataOWM.data.timezone_offset),
     "forecast24hour": [],
@@ -91,10 +153,10 @@ const addForecastObjectOWM = (dataOWM) => {
   return node_weather;
 }
 
-const saveDataOWM = (dataOWM, req) => {
-
+const saveDataOWM = (req, dataOWM) => {
+  let weather = req.payload.data.trip.weather
   for (let i = 0; i < dataOWM.length; i++) {
-    req.factory.weather.push(addForecastObjectOWM(dataOWM[i]));
+    weather.push(addForecastObjectOWM(dataOWM[i]));
   }
   return req;
 }

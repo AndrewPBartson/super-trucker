@@ -34,6 +34,7 @@ const material = [
   MatInputModule,
   MatListModule,
   MatNativeDateModule,
+  MatTabsModule,
   MatRadioModule,
   MatSliderModule,
   NgxMatDatetimePickerModule,

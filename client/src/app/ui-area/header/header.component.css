@@ -9,9 +9,10 @@ h3 {
   margin: 0 20px;
   font-weight: 400;
 }
-h1, h3 {
+h1,
+h3 {
   text-align: center;
-  font-family: 'Titillium Web', sans-serif;
+  font-family: "Titillium Web", sans-serif;
   color: #000;
 }
 #header {
@@ -25,4 +26,14 @@ h1, h3 {
   height: 70px;
   margin: 10px 0 0 auto;
   grid-row: 1 / span 2;
+}
+.header_cell {
+  margin-left: auto;
+  margin-right: auto;
+}
+.header_btn {
+  min-width: 100px;
+  position: relative;
+  top: 11px;
+  z-index: 1;
 }

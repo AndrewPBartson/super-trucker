@@ -33,7 +33,6 @@ const create12HourForecast = (time_pt, weather, idx) => {
     time_pt.weather.hasOWMData = weather[idx].hasOWMData;
     time_pt.weather.hasNOAAData = weather[idx].hasNOAAData;
     time_pt.weather.hasNOAAHtml = weather[idx].hasNOAAHtml;
-    time_pt.weather.hasBlend = null; //weather[idx].hasBlend;
     // match forecast period to ETA for this location
     if (time_pt.timestamp >= weather[idx].forecast12hour[y].start_12
       && time_pt.timestamp < weather[idx].forecast12hour[y].end_12) { // save to time_point
@@ -64,9 +63,8 @@ const create24HourForecast = (time_pt, weather, idx) => {
 }
 
 const assignWeatherToTime = (req, res, next) => {
-  let weather = req.factory.weather;
-  let time_points = req.factory.time_points;
-  let tz_user = req.payload.data.trip.overview.timezone_user;
+  let { weather, time_points, overview } = req.payload.data.trip;
+  let tz_user = overview.timezone_user;
   let timestampObj;
   let idx; // index for weather[]
   // idx is needed because weather.length !== time_points.length
@@ -80,21 +78,28 @@ const assignWeatherToTime = (req, res, next) => {
     setDateTimeLocal(time_points[x], timestampObj)
     setDateTimeUserHome(time_points[x], timestampObj, tz_user)
 
-    // each time_point has index for weather data for that location which
-    // is weather data set: 7 days NOAA forecasts, 8 days OWM forecasts
+    // each time_point has index for weather data for one location 
+    // which consists of:
+    // weather data set: 7 days NOAA forecasts, 8 days OWM forecasts
     create12HourForecast(time_points[x], weather, idx)
     create24HourForecast(time_points[x], weather, idx)
   }
 }
 
-const fillMissingWeather = () => {
-  // 
-  console.log('fillMissingWeather() working')
+const fillMissingWeather = (time_pts) => {
+  for (let i = 0; i < time_pts.length; i++) {
+    if (!time_pts[i].weather.forecast24hour) {
+      time_pts[i].weather.forecast12hour = {
+        icon_NOAA: '../../assets/images/no_data/nodata.jpg',
+        text12short: 'No Weather Data beyond 7 days'
+      }
+    }
+  }
 }
 
 const integrateWeather = (req, res, next) => {
   assignWeatherToTime(req, res, next)
-  fillMissingWeather()
+  fillMissingWeather(req.payload.data.trip.time_points);
   return req;
 }
 
