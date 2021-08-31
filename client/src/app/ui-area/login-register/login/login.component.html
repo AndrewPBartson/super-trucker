@@ -1,8 +1,5 @@
 <mat-card-content>
-  <form
-    [formGroup]="loginForm"
-    (ngSubmit)="callLoginService($event, this.loginForm)"
-  >
+  <form [formGroup]="loginForm" (ngSubmit)="loginUser($event, this.loginForm)">
     <mat-form-field>
       <input
         matInput

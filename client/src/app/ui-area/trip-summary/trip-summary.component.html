@@ -82,7 +82,10 @@
                       &#8457;</span
                     >
                   </span>
-                  <span *ngIf="time_point.weather.forecast12hour" class="text">
+                  <span
+                    *ngIf="time_point.weather.forecast12hour"
+                    class="forecast_text"
+                  >
                     {{ time_point.weather.forecast12hour.text12short }}
                   </span>
                   <span
@@ -90,7 +93,7 @@
                       !time_point.weather.forecast12hour &&
                       time_point.weather.forecast24hour
                     "
-                    class="text dyno_text"
+                    class="forecast_text dyno_text"
                   >
                     {{ time_point.weather.forecast24hour.text24 }}
                   </span>

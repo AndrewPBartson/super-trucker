@@ -8,7 +8,12 @@
 }
 .item_B {
   grid-column-start: 1;
-  grid-row-start: 5;
+}
+.item_B_not_jump {
+  grid-row-start: 6;
+}
+.item_B_jump {
+  grid-row-start: 11;
 }
 .item_C {
   grid-column-start: 1;
@@ -24,11 +29,11 @@
 }
 .item_F {
   grid-column-start: 1;
-  grid-row-start: 10;
+  grid-row-start: 6;
 }
 .item_G {
   grid-column-start: 1;
-  grid-row: 11 / 13;
+  grid-row: 7 / 9;
   display: grid;
   grid-template-rows: repeat(3, 36px);
 }

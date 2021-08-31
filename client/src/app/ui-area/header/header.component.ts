@@ -8,7 +8,7 @@ import { ViewManagerService } from '../../services/view-manager.service';
 })
 
 export class HeaderComponent implements OnInit {
-  @Input() view_status: { type: string, name: string, content: string };
+  @Input() btn_status: { type: string, name: string, content: string };
 
   constructor(private viewManagerService: ViewManagerService) { }
 

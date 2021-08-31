@@ -1,4 +1,4 @@
-<div id="header" [ngSwitch]="view_status">
+<div id="header" [ngSwitch]="btn_status">
   <img class="truckIcon" src="../../assets/images/truck.gif" />
   <h1 id="main_title">SUPER TRUCKER</h1>
   <h3 *ngSwitchCase="'form'" class="header_cell">Weather on Your Route</h3>
@@ -10,7 +10,7 @@
       mat-raised-button
       class="header_btn"
     >
-      Continue as Guest
+      Free during Beta Testing
     </button>
   </div>
   <div *ngSwitchCase="'summary'" class="header_cell">

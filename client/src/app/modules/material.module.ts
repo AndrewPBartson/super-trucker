@@ -15,12 +15,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
-import {
-  NgxMatDatetimePickerModule,
-  NgxMatTimepickerModule,
-  NgxMatNativeDateModule
-} from '@angular-material-components/datetime-picker';
-import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
+
 
 const material = [
   MatButtonModule,
@@ -36,10 +31,7 @@ const material = [
   MatNativeDateModule,
   MatTabsModule,
   MatRadioModule,
-  MatSliderModule,
-  NgxMatDatetimePickerModule,
-  NgxMatMomentModule,
-  NgxMatTimepickerModule
+  MatSliderModule
 ]
 
 @NgModule({

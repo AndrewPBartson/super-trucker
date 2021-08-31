@@ -19,6 +19,33 @@ import { environment } from 'src/environments/environment';
 import { LoginComponent } from './ui-area/login-register/login/login.component';
 import { RegisterComponent } from './ui-area/login-register/register/register.component';
 
+import {
+  NgxMatDatetimePickerModule,
+  NgxMatTimepickerModule,
+  NgxMatNativeDateModule,
+  NgxMatDateFormats,
+  NGX_MAT_DATE_FORMATS
+} from '@angular-material-components/datetime-picker';
+import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
+import { TripTemplateComponent } from './ui-area/trip-template/trip-template.component';
+import { UserProfileComponent } from './ui-area/user-profile/user-profile.component';
+
+const CUSTOM_PARSE_DATE_INPUT = 'l, LTS';
+const CUSTOM_DISPLAY_DATE_INPUT = 'ddd MM/DD - hh:mm a';
+
+// If using Moment
+const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
+  parse: {
+    dateInput: CUSTOM_PARSE_DATE_INPUT
+  },
+  display: {
+    dateInput: CUSTOM_DISPLAY_DATE_INPUT,
+    monthYearLabel: "MMM YYYY",
+    dateA11yLabel: "LL",
+    monthYearA11yLabel: "MMMM YYYY"
+  }
+};
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,7 +55,9 @@ import { RegisterComponent } from './ui-area/login-register/register/register.co
     TripSummaryComponent,
     LoginRegisterComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    TripTemplateComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -40,9 +69,14 @@ import { RegisterComponent } from './ui-area/login-register/register/register.co
     }),
     PopoverModule.forRoot(),
     BrowserAnimationsModule,
+    NgxMatDatetimePickerModule,
+    NgxMatMomentModule,
+    NgxMatTimepickerModule,
     MaterialModule
   ],
-  providers: [],
+  providers: [
+    { provide: NGX_MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

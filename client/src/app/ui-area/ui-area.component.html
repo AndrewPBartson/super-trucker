@@ -1,5 +1,6 @@
 <div class="ui-area" [ngSwitch]="viewMode">
-  <app-header [view_status]="viewMode"></app-header>
+  <app-header [btn_status]="viewMode"></app-header>
+  <app-user-profile *ngSwitchCase="'profile'"></app-user-profile>
   <app-trip-input
     *ngSwitchCase="'form'"
     (tripSubmitted)="callTripService($event)"
@@ -7,5 +8,8 @@
   </app-trip-input>
   <app-trip-summary *ngSwitchCase="'summary'" [trip]="tripObject">
   </app-trip-summary>
-  <app-login-register *ngSwitchCase="'login'"> </app-login-register>
+  <app-login-register *ngSwitchCase="'login'" [view_status]="viewMode">
+  </app-login-register>
+  <!-- <app-login-register *ngSwitchDefault [view_status]="viewMode">
+  </app-login-register> -->
 </div>

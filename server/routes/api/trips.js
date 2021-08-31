@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const validateTripInput = require('../../validation/trip');
-const Trip = require('../../models/Trip');
+// const Trip = require('../../models/Trip');
 let { build_trip } = require('../../trip_factory/trip_builder');
 
 function getAllTrips(req, res, next) {

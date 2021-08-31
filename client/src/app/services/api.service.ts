@@ -26,5 +26,4 @@ export class ApiService {
     console.log('api.service - sendTripRequest() w/ tripSettings :', tripSettings);
     return this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
   }
-
 }

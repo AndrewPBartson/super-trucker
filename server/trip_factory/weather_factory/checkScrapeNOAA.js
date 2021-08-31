@@ -36,20 +36,25 @@ const beginForecast = ($, timezone) => {
   // pull weather data and date string from NOAA html
   let valid_date = $('a:contains("Forecast Valid")');
   let date_str = valid_date.parent().next().text();
-  console.log('should be begin day midnight: [date_str] :>> ', date_str);
+  console.log(' ');
+  console.log('date string scraped from html :>> ', date_str);
+  console.log(' ');
+  // NOAA data is in 12 hr periods that run from
+  // 6 am to 6 pm, and from 6 pm to 6 am
+  // 1) set up time periods for this location (period_start to period_end)
+  // begin_day_midnight is needed to 
+  // to calculate all subsequent time periods.
   let begin_day_midnight = calcMidnight(getTimestampFromStr(date_str, timezone));
-  let data_1 = {
+  let scrapedData_1 = {
     forecast_rows: $('div.row-forecast'),
     main_panels: $('div.tombstone-container'),
     valid_date: valid_date,
     date_str: date_str,
-    // set 1st time period (start and end) for this location
-    // 12 hr periods run from 6 am to 6 pm, and from 6 pm to 6 am
     begin_day_midnight: begin_day_midnight,
     period_start: begin_day_midnight - 21600000,
     period_end: begin_day_midnight + 21600000
   }
-  return data_1;
+  return scrapedData_1;
 }
 
 const buildForecastArray = ($, data) => {
@@ -117,7 +122,7 @@ const patchMissingData = (gaps, req) => {
   }
 }
 
-const checkDataNOAA = (req, res, next) => {
+const fixMissingData = (req, res, next) => {
   createUrlsForGaps(req)
   return getRawHtmlNOAA(req, res, next)
     .then(results => {
@@ -127,5 +132,5 @@ const checkDataNOAA = (req, res, next) => {
 }
 
 module.exports = {
-  checkDataNOAA
+  fixMissingData
 }

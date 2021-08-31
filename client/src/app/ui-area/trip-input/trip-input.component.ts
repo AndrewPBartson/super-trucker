@@ -1,6 +1,8 @@
 import { Component, EventEmitter, OnInit, ViewChild, Output, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators, ControlContainer } from '@angular/forms';
-import * as moment from 'moment';
+import * as _moment from 'moment';
+import { default as _rollupMoment, Moment, MomentFormatSpecification, MomentInput } from 'moment';
+const moment = _rollupMoment || _moment;
 import { tz } from 'moment-timezone';
 import { ThemePalette } from '@angular/material/core';
 
@@ -17,7 +19,7 @@ import { ViewManagerService } from '../../services/view-manager.service';
 export class TripInputComponent implements OnInit {
   tripForm: FormGroup;
   advInputVisible = false;
-  // intervalId - (may be unnecessary) for cancelling update of date time field
+  // for cancelling updating date time field
   intervalId = null;
 
   @Output() tripSubmitted = new EventEmitter();
@@ -94,15 +96,21 @@ export class TripInputComponent implements OnInit {
       depart_time: new FormControl(moment().toDate()),
       timezone_user: new FormControl(tz.guess())
     });
-    // so far, depart_time is refreshed every 6 seconds 
-    // to do: when refreshing depart_time, set it
-    // about 10 minutes ahead of current time
+    // depart_time is refreshed every 30 seconds but
+    // after user sets depart_time manually, it should 
+    // not refresh any more 
+    // to do: be sure depart_time is never in the past (backend?)
     // 10 minutes = 600000 milliseconds
     this.intervalId = setInterval(this.refreshDateTime, 6000, this.tripForm, 600000);
   }
 
   refreshDateTime(form, increment) {
     form.get('depart_time').setValue(moment().toDate())
+  }
+
+  cancelTimeRefresh() {
+    console.log('testing cancel interval')
+    clearInterval(this.intervalId)
   }
 
   onTripSubmitted(e, tForm, presets) {
@@ -118,6 +126,7 @@ export class TripInputComponent implements OnInit {
     console.log('onTripSubmitted() - fixed input :', this.input);
 
     this.tripSubmitted.emit(this.input);
+    return false;
   }
 
   showLogin() {
@@ -141,4 +150,4 @@ export class TripInputComponent implements OnInit {
   }
 }
 
-export declare type NgxMatDateFormats = { parse: { dateInput: any; }; display: { dateInput: any; monthYearLabel: any; dateA11yLabel: any; monthYearA11yLabel: any; }; };
+// export declare type NgxMatDateFormats = { parse: { dateInput: any; }; display: { dateInput: any; monthYearLabel: any; dateA11yLabel: any; monthYearA11yLabel: any; }; };

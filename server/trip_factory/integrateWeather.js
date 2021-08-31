@@ -90,7 +90,7 @@ const fillMissingWeather = (time_pts) => {
   for (let i = 0; i < time_pts.length; i++) {
     if (!time_pts[i].weather.forecast24hour) {
       time_pts[i].weather.forecast12hour = {
-        icon_NOAA: '../../assets/images/no_data/nodata.jpg',
+        icon_NOAA: '../../assets/images/nodata.jpg',
         text12short: 'No Weather Data beyond 7 days'
       }
     }

@@ -1,7 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { LoginService } from '../../../services/login.service';
 import { ILogin } from '../../../models/ilogin';
+import { ViewManagerService } from '../../../services/view-manager.service';
+import setAuthToken from '../../../utils/setAuthToken';
+import jwt_decode from 'jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -9,16 +12,15 @@ import { ILogin } from '../../../models/ilogin';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
   loginForm: FormGroup;
-  viewMode: string;
 
   user: ILogin = {
     email: '',
-    password: ''
+    password: '',
+    isAuthenticated: false
   }
 
-  constructor(private loginService: LoginService) { }
+  constructor(private loginService: LoginService, private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.loginForm = new FormGroup({
@@ -28,22 +30,36 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  handleResponse(data) {
-    console.log('res to login req :>> ', data);
-    return data;
+  showForm() {
+    this.viewManagerService.setViewMode.emit('form')
   }
 
-  callLoginService(event) {
-    console.log('callLoginService()');
+  loginUser(event) {
     Object.entries(this.loginForm.value)
       .forEach(([key, inputValue]) => {
         this.user[key] = inputValue;
       });
     this.loginService.sendLoginRequest(this.user)
-      .subscribe(incoming => {
-        this.user = this.handleResponse(incoming);
-        this.viewMode = 'form';
-        console.log(`this.user`, this.user)
+      .subscribe(res => {
+        console.log(`res`, res)
+        const token = res.token;
+        // save token to localStorage
+        localStorage.setItem('jwtToken', token)
+        // add token to auth header for all requests
+        setAuthToken(token);
+        // decode token
+        const decoded = jwt_decode(token);
+        console.log(`decoded ->  `, decoded)
+        this.user.isAuthenticated = true;
+
+        // if decoded is not empty, set true, else false
+        // isAuthenticated: !isEmpty(action.payload),
+        //   user: action.payload
+
+
+        this.viewManagerService.setViewMode.emit('form')
+        console.log(`this.user has token - `, this.user)
+
         // if login was success
         // show trip form page including user's saved trip templates
         // else 
@@ -54,5 +70,11 @@ export class LoginComponent implements OnInit {
         // with message - "Free access for 10 days or 100 requests"
         // then redirect to "Start New Trip" page 
       })
+  }
+  logoutUser() {
+    // remove token from localStorage
+    localStorage.removeItem('jwtToken');
+    // remove token from axios header
+    setAuthToken(false);
   }
 }

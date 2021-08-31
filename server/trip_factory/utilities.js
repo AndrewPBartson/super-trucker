@@ -157,8 +157,9 @@ const formatDateShort = (dateTime) => {
 }
 
 const getTimestampFromStr = (str, timezone) => {
-  // example input (obtained from NOAA 7 Day Forecast html) - 
+  // input example (string from NOAA 7 Day Forecast html) - 
   // 11am CDT Jul 24, 2021-6pm CDT Jul 30, 2021 
+  // output example - 1629356400000
   const months = {
     'Jan': '01',
     'Feb': '02',
@@ -177,13 +178,22 @@ const getTimestampFromStr = (str, timezone) => {
   let day = str[3].slice(0, 2)
   let month = months[str[2]];
   let year = str[4].slice(0, 4);
+  // need timezone of location to get accurate timestamp
   let tz_trimmed = timezone.slice(3);
-  let date_str = year + '-' + month + '-' + day + 'T00:00:00' + tz_trimmed;
-  return Date.parse(date_str);;
+  let dateString = year + '-' + month + '-' + day + 'T00:00:00' + tz_trimmed;
+  // example of dateString before Date.parse - 2021-08-19T00:00:00-04:00
+  // console.log('dateString local timezone :>> ', dateString);
+  // let timestamp = Date.parse(dateString);
+  // verify by making round trip back to date/time string
+  // console.log('verify result (PDT)       :>> ', getTimeForTimezone(timestamp));
+  // return timestamp;
+  return Date.parse(dateString);
 }
 
 const calcMidnight = (input_time) => {
-  // output - previous midnight from input_time
+  // input example - 1629356400000
+  // output - previous midnight calculated from input_time
+  // timezone not relevant 
   let midnight = new Date(input_time);
   midnight.setHours(0);
   midnight.setMinutes(0);

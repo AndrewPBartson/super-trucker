@@ -13,7 +13,7 @@
       Login/Register
     </button>
   </div>
-  <div class="sectionText item_A">Add Options to Trip:</div>
+  <!-- <div class="sectionText item_A">Add Options to Trip:</div>
   <mat-checkbox
     id="weather"
     class="clickInput item_B"
@@ -30,8 +30,8 @@
     formControlName="truck_stops"
   >
     <label for="truck_stops">Truck Stops</label>
-  </mat-checkbox>
-  <div class="item_E">
+  </mat-checkbox> -->
+  <div class="item_A">
     <button
       (click)="showMoreLess()"
       id="settings_btn"
@@ -39,6 +39,21 @@
       mat-raised-button
     >
       {{ advInputVisible ? "Less Settings" : "More Settings" }}
+    </button>
+  </div>
+  <div
+    class="item_B"
+    [ngClass]="advInputVisible ? 'item_B_jump' : 'item_B_not_jump'"
+  >
+    <button
+      id="create_route_btn"
+      type="submit"
+      class="createRoute item"
+      color="primary"
+      mat-raised-button
+      [disabled]="!tripForm.valid"
+    >
+      Create Route
     </button>
   </div>
   <div class="sectionText item_F" [ngClass]="{ hideToStart: !advInputVisible }">
@@ -52,7 +67,7 @@
       value="average"
       (click)="useQuickPick(this.presets.average)"
     >
-      <label for="average">Pope Francis</label>
+      <label for="average">Dalai Lama</label>
     </mat-radio-button>
     <mat-radio-button
       type="radio"
@@ -61,7 +76,7 @@
       value="fast"
       (click)="useQuickPick(this.presets.fast)"
     >
-      <label for="fast">James Bond</label>
+      <label for="fast">Blues Brothers</label>
     </mat-radio-button>
     <mat-radio-button
       type="radio"
@@ -82,6 +97,7 @@
       formControlName="origin"
     />
     <mat-error> Please enter a valid city name </mat-error>
+    <mat-hint>this is a hint</mat-hint>
   </mat-form-field>
   <mat-form-field class="item_O">
     <input
@@ -185,6 +201,8 @@
     }"
   >
     <input
+      (focus)="cancelTimeRefresh()"
+      (dateChange)="cancelTimeRefresh()"
       matInput
       [ngxMatDatetimePicker]="picker"
       placeholder="Departure Date/Time"
@@ -193,6 +211,7 @@
     />
     <mat-datepicker-toggle matSuffix [for]="picker"> </mat-datepicker-toggle>
     <ngx-mat-datetime-picker
+      (dateChange)="cancelTimeRefresh()"
       #picker
       [showSpinners]="showSpinners"
       [showSeconds]="showSeconds"
@@ -218,18 +237,19 @@
       </option>
     </select>
   </mat-form-field>
-  <div
+  <!-- <div
     class="item_U"
     [ngClass]="advInputVisible ? 'item_U_jump' : 'item_U_not_jump'"
   >
     <button
-      id="create_route_btn"
-      type="submit"
+      id="create_route_btn_"
+      type="submitljh"
       class="createRoute item"
+      color="primary"
       mat-raised-button
       [disabled]="!tripForm.valid"
     >
       Create Route
     </button>
-  </div>
+  </div> -->
 </form>

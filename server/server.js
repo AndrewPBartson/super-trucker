@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const passport = require('passport');
-const port = process.env.PORT || 8880;
 const morgan = require('morgan');
 const cors = require('cors');
+const port = process.env.PORT || 8880;
 const users = require('./routes/api/users');
 const trips = require('./routes/api/trips');
 
@@ -24,7 +24,7 @@ const dbURI = require('../config/keys').mongoURI;
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+  .catch(err => console.log("MongoDB NOT connected: " + error));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -50,7 +50,8 @@ app.use((err, req, res, next) => {
   // res.status(500).json(err.message)
 });
 
-// if a MW calls res.anything(), res is returned, end of execution on server
+// if a MW calls res.anything(), res is returned and sent, 
+// end of execution on server
 // if a MW doesn't call next(), no more MW is run...
 // but execution may continue with non-MW, such as listen():
 app.listen(port, () => {

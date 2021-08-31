@@ -84,7 +84,7 @@ export class InputService {
         miTemp = Math.ceil(spdTemp * hrsTemp);
         break;
       case 3: // input - miles_per_day, hours_driving
-        console.log('THIS NEVER HAPPENS');
+        console.log('THIS NEVER HAPPENS - case 3');
         miTemp = Math.ceil(tForm.value.miles_per_day);
         if (miTemp > 2472) {
           miTemp = 2472;
@@ -104,13 +104,13 @@ export class InputService {
         miTemp = Math.ceil(spdTemp * hrsTemp);
         break;
       case 5: // input - miles_per_day, avg_speed
-        console.log('THIS NEVER HAPPENS');
+        console.log('THIS NEVER HAPPENS - case 5');
         miTemp = Math.ceil(tForm.value.miles_per_day);
         spdTemp = Math.round(tForm.value.avg_speed);
         hrsTemp = (Math.round((miTemp / spdTemp) / 0.25)) * 0.25;
         break;
       case 6: // input - hours_driving, avg_speed
-        console.log('THIS NEVER HAPPENS');
+        console.log('THIS NEVER HAPPENS - case 6');
         hrsTemp = (Math.round((tForm.value.hours_driving) / 0.25)) * 0.25;
         spdTemp = Math.round(tForm.value.avg_speed);
         miTemp = Math.ceil(hrsTemp * spdTemp);

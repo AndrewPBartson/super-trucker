@@ -63,6 +63,7 @@ router.post('/register', (req, res, next) => {
 // @desc     Login user / return JWT token
 // @access   Public
 router.post('/login', (req, res, next) => {
+  console.log('testing login');
   const { errors, isValid } = validateLoginInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);

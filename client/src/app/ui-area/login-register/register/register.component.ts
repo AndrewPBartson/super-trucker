@@ -36,8 +36,7 @@ export class RegisterComponent implements OnInit {
     return data;
   }
 
-  callRegisterService(event) {
-    console.log('callRegisterService()')
+  registerUser(event) {
     Object.entries(this.registerForm.value)
       .forEach(([key, inputValue]) => {
         this.newUser[key] = inputValue;
@@ -46,7 +45,7 @@ export class RegisterComponent implements OnInit {
       .subscribe(incoming => {
         this.newUser = this.handleResponse(incoming);
         // this.viewMode = 'form';
-        console.log(`this.newUser`, this.newUser)
+        console.log(`register this.newUser`, this.newUser)
         // if login was success
         // show newUser's saved trip templates
         // else 
