@@ -55,7 +55,7 @@ app.use((req, res, next) => {
   res.status(404).json({ error: { message: 'Not found - status 404' } })
 });
 
-// middleware with 4 arguments is only called in case of error
+// middleware w/ 4 arguments is only called in case of error
 app.use((err, req, res, next) => {
   console.log('err.status - ', err.status);
   res.status(500).json({ error: { message: `Whaaaat?   ${err}` } })
