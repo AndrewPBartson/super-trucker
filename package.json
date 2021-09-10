@@ -1,18 +1,17 @@
 {
   "name": "supertrucker",
-  "version": "2.0.0",
+  "version": "1.9.0",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
     "start-backend": "nodemon server/server.js",
     "start-frontend": "npm start --prefix client",
     "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client",
-    "test": "none"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "author": "Andrew Bartson",
   "license": "ISC",
-  "description": "Interactive map for trip planning - Enter origin and destination, and get back a route with schedule.",
+  "description": "Interactive map for trip planning - Enter origin and destination, and get back a route with schedule and expected weather.",
   "private": true,
   "dependencies": {
     "axios": "^0.21.1",

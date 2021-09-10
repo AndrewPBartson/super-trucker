@@ -1,7 +1,8 @@
-@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+@import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import url("https://fonts.googleapis.com/css?family=Titillium+Web");
 
-html, body {
+html,
+body {
   height: 100%;
 }
 body {
