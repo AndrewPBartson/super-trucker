@@ -16,8 +16,8 @@ export class LoginComponent implements OnInit {
 
   user: ILogin = {
     email: '',
-    password: '',
-    isAuthenticated: false
+    password: ''
+    // isAuthenticated: false
   }
 
   constructor(private loginService: LoginService, private viewManagerService: ViewManagerService) { }

@@ -7,7 +7,8 @@
     "start-backend": "nodemon server/server.js",
     "start-frontend": "npm start --prefix client",
     "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client",
+    "test": "none"
   },
   "author": "Andrew Bartson",
   "license": "ISC",
