@@ -1,5 +1,5 @@
 # top secret stuff
-/config/keys.js
+/config/keys_dev.js
 /client/src/environments/*
 
 # compiled output
@@ -36,5 +36,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/junkyard
+/staging
 report.*.json

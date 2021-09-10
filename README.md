@@ -51,3 +51,15 @@ Create a weather forecast for the trip. For each location on the schedule, a sev
 ![Application including user input and advanced options](./imgs_readme/app_w_input.png?raw=true "Application including user input and advanced options")
 
 ---
+
+**scripts - package.json**
+
+    - "start": "node server/server.js",
+    - "start-backend": "nodemon server/server.js",
+    - "start-frontend": "npm start --prefix client",
+    - "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
+    - "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+
+    During development - npm run dev
+
+-

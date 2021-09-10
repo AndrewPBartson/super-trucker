@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit {
         // decode token
         const decoded = jwt_decode(token);
         console.log(`decoded ->  `, decoded)
-        this.user.isAuthenticated = true;
+        // this.user.isAuthenticated = true;
 
         // if decoded is not empty, set true, else false
         // isAuthenticated: !isEmpty(action.payload),
