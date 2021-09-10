@@ -47,6 +47,8 @@
     "interstate",
     "travel",
     "weather",
+    "transportation",
+    "dispatch",
     "trucker"
   ]
 }
