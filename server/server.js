@@ -38,9 +38,9 @@ app.use('/api/users', users);
 app.use('/api/trips', trips);
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/dist/client'));
+  app.use(express.static('client/dist'));
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'client', 'index.html'))
+    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
   });
 }
 else {
