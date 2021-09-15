@@ -3,7 +3,7 @@
   "version": "1.9.4",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port=7880",
+    "start": "ng serve",
     "build": "./node_modules/.bin/ng build --configuration=production --output-path=dist",
     "test": "ng test",
     "lint": "ng lint",
