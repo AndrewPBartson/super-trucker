@@ -9,7 +9,7 @@ import { ViewManagerService } from '../../services/view-manager.service';
 export class LoginRegisterComponent implements OnInit {
   @Input() view_status: { type: string, name: string, content: string };
 
-  constructor(private viewManagerService: ViewManagerService) { }
+  constructor(public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
   }

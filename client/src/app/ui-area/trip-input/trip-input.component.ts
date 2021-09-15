@@ -72,7 +72,7 @@ export class TripInputComponent implements OnInit {
     tz.guess(), "GMT-0800 (PST)", "GMT-0700 (PDT MST)", "GMT-0600 (MDT CST)", "GMT-0500 (CDT EST)", "GMT-0400 (EDT)"
   ]
 
-  constructor(private inputService: InputService, private viewManagerService: ViewManagerService) { }
+  constructor(public inputService: InputService, public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
 

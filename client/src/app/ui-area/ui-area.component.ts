@@ -12,7 +12,7 @@ export class UiAreaComponent implements OnInit {
   tripObject: ITripObject;
   viewMode: string;
 
-  constructor(private apiService: ApiService, private viewManagerService: ViewManagerService) { }
+  constructor(public apiService: ApiService, public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.viewMode = 'form'
