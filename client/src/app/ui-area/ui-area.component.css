@@ -10,3 +10,6 @@ app-header {
   float: left;
   height: 100vh;
 }
+app-trip-summary {
+  width: 480px;
+}

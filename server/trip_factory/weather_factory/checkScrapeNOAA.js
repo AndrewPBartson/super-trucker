@@ -79,7 +79,7 @@ const buildForecastArray = ($, data) => {
         text_short = $(data.main_panels[j]).find('p.short-desc').text();
       }
     } else {  // no main_panel, create text_short from forecast_row
-      // reformat this text if it's more than 'medium' sized - 
+      // reformat this text if more than 'medium' sized - 
       // remove leading 'A '
       // replace ' percent' with '%'
       // replace ' possibly a ' with ' possible '
@@ -110,7 +110,7 @@ const patchMissingData = (gaps, req) => {
   if (gaps.length > 0) {
     let data_1;
     for (let i = 0; i < gaps.length; i++) {
-      if (gaps[i].value.status === 200) {
+      if (gaps[i].value && gaps[i].value.status === 200) {
         const $ = cheerio.load(gaps[i].value.data);
         data_1 = beginForecast($, req.factory.patch_data.timezones[i]);
         req.payload.data.trip.weather[req.factory.patch_data.indexes[i]].forecast12hour =

@@ -1,12 +1,12 @@
 <div class="row d-flex">
   <div *ngIf="trip" class="mat-app-background basic-container">
-    <mat-card>
+    <mat-card class="tint">
       <mat-card-header class="col h3">
         <mat-card-title class="trip_title">
-          <span class="title_lite">Trip Plan: </span>
+          <span class="title_lite">From </span>
           {{ trip.overview.origin }} <span class="title_medium"> to </span>
           {{ trip.overview.end_point }}
-          <span class="title_lite"> via {{ trip.overview.summary }}</span>
+          <span class="title_lite no_break"> via {{ trip.overview.summary }}</span>
         </mat-card-title>
       </mat-card-header>
       <div class="btn_wrapper">

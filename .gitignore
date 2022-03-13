@@ -27,6 +27,7 @@
 .env.production.local
 
 # testing
+/tests
 /coverage
 /tests_output
 /tests_assets
@@ -38,3 +39,6 @@ yarn-error.log*
 
 /staging
 report.*.json
+
+# protect intellectual property
+# this app is worth big money

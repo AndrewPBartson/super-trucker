@@ -6,7 +6,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { MaterialModule } from './modules/material.module';
-// why is popover installed? what is ngx-bootstrap?
 import { PopoverModule } from 'ngx-bootstrap/popover';
 
 import { AppComponent } from './app.component';

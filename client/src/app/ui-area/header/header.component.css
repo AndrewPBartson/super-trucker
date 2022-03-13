@@ -34,6 +34,7 @@ h3 {
 .header_btn {
   min-width: 100px;
   position: relative;
-  top: 11px;
+  top: 5px;
   z-index: 1;
+  height: 33px;
 }
