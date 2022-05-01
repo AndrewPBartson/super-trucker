@@ -1,6 +1,9 @@
 {
   "name": "supertrucker",
   "version": "1.9.4",
+  "browserslist": [
+    "defaults"
+  ],
   "main": "server/server.js",
   "scripts": {
     "ng": "ng",

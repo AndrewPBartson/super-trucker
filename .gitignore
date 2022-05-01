@@ -9,7 +9,9 @@
 
 # dependencies
 /node_modules
-/client/node_modules
+/web-mvc/node_modules
+/trip-api/node_modules
+/user-api/node_modules
 
 # vs code and other settings
 /.vscode

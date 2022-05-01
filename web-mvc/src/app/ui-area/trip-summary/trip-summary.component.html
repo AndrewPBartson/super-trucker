@@ -1,0 +1,177 @@
+<div class="row d-flex">
+  <div *ngIf="trip" class="mat-app-background basic-container">
+    <mat-card class="tint">
+      <mat-card-header class="col h3">
+        <mat-card-title class="trip_title">
+          <span class="title_lite">From </span>
+          {{ trip.overview.origin }} <span class="title_medium"> to </span>
+          {{ trip.overview.end_point }}
+          <span class="title_lite no_break"> via {{ trip.overview.summary }}</span>
+        </mat-card-title>
+      </mat-card-header>
+      <div class="btn_wrapper">
+        <button
+          mat-raised-button
+          class="btn_center"
+          (click)="allExpandState = !allExpandState"
+        >
+          {{ allExpandState ? "Collapse All" : "Expand All" }}
+        </button>
+        <button mat-raised-button class="btn_center" (click)="showForm()">
+          Start New Trip
+        </button>
+      </div>
+    </mat-card>
+
+    <ng-container *ngFor="let day of trip.days; index as i">
+      <!-- create panel for each days travel info -->
+      <mat-expansion-panel class="day_panel" [expanded]="allExpandState">
+        <mat-expansion-panel-header class="day_title">
+          <!-- title with overview of days travel -->
+          <mat-panel-title>
+            <p>
+              <span class="day_text">Day {{ i + 1 }} </span> - {{ day.time_points[0].date_user_long }}<br />{{
+                day.time_points[0].city_state
+              }}
+              =>
+              {{ day.time_points[day.time_points.length - 1].city_state }}
+            </p>
+
+          </mat-panel-title>
+          <mat-panel-description>
+            <p>
+              {{ day.time_points[day.time_points.length - 1].miles_today
+              }}<br />
+              {{ day.time_points[day.time_points.length - 1].hours_today }}
+            </p>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <mat-list class="places_list">
+          <ng-container *ngIf="i === 0">
+              <p class="time_local_note time_local_color">*Time at location - Blue</p>
+              <p class="time_user_note time_user_color">*Time at your home timezone - Magenta</p>
+            </ng-container>
+          <ng-container
+            *ngFor="let time_point of trip.days[i].time_points; index as j"
+          >
+            <mat-list-item class="place">
+              <mat-icon *ngIf="time_point.status === 'start_trip'" matListIcon>
+                outlined_flag
+              </mat-icon>
+              <mat-icon *ngIf="time_point.status === 'enroute'" matListIcon>
+                <img
+                  class="truck_icon"
+                  width="32"
+                  height="32"
+                  src="../../assets/images/goFast.jpg"
+                />
+              </mat-icon>
+              <mat-icon *ngIf="time_point.status === 'end_day'" matListIcon>
+                hotel
+              </mat-icon>
+              <mat-icon *ngIf="time_point.status === 'start_day'" matListIcon>
+                alarm
+              </mat-icon>
+              <mat-icon *ngIf="time_point.status === 'end_trip'" matListIcon>
+                flag
+              </mat-icon>
+              <h3 matLine class="time_place_title">
+                <div class="align_times">
+                  <span class="time_local_text time_local_color">{{ time_point.time_local }} </span> <span class="time_user_text time_user_color"> {{ time_point.time_user }}</span>
+                </div>
+                <div>{{ time_point.city_state }}</div>
+              </h3>
+              <div class="weather_report">
+                <div class="wrapper">
+                  <span
+                  *ngIf="time_point.weather.temperature" 
+                  class="temperature">
+                    {{ time_point.weather.temperature }}
+                    <span *ngIf="time_point.weather.temperature" class="deg_F">
+                      &#8457;</span
+                    >
+                  </span>
+                  <span 
+                  *ngIf="!time_point.weather.temperature" 
+                  class="temperature">
+                    {{ time_point.weather.temperature }}
+                    <span *ngIf="time_point.weather.temperature" class="deg_F">
+                      &#8457;
+                  </span>
+                  </span>
+                  <span
+                    *ngIf="time_point.weather.forecast12hour"
+                    class="forecast_text"
+                  >
+                    {{ time_point.weather.forecast12hour.text12short }}
+                  </span>
+                  <span
+                    *ngIf="
+                      !time_point.weather.forecast12hour &&
+                      time_point.weather.forecast24hour
+                    "
+                    class="forecast_text dyno_text"
+                  >
+                    {{ time_point.weather.forecast24hour.text24 }}
+                  </span>
+                  <span
+                    *ngIf="
+                      !time_point.weather.forecast12hour &&
+                      !time_point.weather.forecast24hour
+                    "
+                    class="forecast_text"
+                  >
+                    No Weather Data for {{ time_point.date_local_long }}
+                  </span>
+                </div>
+              </div>
+              <img
+                *ngIf="time_point.weather.icon_NOAA"
+                [src]="time_point.weather.icon_NOAA"
+                [title]="time_point.weather.forecast12hour.text12short"
+                alt="?"
+                width="55"
+                height="55"
+              />
+              <img
+                *ngIf="!time_point.weather.icon_NOAA"
+                [src]="time_point.weather.icon_OWM"
+                [title]="none"
+                alt="?"
+                width="55"
+                height="55"
+              />
+            </mat-list-item>
+          </ng-container>
+        </mat-list>
+      </mat-expansion-panel>
+      <ng-container *ngIf="i === trip.days.length - 1">
+        <!-- show arrival time -->
+        <mat-expansion-panel hideToggle="true" class="summary_footer">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <p>
+                End of Trip -<br />
+                <span class="day_text">
+                  {{ day.time_points[day.time_points.length - 1].city_state }}
+                </span>
+              </p>
+            </mat-panel-title>
+            <mat-panel-description>
+              <p>
+                Total miles -
+                {{ trip.overview.total_mi }}<br />
+                Arrive - 
+                <span class="day_text">{{
+                  day.time_points[day.time_points.length - 1].date_local_long
+                }}, {{ day.time_points[day.time_points.length - 1].time_local
+                }}</span>
+
+              </p>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

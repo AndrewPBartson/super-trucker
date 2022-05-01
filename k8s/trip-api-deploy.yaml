@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trip-api-main
+  labels:
+    app: trip-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trip-api
+  template:
+    metadata:
+      labels:
+        app: trip-api
+    spec:
+      containers:
+        - name: trip-api-pod
+          image: supertacr.azurecr.io/trip-api:v14
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8880
+          env:
+            - name: dbUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: db-configmap
+                  key: db_url
+            - name: dbUser
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: db-root-username
+            - name: dbPwd
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: db-root-password
+            - name: secretOrKey
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: secret-or-key
+            - name: gmKey
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: gm-key
+            - name: owmKey
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: owm-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trip-api-svc
+spec:
+  selector:
+    app: trip-api
+  ports:
+    - name: trip-api-port
+      protocol: TCP
+      port: 80
+      targetPort: 8880
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: trip-api-ext-svc
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: trip-api
+#   ports:
+#     - name: trip-api-port
+#       protocol: TCP
+#       port: 80
+#       targetPort: 8880

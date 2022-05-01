@@ -1,0 +1,36 @@
+{
+  "name": "super-user-api",
+  "version": "1.0.0",
+  "description": "Trip planning app with map - Microservice for user login and register",
+  "main": "server.js",
+  "browserslist": [
+    "defaults"
+  ],
+  "scripts": {
+    "start-user-api": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "Andrew Bartson",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dot-env": "0.0.1",
+    "eslint": "^5.16.0",
+    "express": "^4.17.1",
+    "gravatar": "^1.8.1",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
+    "mongoose": "^5.10.13",
+    "morgan": "^1.10.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "rxjs": "~6.4.0",
+    "validator": "^13.1.17",
+    "zone.js": "~0.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
