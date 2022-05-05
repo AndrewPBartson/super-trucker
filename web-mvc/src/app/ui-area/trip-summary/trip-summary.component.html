@@ -33,12 +33,12 @@
               <span class="day_text">Day {{ i + 1 }} </span> - {{ day.time_points[0].date_user_long }}<br />{{
                 day.time_points[0].city_state
               }}
-              =>
+               &#160; &#10132; &#160;
               {{ day.time_points[day.time_points.length - 1].city_state }}
             </p>
 
           </mat-panel-title>
-          <mat-panel-description>
+          <mat-panel-description class="day_details">
             <p>
               {{ day.time_points[day.time_points.length - 1].miles_today
               }}<br />
@@ -51,6 +51,7 @@
               <p class="time_local_note time_local_color">*Time at location - Blue</p>
               <p class="time_user_note time_user_color">*Time at your home timezone - Magenta</p>
             </ng-container>
+
           <ng-container
             *ngFor="let time_point of trip.days[i].time_points; index as j"
           >
@@ -88,8 +89,8 @@
                   class="temperature">
                     {{ time_point.weather.temperature }}
                     <span *ngIf="time_point.weather.temperature" class="deg_F">
-                      &#8457;</span
-                    >
+                      &#8457;
+                      </span>
                   </span>
                   <span 
                   *ngIf="!time_point.weather.temperature" 
@@ -97,28 +98,16 @@
                     {{ time_point.weather.temperature }}
                     <span *ngIf="time_point.weather.temperature" class="deg_F">
                       &#8457;
-                  </span>
+                    </span>
                   </span>
                   <span
-                    *ngIf="time_point.weather.forecast12hour"
+                    *ngIf="time_point.weather.text"
                     class="forecast_text"
                   >
-                    {{ time_point.weather.forecast12hour.text12short }}
+                    {{ time_point.weather.text }}
                   </span>
                   <span
-                    *ngIf="
-                      !time_point.weather.forecast12hour &&
-                      time_point.weather.forecast24hour
-                    "
-                    class="forecast_text dyno_text"
-                  >
-                    {{ time_point.weather.forecast24hour.text24 }}
-                  </span>
-                  <span
-                    *ngIf="
-                      !time_point.weather.forecast12hour &&
-                      !time_point.weather.forecast24hour
-                    "
+                    *ngIf="!time_point.weather.text"
                     class="forecast_text"
                   >
                     No Weather Data for {{ time_point.date_local_long }}
@@ -126,16 +115,7 @@
                 </div>
               </div>
               <img
-                *ngIf="time_point.weather.icon_NOAA"
-                [src]="time_point.weather.icon_NOAA"
-                [title]="time_point.weather.forecast12hour.text12short"
-                alt="?"
-                width="55"
-                height="55"
-              />
-              <img
-                *ngIf="!time_point.weather.icon_NOAA"
-                [src]="time_point.weather.icon_OWM"
+                [src]="time_point.weather.icon"
                 [title]="none"
                 alt="?"
                 width="55"

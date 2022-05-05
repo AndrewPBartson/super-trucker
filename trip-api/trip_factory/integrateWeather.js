@@ -27,14 +27,15 @@ const setDateTimeUserHome = (time_pt, tz_user) => {
 
 const select24HourForecast = (time_pt, weather, idx) => {
   // OWM forecasts in 24 hr increments, except temp in 6 hr increments
+
   for (let z = 0; z < weather[idx].forecast24hour.length; z++) {
     // match forecast period to ETA for this location
     if (time_pt.timestamp >= weather[idx].forecast24hour[z].start_24
       && time_pt.timestamp < weather[idx].forecast24hour[z].end_24) {
       // save to time_point
       time_pt.weather.forecast24hour = weather[idx].forecast24hour[z];
+      time_pt.weather.text = time_pt.weather.forecast24hour.text24;
       time_pt.weather.icon = time_pt.weather.forecast24hour.icon_OWM;
-      time_pt.weather.icon_OWM = time_pt.weather.forecast24hour.icon_OWM;
 
       for (let a = 0; a < weather[idx].forecast24hour[z].temps.length; a++) {
         // OWM temperature comes in 6 hour increments
@@ -50,7 +51,6 @@ const select24HourForecast = (time_pt, weather, idx) => {
 }
 
 const select12HourForecast = (time_pt, weather, idx) => {
-  // location data may have 16 locations
   // some locations have more than one time_point
   if (weather[idx].forecast12hour.length > 0) {
     for (let y = 0; y < weather[idx].forecast12hour.length; y++) {
@@ -59,10 +59,15 @@ const select12HourForecast = (time_pt, weather, idx) => {
         && time_pt.timestamp < weather[idx].forecast12hour[y].end_12) {
         // save to time_point
         time_pt.weather.forecast12hour = weather[idx].forecast12hour[y];
-        time_pt.weather.icon = time_pt.weather.forecast12hour.icon_NOAA;
+        time_pt.weather.text = weather[idx].forecast12hour[y].text12short;
+        // icon_NOAA can be null for scraped data like 6 days out
         if (time_pt.weather.forecast12hour.icon_NOAA) {
-          time_pt.weather.icon_NOAA = time_pt.weather.forecast12hour.icon_NOAA;
+          time_pt.weather.icon = time_pt.weather.forecast12hour.icon_NOAA;
         }
+      }
+      // if icon is still missing, use error icon
+      if (!time_pt.weather.icon) {
+        time_pt.weather.icon = '../../assets/images/nodata.jpg';
       }
     }
   }

@@ -4,10 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITripObject } from '../models/itrip-object';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ApiService {
+@Injectable({ providedIn: 'root' })
+
+export class TripService {
 
   // apiURL: string = 'http://20.124.155.73';
   apiURL: string = 'http://localhost:8880';
@@ -23,8 +22,8 @@ export class ApiService {
 
   constructor(private httpClient: HttpClient) { }
 
-  sendTripRequest(tripSettings): Observable<ITripObject> {
-    console.log('api.service - sendTripRequest() w/ tripSettings :', tripSettings);
+  tripRequest(tripSettings): Observable<ITripObject> {
+    console.log('trip.service - tripRequest() / tripSettings :', tripSettings);
     return this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
   }
 }

@@ -1,10 +1,11 @@
+/*
 // const {
 //   testWeatherDates,
 //   checkTimeStrings,
 //   checkDistanceDuration,
 //   checkDataSources
 // } = require('./devDataCheck');
-
+*/
 const createDaysArray = (req, res, next) => {
   let { time_points, days } = req.payload.data.trip;
   let emptyDay;
@@ -33,7 +34,6 @@ const createDaysArray = (req, res, next) => {
   // checkTimeStrings(days, req.payload.data.trip.overview.timezone_user);
   // checkDistanceDuration(days, req.payload.data.trip.overview);
   // checkDataSources(days);
-
   return req;
 }
 

@@ -18,9 +18,9 @@
   "description": "Trip planning app with map - Microservice for frontend. Enter origin and destination, and get back a route with schedule and expected weather.",
   "dependencies": {
     "@agm/core": "^1.0.0",
+    "@angular-devkit/build-angular": "^0.803.29",
     "@angular-material-components/datetime-picker": "^2.0.4",
     "@angular-material-components/moment-adapter": "^2.0.2",
-    "@angular-devkit/build-angular": "^0.803.29",
     "@angular/animations": "~8.2.11",
     "@angular/cdk": "~8.2.3",
     "@angular/common": "~8.2.11",
@@ -32,6 +32,7 @@
     "@angular/platform-browser": "~8.2.11",
     "@angular/platform-browser-dynamic": "~8.2.11",
     "@angular/router": "~8.2.11",
+    "@types/googlemaps": "^3.43.3",
     "axios": "^0.21.1",
     "hammerjs": "^2.0.8",
     "jwt-decode": "^3.0.0",
@@ -43,10 +44,10 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^0.803.29",
     "@angular/cli": "^8.3.29",
     "@angular/compiler-cli": "~8.2.11",
     "@angular/language-service": "~8.2.11",
-    "@angular-devkit/build-angular": "^0.803.29",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",

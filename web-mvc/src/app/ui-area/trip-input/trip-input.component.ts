@@ -101,7 +101,7 @@ export class TripInputComponent implements OnInit {
     // after user sets depart_time manually, it should 
     // not refresh any more 
     // backend prevents trips from beginning in the past.
-    // Also modify Departure Date/Time" on the ui so it never
+    // Also modify "Departure Date/Time" on ui so it never
     // shows times in the past
 
     // 10 minutes = 600000 milliseconds

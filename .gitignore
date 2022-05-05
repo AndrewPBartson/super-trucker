@@ -1,6 +1,8 @@
 # top secret stuff
 /config/keys_dev.js
-/client/src/environments/environments.ts
+/web-mvc/src/environments/environments.ts
+/k8s/db-secret.yaml
+
 
 # compiled output
 /dist

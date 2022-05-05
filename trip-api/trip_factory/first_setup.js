@@ -105,6 +105,7 @@ const setupPayload = (req, res, next) => {
       "trip": {
         "days": [],
         "cities": [],
+        "markers": [],
         // in production, time_points[] and weather[] are not needed,
         // at least in theory. But for easier testing, seems 
         // best to include permanently 

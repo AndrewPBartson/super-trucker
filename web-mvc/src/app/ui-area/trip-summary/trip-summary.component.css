@@ -68,16 +68,19 @@
 .forecast_text {
   font-size: 0.9rem;
 }
-.dyno_text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
 .day_text {
   font-size: 1.1rem;
   font-weight: 600;
   font-family: "Titillium Web", sans-serif;
   color: #000199;
+}
+.day_details {
+  padding-top: 5px;
+  max-width: 110px;
+}
+.day_arrow {
+  height: 20px;
+  width: 30px;
 }
 .time_local_color {
   color: blue;

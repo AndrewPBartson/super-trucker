@@ -70,14 +70,14 @@ When the response comes back to the client, the user sees the route displayed in
 - "ng": "ng",
 - "start": "node server/server.js",
 - "start-backend": "nodemon server/server.js",
-- "start-frontend": "npm start --prefix client",
+- "start-frontend": "npm start --prefix web-mvc",
 - "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
-- "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+- "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix web-mvc && npm run build --prefix web-mvc"
 
 During development - npm run dev
 ```
 
-**scripts - client/package.json**
+**scripts - web-mvc/package.json**
 
 ```
 - "ng": "ng",

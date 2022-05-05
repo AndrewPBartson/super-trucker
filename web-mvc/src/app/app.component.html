@@ -1,12 +1,12 @@
 <div class="container1">
   <app-ui-area></app-ui-area>
-
-  <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [styles]="options">
+  <div #mapContainer id="map"></div>
+  <!-- <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [styles]="options">
     <agm-marker
       *ngFor="let point of points"
       [latitude]="point.lat"
       [longitude]="point.lng"
     >
     </agm-marker>
-  </agm-map>
+  </agm-map> -->
 </div>
