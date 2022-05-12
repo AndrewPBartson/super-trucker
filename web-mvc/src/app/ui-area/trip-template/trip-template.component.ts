@@ -8,7 +8,7 @@ import { ViewManagerService } from '../../services/view-manager.service';
 })
 export class TripTemplateComponent implements OnInit {
 
-  constructor(public viewManagerService: ViewManagerService) { }
+  constructor(private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
   }

@@ -39,6 +39,12 @@
 .day_panel .day_title {
   background-color: #e1e1e1;
 }
+.day_panel {
+  border-top: rgb(232, 230, 230) solid 1px;
+  border-bottom: rgb(232, 230, 230) solid 1px;
+  padding-top: 1px;
+}
+
 .places_list .place {
   height: auto;
 }
@@ -51,9 +57,6 @@
   padding-right: 10px;
   padding-top: 5px;
   min-height: 70px;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
 }
 .weather_report .wrapper {
   margin-top: auto;

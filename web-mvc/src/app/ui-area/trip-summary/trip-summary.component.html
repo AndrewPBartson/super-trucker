@@ -1,12 +1,12 @@
 <div class="row d-flex">
-  <div *ngIf="trip" class="mat-app-background basic-container">
+  <div *ngIf="data" class="mat-app-background basic-container">
     <mat-card class="tint">
       <mat-card-header class="col h3">
         <mat-card-title class="trip_title">
           <span class="title_lite">From </span>
-          {{ trip.overview.origin }} <span class="title_medium"> to </span>
-          {{ trip.overview.end_point }}
-          <span class="title_lite no_break"> via {{ trip.overview.summary }}</span>
+          {{ data.trip.overview.origin }} <span class="title_medium"> to </span>
+          {{ data.trip.overview.end_point }}
+          <span class="title_lite no_break"> via {{ data.trip.overview.summary }}</span>
         </mat-card-title>
       </mat-card-header>
       <div class="btn_wrapper">
@@ -23,14 +23,15 @@
       </div>
     </mat-card>
 
-    <ng-container *ngFor="let day of trip.days; index as i">
+    <ng-container *ngFor="let day of data.trip.days; index as i">
       <!-- create panel for each days travel info -->
       <mat-expansion-panel class="day_panel" [expanded]="allExpandState">
         <mat-expansion-panel-header class="day_title">
           <!-- title with overview of days travel -->
           <mat-panel-title>
             <p>
-              <span class="day_text">Day {{ i + 1 }} </span> - {{ day.time_points[0].date_user_long }}<br />{{
+              <span class="day_text">Day {{ i + 1 }} </span> - {{ 
+                day.time_points[0].date_user_long }}<br />{{
                 day.time_points[0].city_state
               }}
                &#160; &#10132; &#160;
@@ -53,7 +54,7 @@
             </ng-container>
 
           <ng-container
-            *ngFor="let time_point of trip.days[i].time_points; index as j"
+            *ngFor="let time_point of data.trip.days[i].time_points; index as j"
           >
             <mat-list-item class="place">
               <mat-icon *ngIf="time_point.status === 'start_trip'" matListIcon>
@@ -78,36 +79,29 @@
               </mat-icon>
               <h3 matLine class="time_place_title">
                 <div class="align_times">
-                  <span class="time_local_text time_local_color">{{ time_point.time_local }} </span> <span class="time_user_text time_user_color"> {{ time_point.time_user }}</span>
+                  <span class="time_local_text time_local_color">{{ 
+                    time_point.time_local }} </span> 
+                  <span class="time_user_text time_user_color"> {{ 
+                      time_point.time_user }}</span>
                 </div>
                 <div>{{ time_point.city_state }}</div>
               </h3>
               <div class="weather_report">
                 <div class="wrapper">
-                  <span
-                  *ngIf="time_point.weather.temperature" 
-                  class="temperature">
-                    {{ time_point.weather.temperature }}
-                    <span *ngIf="time_point.weather.temperature" class="deg_F">
+                  <span class="temperature">
+                    {{ time_point.temperature }}
+                    <span *ngIf="time_point.temperature" class="deg_F">
                       &#8457;
                       </span>
                   </span>
-                  <span 
-                  *ngIf="!time_point.weather.temperature" 
-                  class="temperature">
-                    {{ time_point.weather.temperature }}
-                    <span *ngIf="time_point.weather.temperature" class="deg_F">
-                      &#8457;
-                    </span>
-                  </span>
                   <span
-                    *ngIf="time_point.weather.text"
+                    *ngIf="time_point.text"
                     class="forecast_text"
                   >
-                    {{ time_point.weather.text }}
+                    {{ time_point.text }}
                   </span>
                   <span
-                    *ngIf="!time_point.weather.text"
+                    *ngIf="!time_point.text"
                     class="forecast_text"
                   >
                     No Weather Data for {{ time_point.date_local_long }}
@@ -115,7 +109,7 @@
                 </div>
               </div>
               <img
-                [src]="time_point.weather.icon"
+                [src]="time_point.icon"
                 [title]="none"
                 alt="?"
                 width="55"
@@ -125,7 +119,7 @@
           </ng-container>
         </mat-list>
       </mat-expansion-panel>
-      <ng-container *ngIf="i === trip.days.length - 1">
+      <ng-container *ngIf="i === data.trip.days.length - 1">
         <!-- show arrival time -->
         <mat-expansion-panel hideToggle="true" class="summary_footer">
           <mat-expansion-panel-header>
@@ -140,7 +134,7 @@
             <mat-panel-description>
               <p>
                 Total miles -
-                {{ trip.overview.total_mi }}<br />
+                {{ data.trip.overview.total_mi }}<br />
                 Arrive - 
                 <span class="day_text">{{
                   day.time_points[day.time_points.length - 1].date_local_long

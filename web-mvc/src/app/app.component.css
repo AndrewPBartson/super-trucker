@@ -6,3 +6,9 @@
   grid-template-columns: 480px 1fr ;
   margin: 0;
 }
+.time_local {
+  color: blue;
+}
+.time_user {
+  color: magenta;
+}

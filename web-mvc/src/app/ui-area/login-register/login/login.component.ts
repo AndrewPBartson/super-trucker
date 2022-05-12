@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     // isAuthenticated: false
   }
 
-  constructor(public loginService: LoginService, public viewManagerService: ViewManagerService) { }
+  constructor(private loginService: LoginService, public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.loginForm = new FormGroup({

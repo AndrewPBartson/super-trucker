@@ -45,14 +45,19 @@ function setIntervalsPerDay(meters_per_day, total_meters) {
   return divide_by;
 }
 
-function getSimpleData(req, response_0) {
+function getSimpleData(req, prelim_data) {
   let polylinePts = req.factory.polylinePts;
-  req.factory.total_meters = response_0.data.routes[0].legs[0].distance.value;
-  req.payload.data.trip.overview.total_meters = response_0.data.routes[0].legs[0].distance.value;
-  req.payload.data.trip.overview.total_mi_text = response_0.data.routes[0].legs[0].distance.text;
-  polylinePts = response_0.data.routes[0].overview_polyline.points;
+  req.factory.total_meters = prelim_data.routes[0].legs[0].distance.value;
+  req.payload.data.trip.overview.total_meters = prelim_data.routes[0].legs[0].distance.value;
+  req.payload.data.trip.overview.total_mi_text = prelim_data.routes[0].legs[0].distance.text;
+  req.payload.data.trip.overview.bounds.northeast.lat = prelim_data.routes[0].bounds.northeast.lat;
+  req.payload.data.trip.overview.bounds.northeast.lng = prelim_data.routes[0].bounds.northeast.lng;
+  req.payload.data.trip.overview.bounds.southwest.lat = prelim_data.routes[0].bounds.southwest.lat;
+  req.payload.data.trip.overview.bounds.southwest.lng = prelim_data.routes[0].bounds.southwest.lng;
+  polylinePts = prelim_data.routes[0].overview_polyline.points;
   // convert G_maps trip summary polyline to array of lat/lng coordinates
-  req.factory.all_points = polyline.decode(polylinePts)
+  req.factory.all_points = polyline.decode(polylinePts);
+  req.payload.data.trip.polyline = req.factory.all_points;
 }
 
 function calcFirstTripVariables(factory) {
@@ -106,8 +111,8 @@ function getInitialTripData(req, res, next) {
     ${origin}&destination=${end_point}
     &key=${GMkey}`
   return axios.get(first_url)
-    .then(response_0 => {
-      getSimpleData(req, response_0)
+    .then(initial_res => {
+      getSimpleData(req, initial_res.data)
       calcFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)
       return req;

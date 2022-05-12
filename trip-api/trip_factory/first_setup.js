@@ -70,7 +70,16 @@ const createTripOverview = (req) => {
 
   let overview = {
     "avg_speed": avg_speed,
-    "bounds": {},
+    "bounds": {
+      "northeast": {
+        "lat": 0,
+        "lng": 0
+      },
+      "southwest": {
+        "lat": 0,
+        "lng": 0
+      }
+    },
     "break_period": calcBreakPeriod(hours_driving),
     "drive_time_hours": hours_driving,
     "drive_time_msec": parseFloat(hours_driving) * 3600000,
@@ -106,6 +115,7 @@ const setupPayload = (req, res, next) => {
         "days": [],
         "cities": [],
         "markers": [],
+        "polyline": [],
         // in production, time_points[] and weather[] are not needed,
         // at least in theory. But for easier testing, seems 
         // best to include permanently 

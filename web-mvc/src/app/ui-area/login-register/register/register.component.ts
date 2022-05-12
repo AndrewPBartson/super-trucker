@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
     password2: ''
   }
 
-  constructor(public registerService: RegisterService) { }
+  constructor(private registerService: RegisterService) { }
 
   ngOnInit() {
     this.registerForm = new FormGroup({

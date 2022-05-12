@@ -1,6 +1,4 @@
-import { Component, OnInit, Input, EventEmitter } from '@angular/core';
-import { ITripObject } from '../models/itrip-object';
-import { TripService } from '../services/trip.service';
+import { Component, OnInit } from '@angular/core';
 import { ViewManagerService } from '../services/view-manager.service';
 
 @Component({
@@ -8,13 +6,12 @@ import { ViewManagerService } from '../services/view-manager.service';
   templateUrl: './ui-area.component.html',
   styleUrls: ['./ui-area.component.css']
 })
-export class UiAreaComponent implements OnInit {
-  tripObject: ITripObject;
-  viewMode: string;
-  setTripData: EventEmitter<string> = new EventEmitter<string>()
 
-  constructor(public tripService: TripService,
-    public viewManagerService: ViewManagerService) { }
+export class UiAreaComponent implements OnInit {
+  viewMode: string;
+
+  constructor(
+    private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.viewMode = 'form';
@@ -22,22 +19,7 @@ export class UiAreaComponent implements OnInit {
       .subscribe(mode => {
         this.viewMode = mode;
       });
-  }
-
-  handleResponse(data) {
-    let tripData = data.data.trip;
-    console.log('tripData :>> ', tripData);
-    this.setTripData.emit(JSON.stringify(tripData));
-    // create markers from tripData and load on map
-    return tripData
-  }
-
-  callTripService(tripSettings) {
-    this.tripService.tripRequest(tripSettings)
-      .subscribe(rawData => {
-        // this.setTripData.emit(JSON.stringify(rawData));
-        this.tripObject = this.handleResponse(rawData);
-        this.viewMode = 'summary';
-      })
+    // subscribe to trip service
+    // bc need to set this.viewMode = "summary" 
   }
 }

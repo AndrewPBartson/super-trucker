@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, ViewChild, Output, Input } from '@angular/core';
-import { FormControl, FormGroup, Validators, ControlContainer } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as _moment from 'moment';
 import { default as _rollupMoment, Moment, MomentFormatSpecification, MomentInput } from 'moment';
 const moment = _rollupMoment || _moment;
@@ -9,6 +9,8 @@ import { ThemePalette } from '@angular/material/core';
 import { ITripInput } from '../../models/itrip-input';
 import { InputService } from '../../services/input.service';
 import { ViewManagerService } from '../../services/view-manager.service';
+import { TripService } from '../../services/trip.service';
+import { PublishService } from '../../services/publish.service';
 
 @Component({
   selector: 'app-trip-input',
@@ -22,7 +24,6 @@ export class TripInputComponent implements OnInit {
   // for cancelling updating date time field
   intervalId = null;
 
-  @Output() tripSubmitted = new EventEmitter();
   @ViewChild('picker', { static: true }) picker: any;
 
   public showSpinners = true;
@@ -38,16 +39,17 @@ export class TripInputComponent implements OnInit {
   public stepMinutes = [1, 5, 10, 15, 20, 25];
   public stepSeconds = [1, 5, 10, 15, 20, 25];
 
+  // create property for user input for trip request
   input: ITripInput = {
-    origin: '',
-    end_point: '',
-    miles_per_day: 0,
     avg_speed: null,
-    hours_driving: null,
     depart_time: null,
     depart_time_msec: 0,
-    timezone_user: null,
-    time_user_str: null
+    end_point: '',
+    hours_driving: null,
+    miles_per_day: 0,
+    origin: '',
+    time_user_str: null,
+    timezone_user: null
     //weather: null
   };
 
@@ -73,7 +75,11 @@ export class TripInputComponent implements OnInit {
     tz.guess(), "GMT-0800 (PST)", "GMT-0700 (PDT MST)", "GMT-0600 (MDT CST)", "GMT-0500 (CDT EST)", "GMT-0400 (EDT)"
   ]
 
-  constructor(public inputService: InputService, public viewManagerService: ViewManagerService) { }
+  constructor(
+    private inputService: InputService,
+    private tripService: TripService,
+    private publishService: PublishService,
+    private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
 
@@ -100,39 +106,33 @@ export class TripInputComponent implements OnInit {
     // depart_time is refreshed every 30 seconds but
     // after user sets depart_time manually, it should 
     // not refresh any more 
-    // backend prevents trips from beginning in the past.
-    // Also modify "Departure Date/Time" on ui so it never
-    // shows times in the past
+    // backend prevents trips from beginning in the past
 
     // 10 minutes = 600000 milliseconds
     this.intervalId = setInterval(this.refreshDateTime, 6000, this.tripForm, 600000);
   }
 
-  refreshDateTime(form, increment) {
+  onTripSubmitted(e, tForm, presets) {
+    this.inputService.adjustFormValues(e, tForm, presets)
+    this.inputService.buildRequestData(tForm, this.input)
+    console.log('onTripSubmitted() - user input :>> ', this.input);
+
+    this.tripService.tripRequest(this.input)
+      .subscribe(data => {
+        console.log(`tripRequest() ->  data`, data)
+        this.viewManagerService.setViewMode.emit('summary')
+        return this.publishService.transmitData.next(data);
+      })
+
+    return false;
+  }
+
+  refreshDateTime(form) {
     form.get('depart_time').setValue(moment().toDate())
   }
 
   cancelTimeRefresh() {
-    console.log('testing cancel interval')
     clearInterval(this.intervalId)
-  }
-
-  onTripSubmitted(e, tForm, presets) {
-    this.inputService.adjustFormValues(e, tForm, presets)
-    // convert form to clean data
-    console.log('onTripSubmitted() - raw input :', this.tripForm);
-    Object.entries(this.tripForm.value)
-      .forEach(([key, inputValue]) => {
-        this.input[key] = inputValue;
-      });
-    // add time string from browser because it has user's default timezone
-    this.input.time_user_str = this.tripForm.value.depart_time.toString();
-    // convert depart_time to milliseconds
-    this.input.depart_time_msec = moment(this.tripForm.value.depart_time).valueOf();
-    console.log('onTripSubmitted() - improved input :', this.input);
-
-    this.tripSubmitted.emit(this.input);
-    return false;
   }
 
   showLogin() {

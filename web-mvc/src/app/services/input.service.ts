@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import * as _moment from 'moment';
+import { default as _rollupMoment, Moment, MomentFormatSpecification, MomentInput } from 'moment';
+const moment = _rollupMoment || _moment;
 
 @Injectable({
   providedIn: 'root'
@@ -148,4 +151,18 @@ export class InputService {
     });
     return;
   }
+
+  buildRequestData(tripForm, reqData) {
+    // convert form to clean data
+    Object.entries(tripForm.value)
+      .forEach(([key, inputValue]) => {
+        reqData[key] = inputValue;
+      });
+    // add time string from browser because it has user's default timezone
+    reqData.time_user_str = tripForm.value.depart_time.toString();
+    // convert depart_time to milliseconds
+    reqData.depart_time_msec = moment(tripForm.value.depart_time).valueOf();
+    return reqData;
+  }
+
 }

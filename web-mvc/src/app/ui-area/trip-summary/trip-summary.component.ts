@@ -1,6 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ITripObject } from '../../models/itrip-object';
+import { Component, OnInit } from '@angular/core';
 import { ViewManagerService } from '../../services/view-manager.service';
+import { PublishService } from '../../services/publish.service';
 
 @Component({
   selector: 'app-trip-summary',
@@ -9,18 +9,24 @@ import { ViewManagerService } from '../../services/view-manager.service';
 })
 export class TripSummaryComponent implements OnInit {
 
-  @Input() trip: any;
-
+  data: any; // html is bound to this.data
   showDetails = true;
   panelOpenState: boolean = false;
   allExpandState = false;
 
-  constructor(public viewManagerService: ViewManagerService) { }
+  constructor(
+    private viewManagerService: ViewManagerService,
+    private publishService: PublishService) { }
+
 
   ngOnInit() {
+    this.publishService.transmitData.subscribe(trip => {
+      console.log('data to UI :>> ', trip);
+      this.data = trip;
+    })
   }
 
-  showForm() {
+  showForm(): void {
     this.viewManagerService.setViewMode.emit('form')
   }
 }

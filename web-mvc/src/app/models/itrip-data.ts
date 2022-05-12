@@ -1,9 +1,13 @@
-export interface ITrip {
+export interface ITripData {
   days: [
     {
       time_points: [
         {
           city_state: string
+          // latLng: {
+          //   lat: number
+          //   lng: number
+          // },
           miles_today: string
           hours_today: string
           time_local: string
@@ -50,4 +54,6 @@ export interface ITrip {
       southwest: { lat: number, lng: number }
     }
   }
+  // time_points?: [],
+  // weather?: []
 }

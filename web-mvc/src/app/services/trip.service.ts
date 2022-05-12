@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-//import { InputModel } from '../models/input.model';
 import { Observable } from 'rxjs';
-import { ITripObject } from '../models/itrip-object';
+import { map } from 'rxjs/operators';
+import { ITrip } from '../models/itrip';
+import { ITripData } from '../models/itrip-data';
+import { ITripInput } from '../models/itrip-input';
 
 @Injectable({ providedIn: 'root' })
 
@@ -10,20 +12,30 @@ export class TripService {
 
   // apiURL: string = 'http://20.124.155.73';
   apiURL: string = 'http://localhost:8880';
-  football: {};
-
-  /* private input: InputModel = {
-    origin: '',
-    end_point: '',
-    miles_per_day: 0,
-    timezone_user: '',
-    time_user_str: ''
-  }; */
 
   constructor(private httpClient: HttpClient) { }
 
-  tripRequest(tripSettings): Observable<ITripObject> {
-    console.log('trip.service - tripRequest() / tripSettings :', tripSettings);
-    return this.httpClient.post(`${this.apiURL}/api/trips`, tripSettings)
+  tripRequest(tripSettings: ITripInput): Observable<ITrip> {
+    return this.httpClient.post<ITrip>(`${this.apiURL}/api/trips`, tripSettings)//.pipe(
+    // 
   }
 }
+
+  // transformTripData(tripData: ITripData): any {
+  //   // let trip = {
+  //   //   trip: {
+  //   //     ...tripData
+  //   //   }
+  //   // }
+  //   return {
+  //     ...tripData
+  //     // modify data as needed for the view
+  //     // no changes needed, example only
+  //     // city: data.cat.city,
+  //     // country: data.cat.country,
+  //     // owner: data.cat.food_provider,
+  //     // color: data.cat.color,
+  //     // birthDate: new Date(data.birthDateSec)
+  //     //};
+  //   }
+  // }

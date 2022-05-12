@@ -39,7 +39,7 @@ function searchForServicesSet(req, res, next) {
   let count = 0;
   let promises = [];
   // commented out - too many hits on Google Places
-  // implement when we have subscribers!
+  // implement when we have customers!
   // iterate each way point set which consists of stop point plus 2 nearby ones
   // for (let i = 1; i < trip.exports.way_points_extra.length; i++) { 
   //   // do three searches for way_points_extra, one for each of the three

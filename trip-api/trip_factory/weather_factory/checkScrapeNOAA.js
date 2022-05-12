@@ -126,8 +126,11 @@ const pushSnapshotsToArray = ($, data) => {
         text_short = $(data.main_panels[k])
           .find('p.short-desc')
           .removeAttr('clear')
+          // .find('br')
+          // .replaceWith(' ')
           .text()
-          .replace(/([a-z])([A-Z])/g, '$1 $2')
+        text_short = text_short.replace(/([a-z])([A-Z])/g, '$1 $2')
+        console.log('text_short:>> ', text_short);
       } else { // if text has single line
         text_short = $(data.main_panels[k]).find('p.short-desc').text();
       }

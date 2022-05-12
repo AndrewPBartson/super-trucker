@@ -161,7 +161,8 @@ function getExtraWayPoints(factory) {
         way_pt_obj.next = [...all_points[a + 1]]
         i++
       }
-      way_points_extra.push(way_pt_obj)
+      // may implement later to search for hotels and truck stops
+      // way_points_extra.push(way_pt_obj)
     }
   }
 }
@@ -192,9 +193,9 @@ function savePreviousData(f) { // to determine if done yet
   f.way_points = [];
 }
 
-function pullDataFromResponse(response, leg_distances) {
+function pullDataFromResponse(route, leg_distances) {
   // pull out current leg distances from response
-  let leg_set = response.data.routes[0].legs
+  let leg_set = route.legs
   for (let i = 0; i < leg_set.length; i++) {
     leg_distances.push(leg_set[i].distance.value)
   }
@@ -213,7 +214,7 @@ const fixWayPoints = async (req, res, next) => {
     // fetch data for recalculating way_points
     // need distances between most recent way_points
     let response = await axios.get(req.factory.trip_url)
-    pullDataFromResponse(response, req.factory.leg_distances);
+    pullDataFromResponse(response.data.routes[0], req.factory.leg_distances);
     getMeterCounts(req.factory)
     calibrateMeterCounts(req.factory)
     findMeterCountAtBreakPoints(req.factory)

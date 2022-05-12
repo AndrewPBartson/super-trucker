@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { ViewManagerService } from '../../services/view-manager.service';
 export class LoginRegisterComponent implements OnInit {
   @Input() view_status: { type: string, name: string, content: string };
 
-  constructor(public viewManagerService: ViewManagerService) { }
+  constructor(private viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
   }

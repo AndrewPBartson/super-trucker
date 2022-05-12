@@ -1,11 +1,14 @@
 const createDataPoint = (time_pt) => {
   let data = {
     city_state: time_pt.city_state,
+    lat: time_pt.latLng.lat,
+    lng: time_pt.latLng.lng,
     date: time_pt.date_local,
     time: time_pt.time_local,
+    time_user: time_pt.time_user,
     date_time: time_pt.date_time_local,
-    icon: time_pt.weather.icon,
-    text: time_pt.weather.text,
+    icon: time_pt.icon,
+    text: time_pt.text,
     restart: null
   }
   return data;
