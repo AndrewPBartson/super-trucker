@@ -61,16 +61,28 @@ function getSimpleData(req, prelim_data) {
 }
 
 function calcFirstTripVariables(factory) {
+  // gmaps allows max of 23 waypoints for a request.
+  // that sets max number of cities that 
+  // can be shown on final trip route.
+  // Short trips can have more intervals
+  // per day. But this app shows stops that are at
+  // least 100 miles apart. 
+  // Maybe that could be lowered to 50 miles for short
+  // trips but how much does weather change in 50 miles?
   factory.intervals_per_day = setIntervalsPerDay(factory.meters_per_day, factory.total_meters);
-  // if intervals_per_day === -1, send error - "factory takes too many days"
+  // if intervals_per_day === -1, send error - "Trip takes too many days, exceeds capability of google api"
+
+  // calc meters_per_interval - easy
   factory.meters_per_interval = factory.meters_per_day / factory.intervals_per_day;
-  // get total number of factory segments -
+  // get total number of factory segments - ok
   factory.num_segments = factory.all_points.length - 1
-  // calculate number of legs to destination (usually several legs per day)
+  // calculate number of legs to destination (usually several legs per day) - ok
   factory.num_legs = factory.total_meters / factory.meters_per_interval
-  // convert num_legs to int
+  // convert num_legs to int - ok
   factory.num_legs_round = Math.ceil(factory.num_legs)
   // calculate number of segments that should be in each leg
+  // if segments were all the same length.
+  // Maybe should use num_legs_round instead of num_legs
   factory.segments_per_leg = factory.num_segments / factory.num_legs
   // convert segments_per_leg to int for iteration
   factory.segments_per_leg_round = Math.floor(factory.segments_per_leg);

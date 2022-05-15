@@ -1,0 +1,9 @@
+#map {
+  height: 100vh;
+}
+.time_local {
+  color: blue;
+}
+.time_user {
+  color: magenta;
+}

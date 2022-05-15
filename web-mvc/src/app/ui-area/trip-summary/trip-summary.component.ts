@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ViewManagerService } from '../../services/view-manager.service';
 import { PublishService } from '../../services/publish.service';
+import { ResizeService } from '../../services/resize.service';
 
 @Component({
   selector: 'app-trip-summary',
@@ -16,17 +17,22 @@ export class TripSummaryComponent implements OnInit {
 
   constructor(
     private viewManagerService: ViewManagerService,
-    private publishService: PublishService) { }
+    private publishService: PublishService,
+    private resizeService: ResizeService) { }
 
 
   ngOnInit() {
     this.publishService.transmitData.subscribe(trip => {
-      console.log('data to UI :>> ', trip);
       this.data = trip;
     })
   }
 
   showForm(): void {
     this.viewManagerService.setViewMode.emit('form')
+  }
+
+  changeCollapseStatus() {
+    this.allExpandState = !this.allExpandState;
+    return this.resizeService.notifyResize.next(true);
   }
 }

@@ -14,9 +14,12 @@ import { HeaderComponent } from './ui-area/header/header.component';
 import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
 import { TripSummaryComponent } from './ui-area/trip-summary/trip-summary.component';
 import { LoginRegisterComponent } from './ui-area/login-register/login-register.component';
-import { environment } from 'src/environments/environment';
 import { LoginComponent } from './ui-area/login-register/login/login.component';
 import { RegisterComponent } from './ui-area/login-register/register/register.component';
+import { TripTemplateComponent } from './ui-area/trip-template/trip-template.component';
+import { UserProfileComponent } from './ui-area/user-profile/user-profile.component';
+import { MapComponent } from './map/map.component';
+import { environment } from 'src/environments/environment';
 
 import {
   NgxMatDatetimePickerModule,
@@ -26,8 +29,7 @@ import {
   NGX_MAT_DATE_FORMATS
 } from '@angular-material-components/datetime-picker';
 import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
-import { TripTemplateComponent } from './ui-area/trip-template/trip-template.component';
-import { UserProfileComponent } from './ui-area/user-profile/user-profile.component';
+
 
 const CUSTOM_PARSE_DATE_INPUT = 'l, LTS';
 const CUSTOM_DISPLAY_DATE_INPUT = 'ddd MM/DD - hh:mm a';
@@ -56,7 +58,8 @@ const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
     LoginComponent,
     RegisterComponent,
     TripTemplateComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,

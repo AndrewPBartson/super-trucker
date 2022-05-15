@@ -1,15 +1,14 @@
 app-header {
   float: left;
-  width: 480px;
+  width: 478px;
   height: 83px;
 }
 .ui-area {
   display: grid;
   grid-template-rows: 85px 1fr;
-  width: 480px;
-  float: left;
-  height: 100vh;
+  width: 478px;
+  float: left;  
 }
 app-trip-summary {
-  width: 480px;
+  width: 478px;
 }

@@ -1,5 +1,8 @@
 .basic-container {
-  margin: 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-right: 10px;
+  margin-left: 12px;
 }
 .btn_wrapper {
   display: grid;

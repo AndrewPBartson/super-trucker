@@ -19,7 +19,7 @@ export class UiAreaComponent implements OnInit {
       .subscribe(mode => {
         this.viewMode = mode;
       });
-    // subscribe to trip service
+    // todo: subscribe to trip service
     // bc need to set this.viewMode = "summary" 
   }
 }

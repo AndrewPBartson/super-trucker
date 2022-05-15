@@ -1,14 +1,20 @@
-#map {
-  height: 100vh;
-}
 .container1 {
   display: grid;
-  grid-template-columns: 480px 1fr ;
+  grid-template-columns: 496px 1fr ;
   margin: 0;
+  overflow: hidden;
 }
-.time_local {
-  color: blue;
+.mapWrapper {
+  resize: vertical;
 }
-.time_user {
-  color: magenta;
+.size_1 {
+  height: 100vh;
+}
+.size_2 {
+  height: 99%;
+}
+.uiWrapper {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  overflow: auto;
 }

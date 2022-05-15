@@ -1,14 +1,17 @@
 const { secondsToHoursStr } = require('./utilities');
 
 function getCityString(address) {
-   let components = address.split(",");
-   let city = components[components.length - 3].trim();
-   let statePlusZip = components[components.length - 2].trim();
-   components = statePlusZip.split(' ');
-   // option - add properties for zipCode and country
-   let state = components[0]
-   let result = city + " " + state;
-   return result;
+   if (address) {
+      let components = address.split(",");
+      let city = components[components.length - 3].trim();
+      let statePlusZip = components[components.length - 2].trim();
+      components = statePlusZip.split(' ');
+      // option - add properties for zipCode and country
+      let state = components[0]
+      let result = city + " " + state;
+      return result;
+   } else { return "Unknown place"; }
+
 }
 
 function createNodes(req, res, next) {

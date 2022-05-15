@@ -1,12 +1,10 @@
-<div class="container1">
-  <app-ui-area></app-ui-area>
-  <div #mapContainer id="map"></div>
-  <!-- <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [styles]="options">
-    <agm-marker
-      *ngFor="let point of points"
-      [latitude]="point.lat"
-      [longitude]="point.lng"
-    >
-    </agm-marker>
-  </agm-map> -->
+<div class="container1"
+[ngClass]="mapSizeFlicker ? 'size_1' : 'size_2'">
+  <div class="uiWrapper">
+      <app-ui-area></app-ui-area>
+  </div>
+  <div class="mapWrapper"
+    [ngClass]="mapSizeFlicker ? 'size_1' : 'size_2'">
+    <app-map></app-map>
+  </div>
 </div>

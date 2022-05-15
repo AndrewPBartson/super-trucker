@@ -42,7 +42,7 @@ function createTestUrl(factory) {
   // console.log('factory.test_url (for checking waypoints):>> ', factory.test_url);
   return factory.test_url;
 }
-
+// 1) Function to check
 function getMeterCounts(factory) {
   // Create array of estimated meter accumulation at each all_point
   // based on num_segments_in_leg_array
@@ -63,7 +63,7 @@ function getMeterCounts(factory) {
   }
   return factory
 }
-
+// 2) Function to check
 function calibrateMeterCounts(factory) {
   // compensate for minor compounding inaccuracy
   let { total_meters, meter_counts } = factory;
@@ -79,7 +79,7 @@ function calibrateMeterCounts(factory) {
   }
   return factory
 }
-
+// 3) Function to check
 function findMeterCountAtBreakPoints(factory) {
   let { meter_counts, way_points, all_points, way_pts_indexes, meters_per_interval, num_segments_in_leg_array } = factory;
   let break_point = meters_per_interval;
@@ -203,7 +203,7 @@ function pullDataFromResponse(route, leg_distances) {
 
 const fixWayPoints = async (req, res, next) => {
   let { overview } = req.payload.data.trip;
-  let iterations = 2
+  let iterations = 0
   let isFinal = false;
 
   while (!isFinal) {
@@ -218,6 +218,7 @@ const fixWayPoints = async (req, res, next) => {
     getMeterCounts(req.factory)
     calibrateMeterCounts(req.factory)
     findMeterCountAtBreakPoints(req.factory)
+    checkLegDistances(req.factory.leg_distances)
     isFinal = isResultFinal(
       req.factory.way_pts_indexes,
       req.factory.way_pts_B_indexes,
@@ -227,7 +228,7 @@ const fixWayPoints = async (req, res, next) => {
     iterations++;
     // for development, use iterations > 2, for less perfect route.
     // for production, use iterations > 6:
-    if (isFinal || iterations > 2) {  // if last iteration
+    if (isFinal || iterations > 6) {  // if last iteration
       isFinal = true;
       // save final route details
       overview.summary = response.data.routes[0].summary;
