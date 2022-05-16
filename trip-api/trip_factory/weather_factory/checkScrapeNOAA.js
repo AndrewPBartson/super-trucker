@@ -30,8 +30,6 @@ const createUrlsForGaps = (req) => {
     }
   }
   console.log('patchIndexesStr :>> ', patchIndexesStr);
-  console.log('patch_data.urls :>> ', patch_data.urls);
-  console.log(`patch_data.timezones :>> `, patch_data.timezones)
 }
 
 const getRawHtmlNOAA = (req, res, next) => {
@@ -57,22 +55,12 @@ const setFirst12hourPeriod = (timezone) => {
   console.log('current_timestamp :>> ', now_);
   let current_date = new Date(now_);
   let momentX = moment.utc(current_date).tz(timezone);
-  console.log('at this time :>>      ', momentX);
   console.log('in this timezone :>>  ', timezone);
-  console.log('previous midnight :>> ', momentX.startOf('day'));
-  let previous_midnight = momentX.startOf('day');
-  let midnight_msec_maybe = new Date(previous_midnight).getTime();
-  console.log('midnight_msec_maybe :>> ', midnight_msec_maybe)
-  let yesterday_6pm_maybe = midnight_msec_maybe - 21600000;
-  console.log('yesterday_6pm_maybe :>> ', yesterday_6pm_maybe);
   let midnight = momentX.startOf('day').valueOf();
   console.log('midnight in msec :>>  ', midnight);
   let yesterday_6pm = midnight - 21600000;
-  console.log('yesterday 6pm :>>     ', yesterday_6pm);
   let today_6am = yesterday_6pm + 43200000;
-  console.log('today 6am :>>         ', today_6am);
   let today_6pm = today_6am + 43200000;
-  console.log('today 6pm :>>         ', today_6pm);
 
   if (now_ >= yesterday_6pm && now_ < today_6am) {
     period_start = yesterday_6pm;
@@ -130,12 +118,15 @@ const pushSnapshotsToArray = ($, data) => {
           // .replaceWith(' ')
           .text()
         text_short = text_short.replace(/([a-z])([A-Z])/g, '$1 $2')
-        console.log('text_short:>> ', text_short);
+        // to see the bad scraping, uncomment the following -
+        //console.log('text_short:>> ', text_short);
       } else { // if text has single line
         text_short = $(data.main_panels[k]).find('p.short-desc').text();
       }
-    } else {  // no main_panel, create text_short from forecast_row
-      // reformat this text if more than 'medium' sized - 
+    } else {  // if no main_panel -
+      // create text_short from forecast_row
+      //
+      // ideas for reformatting text - 
       // remove leading 'A '
       // replace ' percent' with '%'
       // replace ' possibly a ' with ' possible '
@@ -144,6 +135,8 @@ const pushSnapshotsToArray = ($, data) => {
       // truncate when encounter these:
       //  ', with'     ', mainly'    ' between'    ' before'   ' after'
       // capitalize 1st letters
+      //
+      // don't reformat - adds too much overhead for too little benefit?
       text_short = text_long.substring(0, 52);
     }
     snapshot = {

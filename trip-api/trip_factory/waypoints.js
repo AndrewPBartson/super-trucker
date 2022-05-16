@@ -45,17 +45,17 @@ function createTestUrl(factory) {
 // 1) Function to check
 function getMeterCounts(factory) {
   // Create array of estimated meter accumulation at each all_point
-  // based on num_segments_in_leg_array
-  let { segments_per_leg_round, num_legs_round, leg_distances } = factory;
+  // based on track_segments_per_leg
+  let { segments_per_leg, num_legs, leg_distances } = factory;
   factory.meter_counts = [0];
   let running_total = 0;
   let current_step;
   let count = 0;
 
-  for (let i = 0; i < num_legs_round; i++) {
-    current_step = leg_distances[i] / factory.num_segments_in_leg_array[i]
+  for (let i = 0; i < num_legs; i++) {
+    current_step = leg_distances[i] / factory.track_segments_per_leg[i]
 
-    for (let j = 0; j < factory.num_segments_in_leg_array[i]; j++) {
+    for (let j = 0; j < factory.track_segments_per_leg[i]; j++) {
       running_total += current_step
       count += 1
       factory.meter_counts.push(Math.round(running_total));
@@ -81,7 +81,7 @@ function calibrateMeterCounts(factory) {
 }
 // 3) Function to check
 function findMeterCountAtBreakPoints(factory) {
-  let { meter_counts, way_points, all_points, way_pts_indexes, meters_per_interval, num_segments_in_leg_array } = factory;
+  let { meter_counts, way_points, all_points, way_pts_indexes, meters_per_interval, track_segments_per_leg } = factory;
   let break_point = meters_per_interval;
   let target_meters = break_point;
   let cutoff, diff;
@@ -97,14 +97,14 @@ function findMeterCountAtBreakPoints(factory) {
     if (b === meter_counts.length - 1) {
       way_points.push(all_points[b])
       way_pts_indexes.push(b)
-      num_segments_in_leg_array.push(count_to_next_hit)
+      track_segments_per_leg.push(count_to_next_hit)
       continue // last one, no further calculations
     }
     // check if greater than target_meters
     else if (meter_counts[b] > target_meters) {
       // select meter_count closer to break_point, either [b] or [b+1]
       // compare to cutoff point midway between: [b] or [b+1]
-      num_segments_in_leg_array.push(count_to_next_hit)
+      track_segments_per_leg.push(count_to_next_hit)
       count_to_next_hit = 0;
       diff = meter_counts[b + 1] - meter_counts[b]
       cutoff = meter_counts[b] + (diff / 2)

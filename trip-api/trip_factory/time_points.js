@@ -27,8 +27,6 @@ function pushTimePoint(req, next_data, idx) {
    let { nodes } = req.factory;
    let weather = req.payload.data.trip.weather;
    let { time_points } = req.payload.data.trip;
-   console.log('idx :>> ', idx);
-   console.log('weather.length :>> ', weather.length);
    if (idx < weather.length) {
       time_points.push({
          city_state: nodes[idx].cityState,
@@ -38,6 +36,7 @@ function pushTimePoint(req, next_data, idx) {
          timestamp: next_data.timer,
          miles_today: next_data.miles_today,
          hours_today: next_data.hours_today,
+         rest_hours: next_data.rest_hours,
          timezone_local: weather[idx].timezone_local,
          timezone_local_str: weather[idx].timezone_local_str,
          weather_idx: idx,
@@ -163,6 +162,7 @@ function createTimePoints(req, res, next) {
                // increment midnight to next day:
                midnight += 86400000;
                next_data.status = "start_day";
+               next_data.rest_hours = rest_stop_msec / 3600000;
                next_data.timer += rest_stop_msec;
                interval_count = 0; // begin first driving period of new day
                day_count++;

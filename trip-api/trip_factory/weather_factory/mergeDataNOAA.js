@@ -21,9 +21,6 @@ const create12hourForecasts = (dataNOAA) => {
     // build weather data set consisting of data for 13 or 14 12-hour periods -
     for (let i = 0; i < dataNOAA.value.data.properties.periods.length; i++) {
       forecast12hour.push(addSnapshot12(dataNOAA.value.data.properties.periods[i]))
-      if (i === 0) {
-        console.log('snapshot12 for 1st timeperiod :>> ', forecast12hour[i]);
-      }
     }
     // else - status === "rejected"
     // leave forecast12hour[] empty until

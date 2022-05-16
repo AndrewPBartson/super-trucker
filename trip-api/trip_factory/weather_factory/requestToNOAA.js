@@ -15,7 +15,6 @@ let getPointNOAA = function (url) {
   return axios.get(url)
     .then(point => {
       let url_NOAA_final = point.data.properties.forecast
-      console.log('url_NOAA_final :>> ', url_NOAA_final);
       // part 2 - real axios call to NOAA api - bring home the bacon
       return axios.get(url_NOAA_final)
     })

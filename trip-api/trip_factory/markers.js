@@ -7,6 +7,7 @@ const createDataPoint = (time_pt) => {
     time: time_pt.time_local,
     time_user: time_pt.time_user,
     date_time: time_pt.date_time_local,
+    rest_hours: time_pt.rest_hours,
     icon: time_pt.icon,
     text: time_pt.text,
     restart: null
@@ -33,7 +34,7 @@ const createMarkersArray = (req, res, next) => {
       }
       else { // if "start_day"
         // marker still exists from "end_day"
-        marker.restart_data = createDataPoint(days[i].time_points[j]);
+        marker.restart = createDataPoint(days[i].time_points[j]);
         // marker w/ two sets of weather data: 1) arrival time 2) departure time
         markers.push(marker);
       }

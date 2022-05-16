@@ -92,7 +92,6 @@ const convertToTimezone = (timestamp, timezone = 'GMT-07:00') => {
 const formatTimesForTimezone = (timestamp, timezone = 'GMT-07:00') => {
   if (timestamp) {
     let time = convertToTimezone(timestamp, timezone);
-    console.log('time (converted w/ tz) :>> ', time);
 
     let timeMultiFormat = {
       timeStrLong: '',

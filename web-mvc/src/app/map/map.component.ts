@@ -85,15 +85,19 @@ export class MapComponent implements AfterViewInit {
         icon_url: data.trip.markers[i].icon,
         restart: null
       };
-      if (data.trip.markers[i].restart_data) {
+      if (data.trip.markers[i].restart) {
         dayNum++;
+        let restHours;
+        if (data.trip.markers[i].restart.rest_hours) {
+          restHours = parseFloat((data.trip.markers[i].restart.rest_hours).toFixed(1)).toString()
+        }
         restartInfo = {
-          date_2: data.trip.markers[i].restart_data.date,
-          time_2: data.trip.markers[i].restart_data.time,
-          time_user_2: data.trip.markers[i].restart_data.time_user,
-          text_2: data.trip.markers[i].restart_data.text,
-          icon_url_2: data.trip.markers[i].restart_data.icon,
-          break_period: parseFloat((data.trip.overview.break_period / 3600000).toFixed(1)).toString(),
+          date_2: data.trip.markers[i].restart.date,
+          time_2: data.trip.markers[i].restart.time,
+          time_user_2: data.trip.markers[i].restart.time_user,
+          text_2: data.trip.markers[i].restart.text,
+          icon_url_2: data.trip.markers[i].restart.icon,
+          rest_hours: restHours
         }
         newMarker.restart = restartInfo;
       }
@@ -133,7 +137,7 @@ export class MapComponent implements AfterViewInit {
   showMainInfoWindows(markers_v1): void {
     for (let i = 0; i < markers_v1.length; i++) {
       if (markers_v1[i] && markers_v1[i].icon) {
-        if (markers_v1[i].restart_data || i === 0 || i === markers_v1.length - 1) {
+        if (markers_v1[i].restart || i === 0 || i === markers_v1.length - 1) {
           google.maps.event.trigger(this.markers[i], 'click');
         }
       }
@@ -209,8 +213,8 @@ export class MapComponent implements AfterViewInit {
       if (marker.restart) {
         info +=
           `<div style="padding:5px 0;margin:0;">
-          <div style="padding:4px 0;margin-bottom:10px;color:white;text-align:center;background-color:gray;border-radius:3px;">
-           Rest for <br/>${marker.restart.break_period} hours
+          <div style="padding:2px 0 5px 0;margin-bottom:10px;font-family:Verdana;color:white;text-align:center;background-color:gray;border-radius:3px;">
+           Rest for <br/>${marker.restart.rest_hours} hours
           </div>
           <div style="padding-bottom:3px;margin:30px 0 0 0;border:#2929ff solid 1px;border-radius:3px;font-family:Verdana;color:blue;font-size:larger;text-align:center;"><b>Day ${marker.dayNum + 2}</b></div>
           <div style="border:#838383 solid 1px;border-radius:3px;margin:3px 0;padding:4px;text-align:center;">

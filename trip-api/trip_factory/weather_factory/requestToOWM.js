@@ -9,7 +9,6 @@ function createUrlsOWM(req) {
 
     url =
       `https://api.openweathermap.org/data/2.5/onecall?lat=${req.factory.way_points[i][0]}&lon=${req.factory.way_points[i][1]}&exclude=current,hourly,minutely&units=imperial&appid=${OWMkey}`;
-    console.log('OWM url :>> ', url);
     req.factory.urls_OWM.push(url);
   }
 }

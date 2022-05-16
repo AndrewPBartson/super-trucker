@@ -10,39 +10,53 @@ const GMkey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
 1287476 meters = 800 miles
 */
 function setIntervalsPerDay(meters_per_day, total_meters) {
-  let num_days = total_meters / meters_per_day
-  let divide_by;
-  if (num_days >= 24) {  // gray
-    divide_by = -1;
-  }
-  else if (num_days < 24 && num_days >= 12) {  // green
-    divide_by = 1;
-  }
-  else if (num_days < 24 && meters_per_day < 32187) {  // dark green
-    divide_by = 1;
-  }
-  else if ((num_days < 12 && num_days >= 6) && meters_per_day >= 32187) {  // violet
-    divide_by = 2;
-  }
-  else if (num_days < 12 && (meters_per_day < 96561 && meters_per_day >= 32187)) {  // dark violet
-    divide_by = 2;
-  }
-  else if (num_days < 6 && num_days >= 4) {  // blue
-    divide_by = 4;
-  }
-  else if ((meters_per_day >= 96561 && meters_per_day < 965606) && num_days < 4) {  // dark blue
-    divide_by = 4;
-  }
-  else if (meters_per_day >= 965606 && (num_days < 4 && num_days >= 3)) {  // orange
-    divide_by = 6;
-  }
-  else if ((meters_per_day >= 965606 && meters_per_day < 1287476) && num_days < 3) {  // dark orange
-    divide_by = 6;
-  }
-  else if (meters_per_day >= 1287476 && (num_days < 3)) {  // yellow
-    divide_by = 8;
-  }
-  return divide_by;
+  let days = total_meters / meters_per_day
+  // let divide_by;
+  // if (num_days >= 24) {  // gray
+  //   divide_by = -1;
+  //   // if divide_by === -1, send error - "Trip takes too many days, exceeds capability of google api"
+  // }
+  // else if (num_days < 24 && num_days >= 12) {  // green
+  //   divide_by = 1;
+  // }
+  // else if (num_days < 24 && meters_per_day < 32187) {  // dark green
+  //   divide_by = 1;
+  // }
+  // else if ((num_days < 12 && num_days >= 6.5) && meters_per_day >= 32187) {  // violet
+  //   divide_by = 2;
+  // }
+  // else if (num_days < 12 && (meters_per_day < 96561 && meters_per_day >= 32187)) {  // dark violet
+  //   divide_by = 2;
+  // }
+  // else if (num_days < 6.5 && num_days >= 4) {  // blue
+  //   divide_by = 4;
+  // }
+  // else if ((meters_per_day >= 96561 && meters_per_day < 965606) && num_days < 4) {  // dark blue
+  //   divide_by = 4;
+  // }
+  // else if (meters_per_day >= 965606 && (num_days < 4 && num_days >= 3)) {  // orange
+  //   divide_by = 6;
+  // }
+  // else if ((meters_per_day >= 965606 && meters_per_day < 1287476) && num_days < 3) {  // dark orange
+  //   divide_by = 6;
+  // }
+  // else if (meters_per_day >= 1287476 && (num_days < 3)) {  // yellow
+  //   divide_by = 8;
+  // }
+  // return divide_by;
+  if (days > 23) { return -1; }
+  if (days > 11.5) { return 1; }
+  if (days > 7.6) { return 2; }
+  if (days > 5.7) { return 3; }
+  if (days > 4.6) { return 4; }
+  if (days > 3.8) { return 5; }
+  if (days > 3.2) { return 6; }
+  if (days > 2.8) { return 7; }
+  if (days > 2.5) { return 8; }
+  if (days > 2.3) { return 9; }
+  if (days > 2) { return 10; }
+  if (days > 1.8) { return 11; }
+  if (days > 1) { return 12; }
 }
 
 function getSimpleData(req, prelim_data) {
@@ -55,67 +69,75 @@ function getSimpleData(req, prelim_data) {
   req.payload.data.trip.overview.bounds.southwest.lat = prelim_data.routes[0].bounds.southwest.lat;
   req.payload.data.trip.overview.bounds.southwest.lng = prelim_data.routes[0].bounds.southwest.lng;
   polylinePts = prelim_data.routes[0].overview_polyline.points;
-  // convert G_maps trip summary polyline to array of lat/lng coordinates
+  // convert Gmaps trip summary polyline to array of lat/lng coordinates
   req.factory.all_points = polyline.decode(polylinePts);
   req.payload.data.trip.polyline = req.factory.all_points;
 }
 
 function calcFirstTripVariables(factory) {
-  // gmaps allows max of 23 waypoints for a request.
-  // that sets max number of cities that 
-  // can be shown on final trip route.
-  // Short trips can have more intervals
-  // per day. But this app shows stops that are at
-  // least 100 miles apart. 
-  // Maybe that could be lowered to 50 miles for short
-  // trips but how much does weather change in 50 miles?
-  factory.intervals_per_day = setIntervalsPerDay(factory.meters_per_day, factory.total_meters);
-  // if intervals_per_day === -1, send error - "Trip takes too many days, exceeds capability of google api"
+  // Gmaps allows max of 23 waypoints per request.
+  // This is apart from origin(?) and end_point(?), I think.
+  // So I'm going with 24 as max number of cities that can be on final trip route.
+  // Also app is configured to show cities that are 100 miles or more apart. 
+  // That could be adjusted to, say, 50 miles apart for short trips.
+  // But how much does weather change in 50 miles? 
+  // What is optimal amount of weather data to show user?
 
-  // calc meters_per_interval - easy
+  // meters_per_day is from user input, converted from miles per day - ok
+  factory.intervals_per_day = setIntervalsPerDay(factory.meters_per_day, factory.total_meters);
+  // make initial estimate for meters_per_interval (target meters per day) - ok
   factory.meters_per_interval = factory.meters_per_day / factory.intervals_per_day;
-  // get total number of factory segments - ok
+  // get total number of segments in original polyline from gmaps - ok
   factory.num_segments = factory.all_points.length - 1
-  // calculate number of legs to destination (usually several legs per day) - ok
-  factory.num_legs = factory.total_meters / factory.meters_per_interval
+  // calculate number of legs to destination - ok
+  factory.num_legs_float = factory.total_meters / factory.meters_per_interval
   // convert num_legs to int - ok
-  factory.num_legs_round = Math.ceil(factory.num_legs)
-  // calculate number of segments that should be in each leg
-  // if segments were all the same length.
-  // Maybe should use num_legs_round instead of num_legs
-  factory.segments_per_leg = factory.num_segments / factory.num_legs
-  // convert segments_per_leg to int for iteration
-  factory.segments_per_leg_round = Math.floor(factory.segments_per_leg);
+  factory.num_legs = Math.ceil(factory.num_legs_float)
+  // calculate number of segments that should be in each leg if
+  // segments were all same length - ok
+  factory.segments_per_leg_float = factory.num_segments / factory.num_legs
+  // convert segments_per_leg_float to int for iteration
+  // needs to be floor, not round - ok
+  factory.segments_per_leg = Math.floor(factory.segments_per_leg_float);
   // calculate number of 'leftover' segments in final driving period
-  factory.leftovers = factory.num_segments - ((factory.num_legs_round - 1) * factory.segments_per_leg_round)
+  factory.leftovers = factory.num_segments - ((factory.num_legs - 1) * factory.segments_per_leg);
+  console.log('factory.segments_per_leg :>> ', factory.segments_per_leg);
+  console.log(`factory.leftovers`, factory.leftovers);
+  let test = factory.leftovers + (factory.num_legs * factory.segments_per_leg)
+  console.log(`factory.num_segments`, factory.num_segments)
+  console.log('should be equal to num_segments :>> ', test);
 }
 
+// remember that num_legs is one less than number of waypoints
 function calcFirstWayPoints(factory) {
-  for (let t = 0; t < factory.num_legs_round; t++) {
-    // if last leg, push number of "leftover" segments into last leg
-    if (t === factory.num_legs_round - 1) {
-      factory.num_segments_in_leg_array.push(factory.leftovers)
+  // 1st loop - create array of number of segments in each leg
+  // for now, all legs have same amount, except last leg has leftover amount
+  for (let t = 0; t < factory.num_legs; t++) {
+    // if last leg, push number of "leftover" segments as last element in array
+    if (t === factory.num_legs - 1 && factory.leftovers > 0) {
+      factory.track_segments_per_leg.push(factory.leftovers)
     }
-    else {
-      factory.num_segments_in_leg_array.push(factory.segments_per_leg_round)
+    else { // push average number of segments per leg
+      factory.track_segments_per_leg.push(factory.segments_per_leg)
     }
   }
-  let count = 0;
-  // gather way_points:
+  console.log('factory.track_segments_per_leg :>> ', factory.track_segments_per_leg);
+  // 2nd loop - gather way_points
   // grab out a point that (somewhat) corresponds to end of each leg
-  for (let i = 0; i <= factory.num_legs_round - 1; i++) {
+  let count = 0;
+  for (let i = 0; i <= factory.num_legs - 1; i++) {
     factory.way_points.push(factory.all_points[count]);
     factory.way_pts_indexes.push(count);
-    count += factory.num_segments_in_leg_array[i]
+    count += factory.track_segments_per_leg[i]
   }
   // push destination
   factory.way_points.push(factory.all_points[factory.all_points.length - 1])
   factory.way_pts_indexes.push(factory.all_points.length - 1);
   // now way_points are first approximation of where stopping places should be
-  console.log('1st way_points', factory.way_points)
+  console.log('1st way_points', factory.way_points);
+  console.log(`factory.way_pts_indexes`, factory.way_pts_indexes)
   return factory;
 }
-
 function getInitialTripData(req, res, next) {
   let origin = req.payload.data.trip.overview.origin.trim().split(" ").join("+")
   let end_point = req.payload.data.trip.overview.end_point.trim().split(" ").join("+");

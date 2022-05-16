@@ -12,12 +12,12 @@ function reviewWaypointCalcs(factory) {
         ${factory.way_points}
       way_points.length -  ${factory.way_points.length}
       leg_distances.length -  ${factory.leg_distances.length}
+      num_legs_float -  ${factory.num_legs_float}
       num_legs -  ${factory.num_legs}
-      num_legs_round -  ${factory.num_legs_round}
+      segments_per_leg_float -  ${factory.segments_per_leg_float}
       segments_per_leg -  ${factory.segments_per_leg}
-      segments_per_leg_round -  ${factory.segments_per_leg_round}
       'leftover' segments -  ${factory.leftovers}
-      ${factory.segments_per_leg_round}  *  ${factory.num_legs_round - 1}  +  ${factory.leftovers}  =  ${factory.num_segments}
+      ${factory.segments_per_leg}  *  ${factory.num_legs - 1}  +  ${factory.leftovers}  =  ${factory.num_segments}
       ======================================================
    `)
   return factory;
