@@ -117,8 +117,8 @@ const setupPayload = (req, res, next) => {
         "markers": [],
         "polyline": [],
         // in production, time_points[] and weather[] are not needed,
-        // at least in theory. But for easier testing, seems 
-        // best to include permanently 
+        // at least in theory. But seems best to include 
+        // permanently(?) for diagnostics 
         "time_points": [],
         "weather": [],
         "overview": createTripOverview(req)
@@ -140,6 +140,9 @@ function setupTripFactory(req, res, next) {
     all_points: [],
     polylinePts: null,
     leg_distances: [],
+    target_stops: [],
+    target_calcs: [],
+    key_pts: [],
     meter_counts: [],
     num_legs_float: null,
     num_legs: null,

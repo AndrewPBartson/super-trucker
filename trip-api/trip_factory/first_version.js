@@ -74,6 +74,18 @@ function getSimpleData(req, prelim_data) {
   req.payload.data.trip.polyline = req.factory.all_points;
 }
 
+const getMeterTargets = (req) => {
+  // build array of points that divide route into equal distances
+  let meters_per_leg = req.factory.total_meters / (req.factory.way_points.length - 1);
+  console.log(`req.factory.total_meters`, req.factory.total_meters)
+  let running_total = 0;
+  for (let i = 0; i < req.factory.way_points.length; i++) {
+    req.factory.target_stops.push(running_total);
+    running_total += meters_per_leg;
+  }
+  console.log('req.factory.target_stops :>> ', req.factory.target_stops);
+}
+
 function calcFirstTripVariables(factory) {
   // Gmaps allows max of 23 waypoints per request.
   // This is apart from origin(?) and end_point(?), I think.
@@ -87,8 +99,9 @@ function calcFirstTripVariables(factory) {
   factory.intervals_per_day = setIntervalsPerDay(factory.meters_per_day, factory.total_meters);
   // make initial estimate for meters_per_interval (target meters per day) - ok
   factory.meters_per_interval = factory.meters_per_day / factory.intervals_per_day;
-  // get total number of segments in original polyline from gmaps - ok
-  factory.num_segments = factory.all_points.length - 1
+  // get total number of segments in original polyline from gmaps
+  // subtract 1 bc number of distances is always one less than number of places- ok
+  factory.num_segments = factory.all_points.length - 1;
   // calculate number of legs to destination - ok
   factory.num_legs_float = factory.total_meters / factory.meters_per_interval
   // convert num_legs to int - ok
@@ -100,44 +113,53 @@ function calcFirstTripVariables(factory) {
   // needs to be floor, not round - ok
   factory.segments_per_leg = Math.floor(factory.segments_per_leg_float);
   // calculate number of 'leftover' segments in final driving period
-  factory.leftovers = factory.num_segments - ((factory.num_legs - 1) * factory.segments_per_leg);
+  factory.leftovers = factory.num_segments - ((factory.num_legs) * factory.segments_per_leg);
+  console.log(`factory.num_segments`, factory.num_segments)
+  console.log(`factory.num_legs`, factory.num_legs)
+  console.log(`factory.num_legs_float`, factory.num_legs_float)
   console.log('factory.segments_per_leg :>> ', factory.segments_per_leg);
+  console.log('factory.segments_per_leg_float :>> ', factory.segments_per_leg_float);
   console.log(`factory.leftovers`, factory.leftovers);
   let test = factory.leftovers + (factory.num_legs * factory.segments_per_leg)
-  console.log(`factory.num_segments`, factory.num_segments)
   console.log('should be equal to num_segments :>> ', test);
 }
 
 // remember that num_legs is one less than number of waypoints
 function calcFirstWayPoints(factory) {
-  // 1st loop - create array of number of segments in each leg
+  // 1st loop -
+  // build array of number of segments in each leg
   // for now, all legs have same amount, except last leg has leftover amount
-  for (let t = 0; t < factory.num_legs; t++) {
-    // if last leg, push number of "leftover" segments as last element in array
-    if (t === factory.num_legs - 1 && factory.leftovers > 0) {
+  for (let i = 0; i < factory.num_legs; i++) {
+    // push average number of segments per leg
+    factory.track_segments_per_leg.push(factory.segments_per_leg);
+    // if last full-size leg, also push number of "leftover" segments as last leg in array
+    if (i === factory.num_legs - 1 && factory.leftovers > 0) {
       factory.track_segments_per_leg.push(factory.leftovers)
     }
-    else { // push average number of segments per leg
-      factory.track_segments_per_leg.push(factory.segments_per_leg)
-    }
   }
+  console.log('factory.track_segments_per_leg.length :>> ', factory.track_segments_per_leg.length);
   console.log('factory.track_segments_per_leg :>> ', factory.track_segments_per_leg);
+
   // 2nd loop - gather way_points
   // grab out a point that (somewhat) corresponds to end of each leg
   let count = 0;
-  for (let i = 0; i <= factory.num_legs - 1; i++) {
+  for (let j = 0; j < factory.track_segments_per_leg.length; j++) {
     factory.way_points.push(factory.all_points[count]);
     factory.way_pts_indexes.push(count);
-    count += factory.track_segments_per_leg[i]
+    count += factory.track_segments_per_leg[j];
+    // add destination - bc number of distances is one less than number of places
+    if (j === factory.track_segments_per_leg.length - 1) {
+      factory.way_points.push(factory.all_points[count]);
+      factory.way_pts_indexes.push(count);
+    }
   }
-  // push destination
-  factory.way_points.push(factory.all_points[factory.all_points.length - 1])
-  factory.way_pts_indexes.push(factory.all_points.length - 1);
   // now way_points are first approximation of where stopping places should be
+  console.log('1st way_points.length', factory.way_points.length);
   console.log('1st way_points', factory.way_points);
+  console.log(`factory.way_pts_indexes.length`, factory.way_pts_indexes.length)
   console.log(`factory.way_pts_indexes`, factory.way_pts_indexes)
-  return factory;
 }
+
 function getInitialTripData(req, res, next) {
   let origin = req.payload.data.trip.overview.origin.trim().split(" ").join("+")
   let end_point = req.payload.data.trip.overview.end_point.trim().split(" ").join("+");
@@ -149,6 +171,7 @@ function getInitialTripData(req, res, next) {
       getSimpleData(req, initial_res.data)
       calcFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)
+      getMeterTargets(req)
       return req;
     })
     .catch(function (error) {
