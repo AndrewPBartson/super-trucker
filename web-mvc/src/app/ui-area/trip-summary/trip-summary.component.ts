@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ViewManagerService } from '../../services/view-manager.service';
 import { PublishService } from '../../services/publish.service';
 import { ResizeService } from '../../services/resize.service';
+import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
   selector: 'app-trip-summary',
@@ -16,9 +16,9 @@ export class TripSummaryComponent implements OnInit {
   allExpandState = false;
 
   constructor(
-    private viewManagerService: ViewManagerService,
     private publishService: PublishService,
-    private resizeService: ResizeService) { }
+    private resizeService: ResizeService,
+    private viewManagerService: ViewManagerService) { }
 
 
   ngOnInit() {

@@ -1,40 +1,37 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
-import { AgmCoreModule } from '@agm/core';
-import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { MaterialModule } from './modules/material.module';
+import { NgxSpinnerModule } from "ngx-spinner";
 import { PopoverModule } from 'ngx-bootstrap/popover';
 
 import { AppComponent } from './app.component';
-import { UiAreaComponent } from './ui-area/ui-area.component';
 import { HeaderComponent } from './ui-area/header/header.component';
+import { LoginComponent } from './ui-area/login-register/login/login.component';
+import { LoginRegisterComponent } from './ui-area/login-register/login-register.component';
+import { MapComponent } from './map/map.component';
+import { RegisterComponent } from './ui-area/login-register/register/register.component';
 import { TripInputComponent } from './ui-area/trip-input/trip-input.component';
 import { TripSummaryComponent } from './ui-area/trip-summary/trip-summary.component';
-import { LoginRegisterComponent } from './ui-area/login-register/login-register.component';
-import { LoginComponent } from './ui-area/login-register/login/login.component';
-import { RegisterComponent } from './ui-area/login-register/register/register.component';
 import { TripTemplateComponent } from './ui-area/trip-template/trip-template.component';
+import { UiAreaComponent } from './ui-area/ui-area.component';
 import { UserProfileComponent } from './ui-area/user-profile/user-profile.component';
-import { MapComponent } from './map/map.component';
 import { environment } from 'src/environments/environment';
 
 import {
   NgxMatDatetimePickerModule,
-  NgxMatTimepickerModule,
-  NgxMatNativeDateModule,
   NgxMatDateFormats,
-  NGX_MAT_DATE_FORMATS
+  NGX_MAT_DATE_FORMATS,
+  NgxMatNativeDateModule,
+  NgxMatTimepickerModule
 } from '@angular-material-components/datetime-picker';
 import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
 
-
 const CUSTOM_PARSE_DATE_INPUT = 'l, LTS';
 const CUSTOM_DISPLAY_DATE_INPUT = 'ddd MM/DD - hh:mm a';
-
-// If using Moment
 const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
   parse: {
     dateInput: CUSTOM_PARSE_DATE_INPUT
@@ -50,31 +47,29 @@ const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
 @NgModule({
   declarations: [
     AppComponent,
-    TripInputComponent,
-    UiAreaComponent,
     HeaderComponent,
-    TripSummaryComponent,
-    LoginRegisterComponent,
     LoginComponent,
+    LoginRegisterComponent,
+    MapComponent,
     RegisterComponent,
+    TripInputComponent,
+    TripSummaryComponent,
     TripTemplateComponent,
-    UserProfileComponent,
-    MapComponent
+    UiAreaComponent,
+    UserProfileComponent
   ],
   imports: [
-    BrowserModule,
-    ReactiveFormsModule,
-    HttpClientModule,
     AppRoutingModule,
-    AgmCoreModule.forRoot({
-      apiKey: environment.gmKey
-    }),
-    PopoverModule.forRoot(),
+    BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
+    MaterialModule,
+    NgxSpinnerModule,
     NgxMatDatetimePickerModule,
     NgxMatMomentModule,
     NgxMatTimepickerModule,
-    MaterialModule
+    PopoverModule.forRoot(),
+    ReactiveFormsModule
   ],
   providers: [
     { provide: NGX_MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }

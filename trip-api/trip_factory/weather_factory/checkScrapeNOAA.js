@@ -16,17 +16,19 @@ const createUrlsForGaps = (req) => {
   patch_data.timezones = [];
   for (let i = 0; i < weather.length; i++) {
     if (weather[i].statusNOAA === "rejected") {
-      // save index for location that is missing data
-      patch_data.indexes.push(i);
-      // for testing - build string of indexes of locations with missing data
-      patchIndexesStr += i + ',';
-      patch_data.timezones.push(weather[i].timezone_local);
-      url = `https://forecast.weather.gov/MapClick.php?lat=${nodes[i].latLng.lat}&lon=${nodes[i].latLng.lng}`;
-      patch_data.urls.push(url)
-      weather[i].city_3noaa = 'NOAA api fail, try scraping';
+      if (nodes[i]) {
+        // save index for location that is missing data
+        patch_data.indexes.push(i);
+        // for testing - build string of indexes of locations with missing data
+        patchIndexesStr += i + ',';
+        patch_data.timezones.push(weather[i].timezone_local);
+        url = `https://forecast.weather.gov/MapClick.php?lat=${nodes[i].latLng.lat}&lon=${nodes[i].latLng.lng}`;
+        patch_data.urls.push(url)
+        weather[i].city_3noaa = 'NOAA api fail, try scraping';
+      }
     }
     else {
-      weather[i].city_3noaa = 'NOAA api ok, no scrapng';
+      weather[i].city_3noaa = 'NOAA api ok, no scraping';
     }
   }
   console.log('patchIndexesStr :>> ', patchIndexesStr);
@@ -52,12 +54,9 @@ const setFirst12hourPeriod = (timezone) => {
   // 6 am to 6 pm, and from 6 pm to 6 am
   let period_start;
   let now_ = Date.now();
-  console.log('current_timestamp :>> ', now_);
   let current_date = new Date(now_);
   let momentX = moment.utc(current_date).tz(timezone);
-  console.log('in this timezone :>>  ', timezone);
   let midnight = momentX.startOf('day').valueOf();
-  console.log('midnight in msec :>>  ', midnight);
   let yesterday_6pm = midnight - 21600000;
   let today_6am = yesterday_6pm + 43200000;
   let today_6pm = today_6am + 43200000;
@@ -181,7 +180,6 @@ const patchMissingData = (gaps, req) => {
         let $ = cheerio.load(gaps[i].value.data);
         // 
         weather[indexes[i]].forecast12hour = create12hourForecast($, weather[indexes[i]].timezone_local_str);
-        console.log('indexes[i] :>> ', indexes[i]);
         if (weather[indexes[i]].forecast12hour.length > 0) {
           weather[indexes[i]].hasNOAAHtml = true;
           weather[indexes[i]].city_3noaa += ', scrape ok';

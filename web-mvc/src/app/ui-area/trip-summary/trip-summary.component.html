@@ -134,13 +134,17 @@
             <mat-panel-description>
               <p>
                 Total miles -
-                {{ data.trip.overview.total_mi }}<br />
+                {{ data.trip.overview.total_mi }} &#160;
+                <span class="time_user_text time_user_color">
+                  {{ day.time_points[day.time_points.length - 1].date_user
+                }}, {{day.time_points[day.time_points.length - 1].time_user}}
+                </span>
+                <br />
                 Arrive - 
                 <span class="day_text">{{
                   day.time_points[day.time_points.length - 1].date_local_long
                 }}, {{ day.time_points[day.time_points.length - 1].time_local
                 }}</span>
-
               </p>
             </mat-panel-description>
           </mat-expansion-panel-header>

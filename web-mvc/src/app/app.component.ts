@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { ResizeService } from './services/resize.service';
 
 @Component({
@@ -10,7 +11,9 @@ export class AppComponent implements OnInit {
 
   mapSizeFlicker = true;
 
-  constructor(private resizeService: ResizeService) { }
+  constructor(
+    private resizeService: ResizeService,
+    private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
     this.resizeService.notifyResize.subscribe(() => {
@@ -18,6 +21,4 @@ export class AppComponent implements OnInit {
       this.mapSizeFlicker = !this.mapSizeFlicker;
     })
   }
-
-
 }

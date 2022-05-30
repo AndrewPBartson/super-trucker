@@ -4,11 +4,11 @@
   "browserslist": [
     "defaults"
   ],
-  "main": "server/server.js",
+  "main": "trip-api/server.js",
   "scripts": {
     "ng": "ng",
-    "start": "node server/server.js",
-    "start-backend": "nodemon server/server.js",
+    "start": "node trip-api/server.js",
+    "start-backend": "nodemon trip-api/server.js",
     "start-frontend": "npm run dev --prefix web-mvc",
     "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\"",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix web-mvc && npm run build --prefix web-mvc"

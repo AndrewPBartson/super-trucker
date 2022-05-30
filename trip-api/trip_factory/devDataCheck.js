@@ -7,17 +7,17 @@ function reviewWaypointCalcs(factory) {
       total miles -  ${factory.total_meters / 1609.34}
       all_points.length -  ${factory.all_points.length}  
       meter_counts.length -  ${factory.meter_counts.length}
-      num_segments -  ${factory.num_segments}
+      num_units -  ${factory.num_units}
       way_points :
         ${factory.way_points}
       way_points.length -  ${factory.way_points.length}
       leg_distances.length -  ${factory.leg_distances.length}
       num_legs_float -  ${factory.num_legs_float}
       num_legs -  ${factory.num_legs}
-      segments_per_leg_float -  ${factory.segments_per_leg_float}
-      segments_per_leg -  ${factory.segments_per_leg}
-      'leftover' segments -  ${factory.leftovers}
-      ${factory.segments_per_leg}  *  ${factory.num_legs - 1}  +  ${factory.leftovers}  =  ${factory.num_segments}
+      units_per_leg_float -  ${factory.units_per_leg_float}
+      units_per_leg -  ${factory.units_per_leg}
+      'leftover' units -  ${factory.leftovers}
+      ${factory.units_per_leg}  *  ${factory.num_legs - 1}  +  ${factory.leftovers}  =  ${factory.num_units}
       ======================================================
    `)
   return factory;

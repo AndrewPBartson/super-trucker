@@ -5,12 +5,14 @@ import { default as _rollupMoment, Moment, MomentFormatSpecification, MomentInpu
 const moment = _rollupMoment || _moment;
 import { tz } from 'moment-timezone';
 import { ThemePalette } from '@angular/material/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 
-import { ITripInput } from '../../models/itrip-input';
+import { ClearMapService } from '../../services/clear-map.service';
 import { InputService } from '../../services/input.service';
-import { ViewManagerService } from '../../services/view-manager.service';
-import { TripService } from '../../services/trip.service';
+import { ITripInput } from '../../models/itrip-input';
 import { PublishService } from '../../services/publish.service';
+import { TripService } from '../../services/trip.service';
+import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
   selector: 'app-trip-input',
@@ -76,10 +78,12 @@ export class TripInputComponent implements OnInit {
   ]
 
   constructor(
+    private clearMapService: ClearMapService,
     private inputService: InputService,
-    private tripService: TripService,
     private publishService: PublishService,
-    private viewManagerService: ViewManagerService) { }
+    private tripService: TripService,
+    private viewManagerService: ViewManagerService,
+    private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
 
@@ -113,13 +117,15 @@ export class TripInputComponent implements OnInit {
   }
 
   onTripSubmitted(e, tForm, presets) {
+    this.showSpinner();
+    this.refreshMap();
     this.inputService.adjustFormValues(e, tForm, presets)
     this.inputService.buildRequestData(tForm, this.input)
     console.log('onTripSubmitted() - user input :>> ', this.input);
 
     this.tripService.tripRequest(this.input)
       .subscribe(data => {
-        console.log(`tripRequest() ->  data`, data)
+        this.hideSpinner();
         this.viewManagerService.setViewMode.emit('summary')
         return this.publishService.transmitData.next(data);
       })
@@ -127,8 +133,20 @@ export class TripInputComponent implements OnInit {
     return false;
   }
 
+  showSpinner() {
+    this.spinner.show();
+  }
+
+  hideSpinner() {
+    this.spinner.hide();
+  }
+
   refreshDateTime(form) {
     form.get('depart_time').setValue(moment().toDate())
+  }
+
+  refreshMap() {
+    return this.clearMapService.clearMarkers.next(true);
   }
 
   cancelTimeRefresh() {

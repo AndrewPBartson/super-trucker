@@ -3,7 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { LoginService } from '../../../services/login.service';
 import { ILogin } from '../../../models/ilogin';
 import { ViewManagerService } from '../../../services/view-manager.service';
-import setAuthToken from '../../../utils/setAuthToken';
+import setAuthToken from '../../../shared/setAuthToken';
 import jwt_decode from 'jwt-decode';
 
 @Component({
@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
 
         // if login was success
         // show trip form page including user's saved trip templates
-        // else 
+        // else - login failed 
         // provide options: 
         // "Forgot password?" - send link to email address
         // "Create new account" - redirect to Register page

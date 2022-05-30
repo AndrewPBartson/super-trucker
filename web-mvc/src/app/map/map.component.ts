@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { PublishService } from '../services/publish.service';
+import { ClearMapService } from '../services/clear-map.service';
 import { ResizeService } from '../services/resize.service';
+import { PublishService } from '../services/publish.service';
 
 @Component({
   selector: 'app-map',
@@ -27,6 +28,7 @@ export class MapComponent implements AfterViewInit {
   markers = [];
 
   constructor(
+    private clearMapService: ClearMapService,
     private publishService: PublishService,
     private resizeService: ResizeService) { }
 
@@ -37,15 +39,17 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.mapInitializer();
+    this.clearMapService.clearMarkers.subscribe(() => {
+      this.mapInitializer();
+    })
     this.publishService.transmitData.subscribe(data => {
-      console.log('data for map :>> ', data);
+      console.log(`incoming ->`, data)
       this.mapInitializer();
       this.data = data;
       this.setMapBounds(data)
       this.addPolyline(data.trip.polyline);
       this.createMarkerArr(this.buildMarkerData(data));
       this.showMainInfoWindows(data.trip.markers);
-      // this.showMainInfoWindows([0, data.trip.markers.length - 1]);
     })
     this.resizeService.notifyResize.subscribe(() => {
       this.mapSizeFlicker = !this.mapSizeFlicker;

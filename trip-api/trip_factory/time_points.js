@@ -94,13 +94,10 @@ function createTimePoints(req, res, next) {
       hours_today: null
    }
    let { start_time, break_period, drive_time_msec,
-      timezone_user, intervals_per_day } = req.payload.data.trip.overview;
+      timezone_user, legs_per_day } = req.payload.data.trip.overview;
    // start_time is in msec
    let midnight = calcMidnight(start_time, timezone_user);
-   console.log('timezone_user :>> ', timezone_user);
-   console.log('midnight, user tz - day 1 :>> ', midnight);
    midnight = midnight + 86400000; // convert to next midnight
-   console.log('midnight, user tz - day 2 :>> ', midnight);
    next_data.timer = adjustTripStartTime(start_time, break_period, nodes[0].next_leg.duration.msec, midnight);
    //  increment midnight to next day if needed
    if (midnight < next_data.timer) {
@@ -111,41 +108,51 @@ function createTimePoints(req, res, next) {
    let end_time, next_start_time, rest_stop_msec;
 
    for (let node_count = 0,
-      day_count = 0,
       current_meters = 0,
       day_start_meters = 0,
-      interval_count = 0;
+      leg_count = 0;
       node_count < nodes.length;) {
 
       next_data.status = "";
-      if (node_count === 0) { // first time_point, first node
+      if (node_count === 0) { // 1st node, create 1st time point
          // don't add to running totals
          next_data.status = "start_trip";
          pushTimePoint(req, next_data, node_count)
+         leg_count++;
          node_count++;
       } else { // is not first node
          // add just completed drive time and distance to running totals
          if (!(node_count === nodes.length - 1)) { // if not last node of trip
-            // if not done driving for the day
-            if (interval_count < intervals_per_day &&
+            // if all legs for day are not completed
+            if (leg_count < legs_per_day - 1 &&
                // and if enough time for next interval before midnight
                next_data.timer + nodes[node_count - 1].next_leg.duration.msec
                + nodes[node_count].next_leg.duration.msec < midnight) {
+               console.log('  *')
+               console.log(`node_count: ${node_count}`);
+               console.log(`current_meters - day_start_meters`, current_meters - day_start_meters)
+               console.log('max meters_per_day               ', req.factory.meters_per_day);
+               console.log('  *')
+
                next_data.status = "enroute";
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
-               interval_count++;
                pushTimePoint(req, next_data, node_count)
+               leg_count++;
                node_count++;
             }
             else { // rest stop - done driving for the day, not end of trip
                // rest stop, part 1 - create 1st time point at this location - "end_day"
+               console.log('  *')
+               console.log(`node_count: ${node_count}`);
+               console.log(`current_meters - day_start_meters`, current_meters - day_start_meters)
+               console.log('max_meters_per_day               ', req.factory.meters_per_day);
+               console.log('  *')
                next_data.status = "end_day";
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
-               interval_count++;
                next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
                   + ' miles'
                next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
@@ -159,18 +166,17 @@ function createTimePoints(req, res, next) {
                next_start_time = setNextStartTime(end_time, drive_time_msec, midnight)
                // get number of milliseconds between end_time and next_start_time
                rest_stop_msec = next_start_time - end_time;
-               // increment midnight to next day:
-               midnight += 86400000;
                next_data.status = "start_day";
                next_data.rest_hours = rest_stop_msec / 3600000;
                next_data.timer += rest_stop_msec;
-               interval_count = 0; // begin first driving period of new day
-               day_count++;
                next_data.miles_today = null;
                next_data.hours_today = null;
                day_start_meters = current_meters;
                day_start_time = next_data.timer;
                pushTimePoint(req, next_data, node_count)
+               // increment midnight to next day:
+               midnight += 86400000;
+               leg_count = 0; // begin first driving period of new day
                node_count++ // now leaving this node in the morning
             }
          } else {  // if last node of trip
@@ -178,12 +184,12 @@ function createTimePoints(req, res, next) {
             // add just completed drive time and distance to running totals
             next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
             current_meters += nodes[node_count - 1].next_leg.distance.meters;
-            interval_count++;
             next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371) + ' miles'
             next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
             pushTimePoint(req, next_data, node_count)
             req.payload.data.trip.overview.end_time = next_data.timer;
             req.payload.data.trip.overview.total_hrs_text = secondsToHoursStr((next_data.timer - start_time) / 1000);
+            leg_count++;
             node_count++;
          }
       }

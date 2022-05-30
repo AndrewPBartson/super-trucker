@@ -2,19 +2,19 @@ import { NgModule } from '@angular/core';
 import {
   MatButtonModule,
   MatCardModule,
-  MatExpansionModule,
   MatDividerModule,
+  MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,
   MatListModule,
   MatNativeDateModule,
   MatTabsModule
 } from '@angular/material';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSliderModule } from '@angular/material/slider';
 
 
 const material = [
@@ -29,9 +29,9 @@ const material = [
   MatInputModule,
   MatListModule,
   MatNativeDateModule,
-  MatTabsModule,
   MatRadioModule,
-  MatSliderModule
+  MatSliderModule,
+  MatTabsModule
 ]
 
 @NgModule({

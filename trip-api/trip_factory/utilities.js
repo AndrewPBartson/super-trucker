@@ -159,8 +159,6 @@ const calcMidnight = (input_time, timezone) => {
   newTimeObj.setSeconds(0);
   newTimeObj.setMilliseconds(0);
   midnight = newTimeObj.getTime();
-
-  console.log('midnight (msec) :>> ', midnight);
   return midnight;
 }
 
