@@ -40,7 +40,7 @@ const determineHomeTimezone = (timezone_user, time_user_str) => {
 example of req.body  {
   origin: 'Jasper AL',
   end_point: 'Little Rock AR',
-  miles_per_day: 390,
+  miles_per_day: 510,
   avg_speed: 65,
   hours_driving: 6,
   depart_time: '2022-04-23T20:00:16.263Z',
@@ -52,17 +52,14 @@ example of req.body  {
 const createTripOverview = (req) => {
   let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
     origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
-  console.log('req.body :>> ', req.body);
+  console.log('   ***  req.body   ', req.body);
   let tz_id = determineHomeTimezone(timezone_user, time_user_str);
-  // let testing_moment = moment(depart_time).tz(tz_id);
-  // console.log('testing_moment :>> ', testing_moment);
 
   // depart_time (string) is in ISO format 
   // therefore start_time (Date object) is assigned UTC timezone
   let start_time = new Date(depart_time);
   let start_time_msec = start_time.getTime();
   let current_time_msec = Date.now();
-  // everything seems good so far
   // process trip start time so it can't be in the past
   if (current_time_msec > start_time_msec) {
     start_time_msec = current_time_msec;
@@ -116,9 +113,8 @@ const setupPayload = (req, res, next) => {
         "cities": [],
         "markers": [],
         "polyline": [],
-        // in production, time_points[] and weather[] are not needed,
-        // at least in theory. But seems best to include 
-        // permanently(?) for diagnostics 
+        // in production, time_points[] and weather[] are not needed in
+        // the overview. For now, they are included for diagnostics
         "time_points": [],
         "weather": [],
         "overview": createTripOverview(req)
@@ -134,35 +130,34 @@ function setupTripFactory(req, res, next) {
   req.factory = {
     meters_per_day: miles_per_day * 1609.34,
     meters_per_second: avg_speed / 2.237,
+    total_legs_max: null,
+    total_legs_float: null,
+    total_legs: null,
     meters_per_leg: null,
     legs_per_day: 1,
     total_meters: null,
+    total_units: null,
+    units_per_leg_float: null,
+    units_per_leg: null,
+    trip_url: '',
+    polylinePts: null,
     legs: [],
     all_points: [],
-    polylinePts: null,
     leg_distances: [],
-    target_points: [],
+    targets: [],
     target_calcs: [],
     key_pts: [],
     meter_counts: [],
-    num_legs_float: null,
-    num_legs: null,
-    num_units: null,
-    units_per_leg_float: null,
-    units_per_leg: null,
     track_units_per_leg: [],
-    leftovers: null,
-    trip_url: '',
     days: [],
     nodes: [],
     urls_OWM: [],
     urls_NOAA: [],
     patch_data: {},
-
     way_points: [],
-    way_points_B: [],
+    way_pts_prev: [],
     way_pts_indexes: [],
-    way_pts_B_indexes: [],
+    way_pts_prev_idxs: [],
   };
   if (hotels || truck_stops || weather) {
     req.factory.way_points_extra = [];

@@ -62,9 +62,9 @@ export class TripInputComponent implements OnInit {
       miles_per_day: 682
     },
     average: {
-      avg_speed: 65,
-      hours_driving: 6,
-      miles_per_day: 390
+      avg_speed: 50,
+      hours_driving: 10.2,
+      miles_per_day: 510
     },
     fast: {
       avg_speed: 75,
@@ -129,7 +129,6 @@ export class TripInputComponent implements OnInit {
         this.viewManagerService.setViewMode.emit('summary')
         return this.publishService.transmitData.next(data);
       })
-
     return false;
   }
 

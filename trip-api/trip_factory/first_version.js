@@ -21,59 +21,82 @@ function between(x, min, max) {
 804672 meters = 500 miles
 965606 meters = 600 miles
 1287476 meters = 800 miles
-// remember that num_legs is one less than number of waypoints
 */
-function setLegsPerDay(meters_per_day, total_meters) {
-  let total_days = 0;
-  let legs_per_day = 1;
-  let leg_cap = 1;
-  if (meters_per_day > total_meters) {
-    total_days = 1;
+const calcTotalLegsMax = (total_meters) => {
+  // prevent showing too many weather reports over short distance 
+  if (total_meters > 1062167) {  // 660+ mi
+    return 23;
   }
-  else { total_days = total_meters / meters_per_day }
-
-  if (total_days > 23) { legs_per_day = -1; }   // too many days, exceeds google api capacity
-  else if (total_days > 11.5) { legs_per_day = 1; }  // total legs per trip: 12 - 23
-  else if (total_days > 7.6) { legs_per_day = 2; }   // total legs per trip: 14 - 23
-  else if (total_days > 5.7) { legs_per_day = 3; }   // total legs per trip: 15 - 23
-  else if (total_days > 4.6) { legs_per_day = 4; }   // total legs per trip: 16 - 23
-  else if (total_days > 3.8) { legs_per_day = 5; }   // total legs per trip: 20 - 23
-  else if (total_days > 3.2) { legs_per_day = 6; }   // total legs per trip: 20 - 23
-  else if (total_days > 2.8) { legs_per_day = 7; }
-  else if (total_days > 2.5) { legs_per_day = 8; }
-  else if (total_days > 2.3) { legs_per_day = 9; }
-  else if (total_days > 2) { legs_per_day = 10; }
-  else if (total_days > 1.8) { legs_per_day = 11; }
-  else if (total_days >= 1) { legs_per_day = 12; }
-
-  if (total_meters < 965606) {
-    // prevent showing too many weather reports over short distance  
-    if (between(total_meters, 804672, 965606)) { // 500 - 600 miles
-      leg_cap = meters_per_day / 88514; // at least 55 mi per leg
-    }
-    else if (between(total_meters, 643738, 804672)) { // 400 - 500 miles
-      leg_cap = meters_per_day / 72420; // at least 45 mi per leg
-    }
-    else if (between(total_meters, 482803, 643738)) { // 300 - 400 miles
-      leg_cap = meters_per_day / 56327; // at least 35 mi per leg
-    }
-    else if (between(total_meters, 321869, 482803)) {  // 200 - 300 miles
-      leg_cap = meters_per_day / 48281; // at least 30 mi per leg
-    }
-    else if (between(total_meters, 0, 321869)) { // 0 - 200 miles
-      leg_cap = meters_per_day / 40233; // at least 25 mi per leg
-    }
-    leg_cap = Math.floor(leg_cap)
-    if (leg_cap < 1) { leg_cap = 1; }
-    if (legs_per_day > leg_cap) {
-      legs_per_day = leg_cap;
-    }
+  else if (between(total_meters, 1013887, 1062167)) { // 630 - 660 miles
+    return 22;
   }
-  return legs_per_day;
+  else if (between(total_meters, 965606, 1013887)) { // 600 - 630 miles
+    return 21;
+  }
+  else if (between(total_meters, 917326, 965606)) { // 570 - 600 miles
+    return 20;
+  }
+  else if (between(total_meters, 869046, 917326)) { // 540 - 570 miles
+    return 19;
+  }
+  else if (between(total_meters, 820765, 869046)) { // 510 - 540 miles
+    return 18;
+  }
+  else if (between(total_meters, 772485, 820765)) { // 480 - 510 miles
+    return 17;
+  }
+  else if (between(total_meters, 724205, 772485)) { // 450 - 480 miles
+    return 16;
+  }
+  else if (between(total_meters, 675924, 724205)) { // 420 - 450 miles
+    return 15;
+  }
+  else if (between(total_meters, 627644, 675924)) { // 390 - 420 miles
+    return 14;
+  }
+  else if (between(total_meters, 579364, 627644)) { // 360 - 390 miles
+    return 13;
+  }
+  else if (between(total_meters, 531084, 579364)) { // 330 - 360 miles
+    return 12;
+  }
+  else if (between(total_meters, 482803, 531084)) { // 300 - 330 miles
+    return 11;
+  }
+  else if (between(total_meters, 434523, 482803)) { // 270 - 300 miles
+    return 10;
+  }
+  else if (between(total_meters, 386243, 434523)) { // 240 - 270 miles
+    return 9;
+  }
+  else if (between(total_meters, 337962, 386243)) { // 210 - 240 miles
+    return 8;
+  }
+  else if (between(total_meters, 289682, 337962)) { // 180 - 210 miles
+    return 7;
+  }
+  else if (between(total_meters, 241402, 289682)) { // 150 - 180 miles
+    return 6;
+  }
+  else if (between(total_meters, 193121, 241402)) { // 120 - 150 miles
+    return 5;
+  }
+  else if (between(total_meters, 144841, 193121)) { // 90 - 120 miles
+    return 4;
+  }
+  else if (between(total_meters, 96561, 144841)) { // 60 - 90 miles
+    return 3;
+  }
+  else if (between(total_meters, 48280, 96561)) { // 30 - 60 miles
+    return 2;
+  }
+  else if (between(total_meters, 0, 48280)) { // 0 - 30 miles
+    return 1;
+  }
+  else return 23;
 }
 
 function getSimpleData(req, prelim_data) {
-  let polylinePts = req.factory.polylinePts;
   req.factory.total_meters = prelim_data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_meters = prelim_data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_mi_text = prelim_data.routes[0].legs[0].distance.text;
@@ -81,54 +104,116 @@ function getSimpleData(req, prelim_data) {
   req.payload.data.trip.overview.bounds.northeast.lng = prelim_data.routes[0].bounds.northeast.lng;
   req.payload.data.trip.overview.bounds.southwest.lat = prelim_data.routes[0].bounds.southwest.lat;
   req.payload.data.trip.overview.bounds.southwest.lng = prelim_data.routes[0].bounds.southwest.lng;
-  polylinePts = prelim_data.routes[0].overview_polyline.points;
   // convert Gmaps trip summary polyline to array of lat/lng coordinates
+  let polylinePts = prelim_data.routes[0].overview_polyline.points;
   req.factory.all_points = polyline.decode(polylinePts);
   req.payload.data.trip.polyline = req.factory.all_points;
+  // subtract 1 bc number of distances is always one less than number of places:
+  req.factory.total_units = req.factory.all_points.length - 1;
 }
 
-const calcMetersPerLeg = (total_meters, meters_per_day) => {
-  let max_legs = 23;
-  let days = total_meters / meters_per_day;
-  let legs_per_day = max_legs / days;
-  let total_legs = Math.floor(legs_per_day) * days;
-  return total_meters / total_legs;
+const showFirstVersionData = (factory) => {
+
+  console.log('     *')
+  console.log('   ***  1st way points')
+  console.log(`   all_points.length         `, factory.all_points.length)
+  console.log(`   total_units               `, factory.total_units)
+  console.log('   meters_per_day            ', factory.meters_per_day);
+  console.log('   days (more if late start) ', factory.total_meters / factory.meters_per_day);
+  console.log('   legs_per_day              ', factory.legs_per_day);
+  console.log(`   total_legs_float          `, factory.total_legs_float)
+  console.log(`   total_legs                `, factory.total_legs)
+  console.log('   meters_per_leg            ', factory.meters_per_leg);
+  console.log('   miles per leg             ', factory.meters_per_leg / 1609.34);
+  console.log('   units_per_leg_float       ', factory.units_per_leg_float);
+  console.log('   units_per_leg             ', factory.units_per_leg);
+  console.log(`   meters/leg * legs/day =    ${(factory.meters_per_leg * factory.legs_per_day) / 1609.34} mi/day`);
+  console.log('   way_points.length         ', factory.way_points.length);
+  console.log(`   way_pts_indexes.length    `, factory.way_pts_indexes.length)
+  console.log(`   way_pts_indexes           `, factory.way_pts_indexes)
+  console.log('   track_units_per_leg.length ', factory.track_units_per_leg.length);
+  console.log('   track_units_per_leg       ', factory.track_units_per_leg);
+  let track_units = 0;
+  for (let i = 0; i < factory.track_units_per_leg.length; i++) {
+    track_units += factory.track_units_per_leg[i];
+  }
+  console.log('   sum of track_units     ', track_units);
+  console.log('   targets.length   ', factory.targets.length);
+  console.log('   targets          ', factory.targets);
+  console.log('     ***  1st version  Done!   *');
+  console.log('     *')
 }
 
-const setupTargets = (req) => {
+const initializeTargetCalcs = (req) => {
   /* 
   // Create two arrays -
-  // 1) target_points - has meter count at ideal location for each way_point
-  // 2) target_calcs - has element for each way_point containing data for improving 
-  // spacing between neighboring way_points. 
-  // Goal - divide route into nearly equal distances (legs)
+  // 1) targets - has meter count at ideal location for each way_point
+  //    so that route is divided into nearly equal distances (legs)
+  // 2) target_calcs - tracks whether a way_point has been correctly matched to this target 
   */
-  let meters_per_leg = calcMetersPerLeg(req.factory.total_meters, req.factory.meters_per_day);
   let running_total = 0;
   let calcsObj = {};
   for (let i = 0; i < req.factory.way_points.length; i++) {
-    req.factory.target_points.push(running_total);
+    req.factory.targets.push(Math.round(running_total));
     calcsObj = {
       target_meters: Math.round(running_total),
-      estimate: {
-        est_idx: null,
-        meters: null
-      },
-      search_area: {
-        min_idx: 0,
-        min_meters: 0,
-        max_idx: null,
-        max_meters: null
-      },
-      diff: 0,
+      est_idx: null,
+      est_meters: null,
+      est_miles: null,
       isGood: false
     };
-    if (i === 0 || i === req.factory.way_points.length - 1) {
+    if (i === 0) {
       calcsObj.isGood = true;
     }
+    if (i === req.factory.way_points.length - 1) {
+      calcsObj.isGood = true;
+      calcsObj.target_meters = req.factory.total_meters;
+      // last target should be equal to end of trip:
+      req.factory.targets.pop();
+      req.factory.targets.push(req.factory.total_meters);
+    }
     req.factory.target_calcs.push(calcsObj);
-    running_total += meters_per_leg;
+    running_total += req.factory.meters_per_leg;
   }
+}
+
+const calcFirstTrackUnits = (factory) => {
+  // build initial version of track_units_per_leg array
+  // each element is number of units for current leg
+  let running_total = 0;
+  let numberShortOrOver = (factory.total_legs * factory.units_per_leg) - factory.total_units;
+  let bumpSign = numberShortOrOver > 0 ? -1 : 1;
+  let bumpMax = Math.abs(Math.round(factory.total_legs / numberShortOrOver));
+  let bumpCount = 0;
+  let current_step;
+  for (let i = 0; i < factory.total_legs; i++) {
+    current_step = factory.units_per_leg;
+    // adjust current_step so total stays close to total_units
+    if (bumpCount >= bumpMax) {
+      current_step += (1 * bumpSign);
+      bumpCount = 0;
+    }
+    running_total += current_step;
+    if (i === factory.total_legs - 1) {
+      // adjust last step so total comes out equal to total_units
+      current_step += factory.total_units - running_total;
+    }
+    // push number of units for current leg
+    factory.track_units_per_leg.push(current_step);
+    bumpCount++;
+  }
+}
+
+const showFirstTripVariables = (factory) => {
+  console.log('   ***  1st trip variables');
+  console.log(`   total_meters`, factory.total_meters)
+  console.log(`   total miles`, factory.total_meters / 1609.34)
+  console.log('   total_legs_max :>> ', factory.total_legs_max);
+  console.log('   legs_per_day :>> ', factory.legs_per_day);
+  console.log('   meters_per_leg :>> ', factory.meters_per_leg);
+  console.log('   total_legs_float :>> ', factory.total_legs_float);
+  console.log('   units_per_leg_float :>> ', factory.units_per_leg_float);
+  console.log('   units_per_leg :>> ', factory.units_per_leg);
 }
 /*  
   // Gmaps allows max of 23 waypoints per request.
@@ -140,52 +225,32 @@ const setupTargets = (req) => {
   // doesn't change that much in 25 miles
 */
 function calcFirstTripVariables(factory) {
-  // if length of trip is less than meters_per_day, set meters_per_day to length of trip
-  if (factory.total_meters < factory.meters_per_day) {
-    factory.meters_per_day = factory.total_meters;
-  }
-  // meters_per_day is from user input, converted from miles per day
-  factory.legs_per_day = setLegsPerDay(factory.meters_per_day, factory.total_meters);
-  // make initial estimate for meters_per_leg (target meters per day)
-  factory.meters_per_leg = calcMetersPerLeg(factory.total_meters, factory.meters_per_day);
-  // get total number of units in original polyline from gmaps
-  // subtract 1 bc number of distances is always one less than number of places
-  factory.num_units = factory.all_points.length - 1;
-  // calculate number of legs to destination
-  factory.num_legs_float = factory.total_meters / factory.meters_per_leg
-  if (factory.num_legs_float < 1) {
-    factory.num_legs = 1;
-  }
-  // convert num_legs to int
-  factory.num_legs = Math.ceil(factory.num_legs_float)
+  /*
+   these calculations take into account that number of legs per day needs to be an integer
+   and all legs should be close to same length, except final leg of trip can be shorter. 
+   The length of legs needs to be such that -
+   number of legs * meters_per_leg = meters_per_day (set by user as miles per day) 
+  */
+  factory.total_legs_max = calcTotalLegsMax(factory.total_meters);
+  let meters_per_leg_est = factory.total_meters / factory.total_legs_max;
+  let legs_per_day_est = factory.meters_per_day / meters_per_leg_est
+  factory.legs_per_day = Math.floor(legs_per_day_est);
+  factory.meters_per_leg = factory.meters_per_day / factory.legs_per_day;
+  factory.total_legs_float = factory.total_meters / factory.meters_per_leg;
+  factory.total_legs = Math.round(factory.total_legs_float);
   // calculate number of units that should be in each leg if
   // units were all same length
-  factory.units_per_leg_float = factory.num_units / factory.num_legs
+  factory.units_per_leg_float = factory.total_units / factory.total_legs_float
   // convert units_per_leg_float to int for iteration
-  // needs to be floor, not round
-  factory.units_per_leg = Math.floor(factory.units_per_leg_float);
-  // calculate number of 'leftover' units in final driving period
-  factory.leftovers = factory.num_units - ((factory.num_legs) * factory.units_per_leg);
+  factory.units_per_leg = Math.round(factory.units_per_leg_float);
+  calcFirstTrackUnits(factory);
 }
 
 function calcFirstWayPoints(factory) {
-  // 1st loop -
-  // build initial version of track_units_per_leg array.
-  // each element is number of units for current leg
-  // at the outset, all legs have same amount, except last leg has leftover amount
-  for (let i = 0; i < factory.num_legs; i++) {
-    // push average number of units per leg
-    factory.track_units_per_leg.push(factory.units_per_leg);
-    // if last full-size leg, also push number of "leftover" units as last leg in array
-    if (i === factory.num_legs - 1 && factory.leftovers > 0) {
-      factory.track_units_per_leg.push(factory.leftovers)
-    }
-  }
-  // 2nd loop -
-  // Select index of one all_point (point from polyline) that
-  // is best guess for next way_point, which is closest to current target.
-  // target is the ideal location for end of current leg
-  // spacing of way_points needs to be as even as possible
+  // Select index of an all_point (point from polyline) that
+  // is best guess for next way_point based solely on
+  // indexes, no geo-data
+  // later spacing of way_points is adjusted to be as even as possible
   let count = 0;
   for (let j = 0; j < factory.track_units_per_leg.length; j++) {
     factory.way_points.push(factory.all_points[count]);
@@ -197,27 +262,6 @@ function calcFirstWayPoints(factory) {
       factory.way_pts_indexes.push(count);
     }
   }
-  console.log('     *')
-  console.log('  **** 1) first way points')
-  console.log('  legs_per_day :>> ', factory.legs_per_day);
-  console.log(`  all_points.length`, factory.all_points.length)
-  console.log(`  num_units`, factory.num_units)
-  console.log(`  num_legs_float`, factory.num_legs_float)
-  console.log(`  num_legs`, factory.num_legs)
-  console.log('  units_per_leg_float :>> ', factory.units_per_leg_float);
-  console.log('  units_per_leg :>> ', factory.units_per_leg);
-  console.log(`  leftovers`, factory.leftovers);
-  console.log('should be equal to num_units :>> ', factory.leftovers + (factory.num_legs * factory.units_per_leg));
-  console.log(`meters/leg * legs/day = ${(factory.meters_per_leg * factory.legs_per_day) / 1609.34} mi/day`);
-  console.log('  way_points.length', factory.way_points.length);
-  console.log(`  way_pts_indexes.length`, factory.way_pts_indexes.length)
-  console.log(`  way_pts_indexes`, factory.way_pts_indexes)
-  console.log('  track_units_per_leg.length :>> ', factory.track_units_per_leg.length);
-  console.log('  track_units_per_leg :>> ', factory.track_units_per_leg);
-  console.log('  meters_per_leg :>> ', factory.meters_per_leg);
-  console.log('  target_points.length :>> ', factory.target_points.length);
-  console.log('  target_points :>> ', factory.target_points);
-  console.log('     **** End 1)     *');
 }
 
 function getInitialTripData(req, res, next) {
@@ -230,8 +274,10 @@ function getInitialTripData(req, res, next) {
     .then(initial_res => {
       getSimpleData(req, initial_res.data)
       calcFirstTripVariables(req.factory)
+      showFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)
-      setupTargets(req)
+      initializeTargetCalcs(req)
+      showFirstVersionData(req.factory)
       return req;
     })
     .catch(function (error) {

@@ -104,58 +104,56 @@ function createTimePoints(req, res, next) {
       midnight += 86400000;
    }
    let day_start_time = next_data.timer;
-   // vars for calculating start time for next day
+   // vars for calculating start time for next day:
    let end_time, next_start_time, rest_stop_msec;
-
+   console.log('');
+   console.log('   ***  Check time_points');
+   console.log('   legs_per_day ', legs_per_day);
+   console.log('   meters_per_leg ', req.factory.meters_per_leg);
+   console.log('   meters_per_day ', req.factory.meters_per_day);
+   console.log('   total_meters ', req.factory.total_meters);
+   console.log('   way_points.length ', req.factory.way_points.length);
+   console.log('   all_points.length ', req.factory.all_points.length);
    for (let node_count = 0,
       current_meters = 0,
       day_start_meters = 0,
-      leg_count = 0;
-      node_count < nodes.length;) {
-
+      leg_count = 0; node_count < nodes.length;) {
       next_data.status = "";
       if (node_count === 0) { // 1st node, create 1st time point
-         // don't add to running totals
          next_data.status = "start_trip";
+         console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]
+            }   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count
+            }   meters ${current_meters - day_start_meters}           - start trip`);
+         // don't add to running totals
          pushTimePoint(req, next_data, node_count)
          leg_count++;
          node_count++;
       } else { // is not first node
-         // add just completed drive time and distance to running totals
          if (!(node_count === nodes.length - 1)) { // if not last node of trip
             // if all legs for day are not completed
-            if (leg_count < legs_per_day - 1 &&
+            if (leg_count < legs_per_day &&
                // and if enough time for next interval before midnight
-               next_data.timer + nodes[node_count - 1].next_leg.duration.msec
-               + nodes[node_count].next_leg.duration.msec < midnight) {
-               console.log('  *')
-               console.log(`node_count: ${node_count}`);
-               console.log(`current_meters - day_start_meters`, current_meters - day_start_meters)
-               console.log('max meters_per_day               ', req.factory.meters_per_day);
-               console.log('  *')
-
+               next_data.timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec < midnight) {
                next_data.status = "enroute";
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
+               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}`);
                pushTimePoint(req, next_data, node_count)
                leg_count++;
                node_count++;
             }
             else { // rest stop - done driving for the day, not end of trip
                // rest stop, part 1 - create 1st time point at this location - "end_day"
-               console.log('  *')
-               console.log(`node_count: ${node_count}`);
-               console.log(`current_meters - day_start_meters`, current_meters - day_start_meters)
-               console.log('max_meters_per_day               ', req.factory.meters_per_day);
-               console.log('  *')
                next_data.status = "end_day";
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
-               next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371)
+               next_data.miles_today = Math.round((current_meters - day_start_meters) / 1609.34)
                   + ' miles'
                next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
+               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters for day`);
+               console.log('');
                pushTimePoint(req, next_data, node_count)
                // rest stop, part 2 - "start_day"
                // layover at same node so:
@@ -177,6 +175,7 @@ function createTimePoints(req, res, next) {
                // increment midnight to next day:
                midnight += 86400000;
                leg_count = 0; // begin first driving period of new day
+               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}       - begin day`);
                node_count++ // now leaving this node in the morning
             }
          } else {  // if last node of trip
@@ -186,6 +185,8 @@ function createTimePoints(req, res, next) {
             current_meters += nodes[node_count - 1].next_leg.distance.meters;
             next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371) + ' miles'
             next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
+            console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters last day`);
+            console.log('');
             pushTimePoint(req, next_data, node_count)
             req.payload.data.trip.overview.end_time = next_data.timer;
             req.payload.data.trip.overview.total_hrs_text = secondsToHoursStr((next_data.timer - start_time) / 1000);

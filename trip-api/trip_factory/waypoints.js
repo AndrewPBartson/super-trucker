@@ -28,14 +28,14 @@ function getExtraWayPoints(factory) {
         way_pt_obj.next = [...all_points[a + 1]]
         i++
       }
-      // may implement later to search for hotels and truck stops
+      // implement later to search for hotels and truck stops
       // way_points_extra.push(way_pt_obj)
     }
   }
 }
 
 function createTestUrl(factory) {
-  // create normal url (not to API) for checking way points
+  // create test url (not to API) for checking way points
   let { way_points } = factory
   factory.test_url = `https://www.google.com/maps/dir/`
   for (let i = 0; i < factory.way_points.length; i++) {
@@ -43,63 +43,86 @@ function createTestUrl(factory) {
     factory.test_url += '/';
   }
   factory.test_url = `${factory.test_url}&key=${GMkey}`;
-  // console.log('factory.test_url (for checking waypoints):>> ', factory.test_url);
   return factory.test_url;
 }
 
-function checkLegDistances(leg_distances) { // for testing
-  let total_legs = 0;
-  let avg_leg = 0;
-  let variations = [];
-  let total_v = 0;
-  let avg_v = 0;
-  // get average leg distance
-  for (let i = 0; i < leg_distances.length - 1; i++) {
-    total_legs += leg_distances[i]
-  }
-  avg_leg = total_legs / leg_distances.length - 1;
-  console.log('average leg distance - ', avg_leg)
-  // get amounts of variation from average
-  for (let j = 0; j < leg_distances.length - 1; j++) {
-    let leg_v = leg_distances[j] - avg_leg
-    let leg_v_abs = Math.abs(leg_v);
-    variations.push(leg_v_abs)
-  }
-  // get average variation
-  for (let k = 0; k < variations.length; k++) {
-    total_v += variations[k]
-  }
-  avg_v = total_v / variations.length;
-  console.log('Are leg distances improving? (less is better) - ', avg_v)
-}
-
-function saveOldWaypoints(f) { //
-  f.way_pts_B_indexes = f.way_pts_indexes;
-  f.way_points_B = f.way_points;
+function savePreviousWaypoints(f) { //
+  f.way_pts_prev_idxs = f.way_pts_indexes;
+  f.way_pts_prev = f.way_points;
 }
 
 function getLegDistances(route, leg_distances) {
   let leg_set = route.legs;
-  for (let i = 0; i < leg_set.length; i++) {
-    leg_distances.push(leg_set[i].distance.value);
-    console.log(`leg ${i}             start  ${leg_set[i].start_address}`);
-    console.log(`       ${leg_set[i].distance.text}       end    ${leg_set[i].end_address}`);
-  }
-  console.log(' 1) leg_distances.length :>> ', leg_distances.length);
-  console.log(' 1) leg_distances :>> ', leg_distances);
-}
-
-function setUrlWithWayPoints(trip) {
-  let { way_points, trip_url } = trip;
-  trip.trip_url = `https://maps.googleapis.com/maps/api/directions/json?origin=${way_points[0]}&destination=${way_points[way_points.length - 1]}&waypoints=`;
-  for (let i = 1; i < trip.way_points.length - 1; i++) {
-    trip.trip_url += way_points[i];
-    if (i !== trip.way_points.length - 2) {
-      trip.trip_url += '|';
+  //leg_distances = [];
+  console.log('     *');
+  console.log('   ***  New leg distances from new geo data');
+  // this if/else is only necessary because leg_distances array is behaving weirdly
+  if (leg_distances.length > 0) {
+    for (let i = 0; i < leg_set.length; i++) {
+      leg_distances[i] = leg_set[i].distance.value;
+      console.log(`leg ${i}   ${leg_set[i].distance.text}  > ${leg_set[i].start_address}  ==> ${leg_set[i].end_address}`);
     }
   }
-  trip.trip_url = `${trip.trip_url}&key=${GMkey}`;
-  return trip
+  else {
+    for (let i = 0; i < leg_set.length; i++) {
+      leg_distances.push(leg_set[i].distance.value);
+      console.log(`leg ${i}   ${leg_set[i].distance.text}  > ${leg_set[i].start_address}  ==> ${leg_set[i].end_address}`);
+    }
+  }
+  console.log('     *');
+}
+
+function setUrlWithWayPoints(factory) {
+  let { way_points, trip_url } = factory;
+  factory.trip_url = `https://maps.googleapis.com/maps/api/directions/json?origin=${way_points[0]}&destination=${way_points[way_points.length - 1]}&waypoints=`;
+  for (let i = 1; i < factory.way_points.length - 1; i++) {
+    factory.trip_url += way_points[i];
+    if (i !== factory.way_points.length - 2) {
+      factory.trip_url += '|';
+    }
+  }
+  factory.trip_url = `${factory.trip_url}&key=${GMkey}`;
+  console.log(`factory.trip_url`, factory.trip_url)
+}
+
+const showRevisedData = (factory) => {
+  console.log('     * =================================================')
+  console.log('   ***  Revised data - new way points')
+  console.log(`   all_points.length      `, factory.all_points.length)
+  console.log('   meter_counts.length    ', factory.meter_counts.length);
+  console.log(`   total_units            `, factory.total_units)
+  console.log('   last item meter_counts ', factory.meter_counts[factory.meter_counts.length - 1]);
+  console.log(`   total_meters           `, factory.total_meters)
+  console.log('    leg_distances.length  ', factory.leg_distances.length);
+  console.log('    leg_distances         ', factory.leg_distances);
+  console.log('       *');
+  console.log('   way_points.length      ', factory.way_points.length);
+  console.log(`   way_pts_indexes.length `, factory.way_pts_indexes.length)
+  console.log(`   way_pts_indexes        `, factory.way_pts_indexes)
+  console.log('   track_units_per_leg.length ', factory.track_units_per_leg.length);
+  console.log('   track_units_per_leg        ', factory.track_units_per_leg);
+  let track_units = 0;
+  for (let i = 0; i < factory.track_units_per_leg.length; i++) {
+    track_units += factory.track_units_per_leg[i];
+  }
+  console.log('   sum of track_units     ', track_units);
+  console.log('   target_calcs.length    ', factory.target_calcs.length);
+  // console.log('   target_calcs  ', factory.target_calcs);
+  console.log(`   key_pts.length  `, factory.key_pts.length)
+  console.log(`   key_pts  `, factory.key_pts)
+  console.log('     ***    Next!')
+  console.log('')
+}
+
+const saveTargetData = (factory, way_pt_idx, all_pt_idx, meter_count, is_good) => {
+  if (factory.target_calcs[way_pt_idx]) {
+    factory.target_calcs[way_pt_idx].est_idx = all_pt_idx;
+    factory.target_calcs[way_pt_idx].est_meters = meter_count;
+    factory.target_calcs[way_pt_idx].est_miles = Math.round(meter_count / 1609.34);
+    if (is_good) {
+      factory.target_calcs[way_pt_idx].isGood = true;
+    }
+  }
 }
 
 const saveKeyPoints = (factory) => {
@@ -111,10 +134,9 @@ const saveKeyPoints = (factory) => {
   }
 }
 
-const sortKeyPoints = (req) => {
-  console.log('req.factory.key_pts.sort(sortKeyPointsB) :>> ', req.factory.key_pts.sort(sortKeyPointsB));
+const cleanKeyPoints = (factory) => {
   let diff;
-  req.factory.key_pts = req.factory.key_pts.sort((a, b) => {
+  factory.key_pts = factory.key_pts.sort((a, b) => {
     diff = 0;
     if (a.all_pt_idx > b.all_pt_idx) {
       diff = 1;
@@ -123,44 +145,111 @@ const sortKeyPoints = (req) => {
     }
     return diff;
   });
-  // remove duplicates
-  // req.factory.key_pts = req.factory.key_pts.filter((pt, i, a) => {
-  //   a.findIndex(pt2 => (pt2.all_pt_idx === pt.all_pt_idx)) === i
-  // })
-}
-
-const sortKeyPointsB = (a, b) => {
-  let comparison = 0;
-  if (a.all_pt_idx > b.all_pt_idx) {
-    comparison = 1;
-  } else if (a.all_pt_idx < b.all_pt_idx) {
-    comparison = -1;
-  }
-  return comparison;
+  // remove duplicates:
+  factory.key_pts = factory.key_pts.filter((pt_1, i, arr) => arr.findIndex(pt_2 => (pt_2.all_pt_idx === pt_1.all_pt_idx)) === i)
 }
 
 const checkWayPoints = (factory) => {
-  let { key_pts, target_calcs } = factory;
-  // remove duplicates from key_pts
-  key_pts = key_pts.filter((pt, i, a) => a.findIndex(pt2 => (pt2.all_pt_idx === pt.all_pt_idx)) === i)
-
-  // key_pts.filter((point, i, a) => {
-  //   // return a.findIndex(v2=>(v2.id===v.id))===i)
-  // })
+  let { target_calcs } = factory;
   for (let i = 0; i < target_calcs.length; i++) {
-    // only work on way_points that are not good
+    // check formerly bad ones to see if they are acceptable
     if (!target_calcs[i].isGood) {
-      // look for new good ones 
-      // if key_pt (known location) is within 2 miles of target for way_pt
-      if (Math.abs(key_pts[i].meters - target_calcs[i].target_meters) < 3218) {
+      // check if key_pt (known location) is close enough to target location
+      // 2 mi = 3218 meters
+      // 3 mi = 4828 meters
+      if (Math.abs(target_calcs[i].est_meters - target_calcs[i].target_meters) < 3218) {
         target_calcs[i].isGood = true;
-      }
-      else { // set up calculations for remaining bod ones
-        // need neighboring key_pts (higher and lower)
-        // if no indexes are in between neighboring key_pts, select closest one and call it good
       }
     }
   }
+}
+
+const replaceFixedWayPoints = (factory) => { // why are both logged versions the same?
+  // final results are not corrected :(
+  // console.log('way_points.length - before replace', factory.way_points.length);
+  // console.log('way_points - before replace', factory.way_points);
+  console.log('way_pts_indexes - before replace', factory.way_pts_indexes);
+  for (let i = 0; i < factory.target_calcs.length; i++) {
+    if (factory.target_calcs[i].isGood) {
+      // console.log('this is current way_point ', factory.way_points[i]);
+      // console.log('replace w/ this way_point ', factory.all_points[factory.target_calcs[i].est_idx]);
+      factory.way_points.splice(i, 1, factory.all_points[factory.target_calcs[i].est_idx]);
+      // console.log('did it work? ', factory.way_points[i]);
+      // console.log(`this is current idx - `, factory.way_pts_indexes[i])
+      // console.log('replace w/ this idx - ', factory.target_calcs[i].est_idx);
+      factory.way_pts_indexes.splice(i, 1, factory.target_calcs[i].est_idx);
+      // console.log('did it work? ', factory.way_pts_indexes[i]);
+    }
+  }
+  // console.log('way_points - after replace', factory.way_points);
+  console.log('way_pts_indexes - after replace', factory.way_pts_indexes);
+}
+
+const selectFinalWayPoints = (factory) => {
+  console.log('    ');
+  console.log('   *** select in final way_points - use in 2nd multi-stop call to google api')
+
+  let target, min_meters, max_meters, closer_pt, min_idx, max_idx, gap_size, distance, running_total, step;
+  let { key_pts, target_calcs } = factory;
+  savePreviousWaypoints(factory)
+  // for each target/way_point
+  for (let i = 0; i < target_calcs.length; i++) {
+    // if this target has acceptable way point:
+    if (target_calcs[i].isGood) {
+
+    } else {    // for target that doesn't have acceptable way point:
+      target = target_calcs[i].target_meters
+      // for missed target, find neighboring key_pts: [k] and [k-1]
+      for (let k = 0; k < key_pts.length; k++) {
+        if (!target_calcs[i].isGood) {
+          if (key_pts[k].meters > target) {
+            min_meters = key_pts[k - 1].meters;
+            max_meters = key_pts[k].meters;
+            min_idx = key_pts[k - 1].all_pt_idx;
+            max_idx = key_pts[k].all_pt_idx;
+            // find closest one
+            if (Math.abs(target - max_meters) <= Math.abs(target - min_meters)) {
+              closer_pt = key_pts[k];
+            }
+            else {
+              closer_pt = key_pts[k - 1];
+            }
+            // check if selected key_pt is close enough, or if there are no other candidates
+            if (Math.abs(Math.abs(closer_pt.meters - target)) < 3218 || max_idx - min_idx === 1) {
+              saveTargetData(factory, i, closer_pt.all_pt_idx, closer_pt.meters, true);
+              break;
+            }
+            else {  // start w/ previous key_pt that doesn't exceed target
+              // check each step to find best guess for closest idx
+              gap_size = max_idx - min_idx;
+              distance = max_meters - min_meters;
+              step = distance / gap_size;
+              running_total = key_pts[k - 1].meters;
+              for (let step_count = 0; step_count <= gap_size; step_count++) {
+                if (!target_calcs[i].isGood) {
+                  // walk through steps until past the target
+                  if (running_total > target) { // if step exceeds target
+                    if (Math.abs(running_total - target) <=
+                      Math.abs((running_total - step) - target)) { // if current step/all_pt is winner
+                      saveTargetData(factory, i, min_idx + step_count, running_total, true);
+                      break;
+                    }
+                    else {  // previous step/all_pt is winner
+                      saveTargetData(factory, i, min_idx + (step_count - 1), running_total - step, true);
+                      break;
+                    }
+                  } else {
+                    running_total += step;
+                  }
+                }
+              } // end steps loop
+            }
+          }
+        }
+      } // end key_pts loop for this target
+    }
+  } // end target_calcs loop
+  replaceFixedWayPoints(factory);
 }
 
 function getMeterCounts(factory) {
@@ -177,7 +266,7 @@ function getMeterCounts(factory) {
   // for each leg_distance -
   //    - calculate size of step 
   //         size_of_step = size of leg in meters/number of units in leg 
-  //            (get num_units from track_units_per_leg)
+  //            (get total_units from track_units_per_leg)
   //    - go through indexes of all_points for this leg, but don't actually touch all_points,
   //         just use all_point indexes from way_pts_indexes 
   */
@@ -191,7 +280,7 @@ function getMeterCounts(factory) {
   for (let i = 0; i < leg_distances.length; i++) {
     // recalculate size_of_step for current leg distance
     size_of_step = leg_distances[i] / factory.track_units_per_leg[i];
-    // loop through points in current leg_distance, way_pt_idx tells when to stop
+    // loop through points in current leg_distance, stops at next way_pt_idx:
     for (let j = all_pt_count; j < way_pts_indexes[i + 1]; j++) {
       running_total += size_of_step;
       // push running_total (meter count for this all_point) to meter_counts
@@ -199,104 +288,89 @@ function getMeterCounts(factory) {
       all_pt_count++;
     }
   }
-}
-
-const saveTargetData = (factory, way_pt_idx, all_pt_idx, meter_count) => {
-  if (factory.target_calcs[way_pt_idx]) {
-    factory.target_calcs[way_pt_idx].estimate.est_idx = all_pt_idx;
-    factory.target_calcs[way_pt_idx].estimate.meters = meter_count;
-  }
+  // replace last meter_count with total_meters, removes compounding error
+  factory.meter_counts.pop();
+  factory.meter_counts.push(factory.total_meters);
 }
 
 function selectNewWayPoints(factory) {
   /*
-//     find value closest to each stopping point - 'target_meters'. for each all_point -
-//       - compare to target
-//       - if less than target
-//            - increment running_total with size_of_step
-//            - go to next all_point
-//       - if more than target, 
-//            - check if this all-point is closer to target
-//              than the next all-point
+     find value closest to each stopping point (target_meters) 
+     for each all_point -
+       - compare to target
+       - if less than target
+            - increment running_total with size_of_step
+            - go to next all_point
+       - if more than target, 
+            - check if this all-point is closer to target
+              than previous all-point
 */
-  let { all_points, meter_counts, target_points } = factory;
-  saveOldWaypoints(factory)
+  console.log('        *')
+  console.log('   *** select new way_points - use in 1st multi-stop call to google api')
+  let { all_points, meter_counts, targets } = factory;
+  savePreviousWaypoints(factory)
   factory.way_points = [];
   factory.way_pts_indexes = [];
   factory.track_units_per_leg = [];
-  // target_idx starts at 1 bc target for first leg should not be zero
-  let target_idx = 1;
+  let target_idx = 0;
   let target_meters;
-  let count_to_next_hit = 0;
-
-  for (let b = 0; b <= meter_counts.length; b++) {
+  let count_to_next_hit;
+  for (let x = 0; x <= meter_counts.length; x++) {
     // loop iterates one past end of meter_counts bc meter_counts.length is
     // one less than all_points.length
-
-    // Push first point regardless
-    if (b === 0) {
-      factory.way_points.push(all_points[b]);
-      factory.way_pts_indexes.push(b);
-      saveTargetData(factory, factory.way_points.length - 1, b, meter_counts[b])
-      target_meters = target_points[target_idx];
+    if (x === 0) {
+      console.log(` all_pt ${x}  value ${meter_counts[x]}  target ${target_meters} - 1st one`);
+      factory.way_points.push(all_points[x]);
+      factory.way_pts_indexes.push(x);
+      saveTargetData(factory, factory.way_points.length - 1, x, meter_counts[x])
       target_idx++;
-      console.log(`i   ${b}, value   ${meter_counts[b]} / target ${target_meters} - 1st one`);
+      target_meters = targets[target_idx];
+      count_to_next_hit = 0;
     }
-    // if greater than target_meters && not the last one
-    else if (meter_counts[b] >= target_meters && (!(b === meter_counts.length - 1))) {
-      // went past target_meters, find out which is closer - [b] or [b-1]
-      if (Math.abs(target_meters - meter_counts[b]) <=
-        Math.abs(target_meters - meter_counts[b - 1])) // if current one is closer than previous
-      {
-        factory.way_points.push(all_points[b]);
-        factory.way_pts_indexes.push(b);
-        saveTargetData(factory, factory.way_points.length - 1, b, meter_counts[b])
-        target_meters = target_points[target_idx];
-        target_idx++;
-        factory.track_units_per_leg.push(count_to_next_hit);
-        count_to_next_hit = 0;
-        console.log(`i ${b}, value ${meter_counts[b]} / target ${target_meters}`);
-      }
-      else { // previous one is closer
-        count_to_next_hit--;
-        factory.way_points.push(all_points[b - 1]);
-        factory.way_pts_indexes.push(b - 1);
-        saveTargetData(factory, factory.way_points.length - 1, b - 1, meter_counts[b])
-        target_meters = target_points[target_idx];
-        target_idx++;
-        factory.track_units_per_leg.push(count_to_next_hit);
-        count_to_next_hit = 0;
-        console.log(`i ${b - 1}, value ${meter_counts[b - 1]} / target ${target_meters}`);
-      }
-    }
-    // Push last point regardless
-    else if (b === meter_counts.length - 1) {
+    // if last target or last meter_count
+    else if (target_idx === targets.length - 1 || x === meter_counts.length - 1) { // for last one, we already know what the end point is
+      console.log(` all_pt ${all_points.length - 1}  value ${meter_counts[all_points.length - 1]}  target ${target_meters} - last one`);
       factory.way_points.push(all_points[all_points.length - 1]);
       factory.way_pts_indexes.push(all_points.length - 1);
       saveTargetData(factory, factory.way_points.length - 1, all_points.length - 1, meter_counts[all_points.length - 1])
-      target_meters = target_points[target_idx];
       target_idx++;
-      factory.track_units_per_leg.push(count_to_next_hit);
-      console.log(`i ${all_points.length - 1}, value ${meter_counts[all_points.length - 1]} / target ${target_meters} - last one`);
+      target_meters = targets[target_idx];
+      factory.track_units_per_leg.push((all_points.length - 1) - factory.way_pts_indexes[factory.way_pts_indexes.length - 2]);
+      break;
+    }
+
+    else if (meter_counts[x] >= target_meters) { // if went past target_meters
+      // find out which is closer - [x] or [x-1]
+      if (Math.abs(target_meters - meter_counts[x]) <=
+        Math.abs(target_meters - meter_counts[x - 1])) // if current one is closer than previous
+      {
+        console.log(` all_pt ${x}  value ${meter_counts[x]}  target ${target_meters}`);
+        factory.way_points.push(all_points[x]);
+        factory.way_pts_indexes.push(x);
+        saveTargetData(factory, factory.way_points.length - 1, x, meter_counts[x])
+        target_idx++;
+        target_meters = targets[target_idx];
+        count_to_next_hit++;
+        factory.track_units_per_leg.push(count_to_next_hit);
+        count_to_next_hit = 0;
+      }
+      else { // previous one is closer
+        console.log(` all_pt ${x - 1}  value ${meter_counts[x - 1]}  target ${target_meters}`);
+        factory.way_points.push(all_points[x - 1]);
+        factory.way_pts_indexes.push(x - 1);
+        saveTargetData(factory, factory.way_points.length - 1, x - 1, meter_counts[x])
+        target_idx++;
+        target_meters = targets[target_idx];
+        factory.track_units_per_leg.push(count_to_next_hit);
+        x--;
+        count_to_next_hit = 0;
+      }
     }
     else {  // if no hit
       count_to_next_hit += 1;
     }
   }
-  console.log('     *')
-  console.log('  **** 2) new way points')
-  console.log(`   all_points.length`, factory.all_points.length)
-  console.log(`   num_units`, factory.num_units)
-  console.log('   meter_counts.length :>> ', meter_counts.length);
-  console.log('   last item in meter_counts :>> ', meter_counts[meter_counts.length - 1]);
-  console.log('       *');
-  console.log('   all_points.length :>> ', all_points.length);
-  console.log('   way_points.length :>> ', factory.way_points.length);
-  console.log(`   way_pts_indexes.length`, factory.way_pts_indexes.length)
-  console.log(`   way_pts_indexes`, factory.way_pts_indexes)
-  console.log('   track_units_per_leg.length :>> ', factory.track_units_per_leg.length);
-  console.log('   track_units_per_leg :>> ', factory.track_units_per_leg);
-  console.log('     **** End 2)     *')
+  console.log('        *')
 }
 
 const getRouteData = (url) => {
@@ -311,47 +385,36 @@ const fixWayPoints = (req, res, next) => {
   return getRouteData(req.factory.trip_url)
     .then(incoming => {
       // need distances between new way_points
-      getLegDistances(incoming.data.routes[0], req.factory.leg_distances);
-      // make better estimate of meter count at each all_point
+      getLegDistances(incoming.data.routes[0], req.factory.leg_distances); // 1st leg distances as expected
+      // make tentative estimate of meter count at each all_points
       getMeterCounts(req.factory)
       saveKeyPoints(req.factory)
-      // select new waypoints based on new meter count estimates
+      // select new waypoints based on first geo data
       selectNewWayPoints(req.factory)
-      // checkLegDistances(req.factory.leg_distances)
-      req.factory.leg_distances = []
-      setUrlWithWayPoints(req.factory)
-      // fetch more data for recalculating way_points
+      showRevisedData(req.factory)  // revisions seem fine
+      setUrlWithWayPoints(req.factory) // url seems fine
       return getRouteData(req.factory.trip_url)
         .then(incoming => {
-          // need distances between new way_points
-          getLegDistances(incoming.data.routes[0], req.factory.leg_distances);
-          checkWayPoints(req.factory)
-          // make better estimate of meter count at each all_point
-          getMeterCounts(req.factory)
+          getLegDistances(incoming.data.routes[0], req.factory.leg_distances); // 2nd leg distances are better
+          checkWayPoints(req.factory) // update target_calcs with way points are now good
           saveKeyPoints(req.factory)
-          sortKeyPoints(req);
-          // select new waypoints based on new meter count estimates
-          selectNewWayPoints(req.factory)
-          // save final route details
-          overview.summary = incoming.data.routes[0].summary;
-          overview.bounds = incoming.data.routes[0].bounds;
-          overview.total_meters = req.factory.total_meters;
-          overview.total_mi = Math.round(overview.total_meters / 1609.34);
-          overview.legs_per_day = req.factory.legs_per_day;
-          req.factory.legs = incoming.data.routes[0].legs;
-
-          // createTestUrl(req.factory); // url for debugging
-          console.log('     *')
-          console.log('  **** Done with way points')
-          console.log('  final way_points.length :>> ', req.factory.way_points.length);
-          console.log(`  final way_pts_indexes.length`, req.factory.way_pts_indexes.length)
-          console.log(`  final way_pts_indexes`, req.factory.way_pts_indexes)
-          console.log('  final track_units_per_leg.length :>> ', req.factory.track_units_per_leg.length);
-          console.log('  final track_units_per_leg :>> ', req.factory.track_units_per_leg);
-          console.log('  target_calcs :>> ', req.factory.target_calcs);
-          console.log(`  key_pts`, req.factory.key_pts)
-          console.log('     *')
-          return req;
+          cleanKeyPoints(req.factory);
+          // select final waypoints based on accumulated geo data
+          selectFinalWayPoints(req.factory);
+          showRevisedData(req.factory) // data is not revised
+          setUrlWithWayPoints(req.factory) // url has same waypoints as before
+          return getRouteData(req.factory.trip_url)
+            .then(incoming => {
+              getLegDistances(incoming.data.routes[0], req.factory.leg_distances);  // 3rd leg distances not better
+              // save final route details
+              overview.summary = incoming.data.routes[0].summary;
+              overview.bounds = incoming.data.routes[0].bounds;
+              overview.total_meters = req.factory.total_meters;
+              overview.total_mi = Math.round(overview.total_meters / 1609.34);
+              overview.legs_per_day = req.factory.legs_per_day;
+              req.factory.legs = incoming.data.routes[0].legs;
+              return req;
+            })
         })
     })
 }
