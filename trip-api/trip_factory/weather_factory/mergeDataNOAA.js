@@ -46,7 +46,7 @@ const addToNodeForecast = (nodeDataNOAA, req) => {
   let { weather, cities } = req.payload.data.trip;
   // for each item (location) in weather[], add 7-day forecast from NOAA
   for (let i = 0; i < weather.length; i++) {
-    console.log('NOAA promise[' + i + '] :>> ', nodeDataNOAA[i].status);
+    // console.log('NOAA promise[' + i + '] :>> ', nodeDataNOAA[i].status);
     // create set of 13 or 14 12-hour forecasts for current location
     weather[i].forecast12hour = (create12hourForecasts(nodeDataNOAA[i]));
     addLocationMetadata(weather[i], nodeDataNOAA[i], cities[i]);

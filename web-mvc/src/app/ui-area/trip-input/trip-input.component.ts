@@ -12,6 +12,7 @@ import { InputService } from '../../services/input.service';
 import { ITripInput } from '../../models/itrip-input';
 import { PublishService } from '../../services/publish.service';
 import { TripService } from '../../services/trip.service';
+import { ButtonService } from '../../services/button.service';
 import { ViewManagerService } from '../../services/view-manager.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class TripInputComponent implements OnInit {
   advInputVisible = false;
   // for cancelling updating date time field
   intervalId = null;
+  isLoggedIn = false;
 
   @ViewChild('picker', { static: true }) picker: any;
 
@@ -56,10 +58,10 @@ export class TripInputComponent implements OnInit {
   };
 
   presets = {
-    trucker: {
-      avg_speed: 62,
-      hours_driving: 11,
-      miles_per_day: 682
+    team: {
+      avg_speed: 50,
+      hours_driving: 22,
+      miles_per_day: 1100
     },
     average: {
       avg_speed: 50,
@@ -82,13 +84,14 @@ export class TripInputComponent implements OnInit {
     private inputService: InputService,
     private publishService: PublishService,
     private tripService: TripService,
+    private buttonService: ButtonService,
     private viewManagerService: ViewManagerService,
     private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
 
     this.tripForm = new FormGroup({
-      weather: new FormControl(true),
+      // weather: new FormControl(true),
       hotels: new FormControl({ value: null, disabled: true }),
       truck_stops: new FormControl({ value: null, disabled: true }),
       origin: new FormControl('', [
@@ -114,6 +117,10 @@ export class TripInputComponent implements OnInit {
 
     // 10 minutes = 600000 milliseconds
     this.intervalId = setInterval(this.refreshDateTime, 6000, this.tripForm, 600000);
+
+    this.buttonService.loggedIn.subscribe(loginStatus => {
+      this.isLoggedIn = loginStatus;
+    })
   }
 
   onTripSubmitted(e, tForm, presets) {
@@ -121,7 +128,7 @@ export class TripInputComponent implements OnInit {
     this.refreshMap();
     this.inputService.adjustFormValues(e, tForm, presets)
     this.inputService.buildRequestData(tForm, this.input)
-    console.log('onTripSubmitted() - user input :>> ', this.input);
+    console.log('form data -> ', this.input);
 
     this.tripService.tripRequest(this.input)
       .subscribe(data => {
@@ -154,6 +161,11 @@ export class TripInputComponent implements OnInit {
 
   showLogin() {
     this.viewManagerService.setViewMode.emit('login')
+  }
+
+  logout() {
+    this.viewManagerService.setViewMode.emit('login');
+    return this.buttonService.loggedIn.next(false);
   }
 
   showMoreLess() {

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { RegisterService } from '../../../services/register.service';
 import { IRegister } from '../../../models/iregister';
+import { ViewManagerService } from '../../../services/view-manager.service';
+import isEmpty from '../../../shared/isEmpty';
 
 @Component({
   selector: 'app-register',
@@ -11,15 +13,18 @@ import { IRegister } from '../../../models/iregister';
 export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
+  showRegisterFailed = false;
 
   newUser: IRegister = {
     name: '',
     email: '',
     password: '',
-    password2: ''
+    password2: '',
+    _id: ''
   }
 
-  constructor(private registerService: RegisterService) { }
+  constructor(private registerService: RegisterService,
+    public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.registerForm = new FormGroup({
@@ -31,7 +36,6 @@ export class RegisterComponent implements OnInit {
   }
 
   handleResponse = (data) => {
-    console.log('res to register req :>> ', data);
     return data;
   }
 
@@ -41,19 +45,18 @@ export class RegisterComponent implements OnInit {
         this.newUser[key] = inputValue;
       });
     this.registerService.sendRegisterRequest(this.newUser)
-      .subscribe(incoming => {
-        this.newUser = this.handleResponse(incoming);
-        // this.viewMode = 'form';
-        console.log(`register this.newUser`, this.newUser)
-        // if login was success
-        // show newUser's saved trip templates
-        // else 
-        // provide options: 
-        // "Forgot password?" - send link to email address
-        // "Create new account" - redirect to Register page
-        // "Login as guest" - give temporary access to site
-        // with message - "Free access for 10 days or 100 requests"
-        // then redirect to "Start New Trip" page 
-      })
+      .subscribe(res => {
+        if (res._id) {
+          console.log(`new user registered `, this.newUser)
+          this.newUser = this.handleResponse(res);
+
+          this.viewManagerService.setViewMode.emit('form')
+        } else {
+          console.log("Server did not return an id");
+        }
+      },
+        (error) => { // Register failed 
+          this.showRegisterFailed = true;
+        })
   }
 }

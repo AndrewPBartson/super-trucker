@@ -51,28 +51,28 @@ function setNextStartTime(end_time, drive_time_msec, midnight) {
    if (drive_time_msec < 50400000) {
       if (end_time + 36000000 > midnight + 21600000) {
          // console.log(`Restart time - Option 1)
-         //    drive_time_msec < hours_14 && end_time + hours_10 > midnight + hours_6`);
+         //     drive_time_msec < hours_14 && end_time + hours_10 > midnight + hours_6`);
          start_time = end_time + 36000000;
       } else {
          // console.log(`Restart time - Option 2)
-         //    drive_time_msec < hours_14 && end_time + hours_10 <= midnight + hours_6`);
+         //     drive_time_msec < hours_14 && end_time + hours_10 <= midnight + hours_6`);
          start_time = midnight + 21600000;
       }
    } // drive period > 14 hours & drive period < 18 hours
    else if (drive_time_msec >= 50400000 && drive_time_msec < 28800000) {
       if (end_time + (86400000 - drive_time) < midnight + 21600000) {
          // console.log(`Restart time - Option 3)
-         //    drive_time_msec >= hours_14 && drive_time_msec < hours_18 && end_time + (hours_24 - drive_time) < midnight + hours_6`);
+         //     drive_time_msec >= hours_14 && drive_time_msec < hours_18 && end_time + (hours_24 - drive_time) < midnight + hours_6`);
          start_time = end_time + (86400000 - drive_time_msec);
       } else {
          // console.log(`Restart time - Option 4)
-         //    drive_time_msec >= hours_14 && drive_time_msec < hours_18  && end_time + (hours_24 - drive_time) > midnight + hours_6`);
+         //     drive_time_msec >= hours_14 && drive_time_msec < hours_18  && end_time + (hours_24 - drive_time) > midnight + hours_6`);
          start_time = midnight + 21600000;
       }
    } else {
       // console.log(`Option 5)
-      //    drive_time_msec > hours_18`);
-      start_time = midnight + (86400000 - drive_time_msec);
+      //     drive_time_msec > hours_18`);
+      start_time = Math.min(midnight + (86400000 - drive_time_msec), end_time + (86400000 - drive_time_msec));
    }
    return start_time;
 }
@@ -95,7 +95,6 @@ function createTimePoints(req, res, next) {
    }
    let { start_time, break_period, drive_time_msec,
       timezone_user, legs_per_day } = req.payload.data.trip.overview;
-   // start_time is in msec
    let midnight = calcMidnight(start_time, timezone_user);
    midnight = midnight + 86400000; // convert to next midnight
    next_data.timer = adjustTripStartTime(start_time, break_period, nodes[0].next_leg.duration.msec, midnight);
@@ -106,24 +105,25 @@ function createTimePoints(req, res, next) {
    let day_start_time = next_data.timer;
    // vars for calculating start time for next day:
    let end_time, next_start_time, rest_stop_msec;
-   console.log('');
-   console.log('   ***  Check time_points');
-   console.log('   legs_per_day ', legs_per_day);
-   console.log('   meters_per_leg ', req.factory.meters_per_leg);
-   console.log('   meters_per_day ', req.factory.meters_per_day);
-   console.log('   total_meters ', req.factory.total_meters);
-   console.log('   way_points.length ', req.factory.way_points.length);
-   console.log('   all_points.length ', req.factory.all_points.length);
+   // console.log('');
+   // console.log('   ***  Check time_points');
+   // console.log('   legs_per_day ', legs_per_day);
+   // console.log('   meters_per_leg ', req.factory.meters_per_leg);
+   // console.log('   meters_per_day ', req.factory.meters_per_day);
+   // console.log('   total_meters ', req.factory.total_meters);
+   // console.log('   way_points.length ', req.factory.way_points.length);
+   // console.log('   all_points.length ', req.factory.all_points.length);
    for (let node_count = 0,
       current_meters = 0,
       day_start_meters = 0,
       leg_count = 0; node_count < nodes.length;) {
       next_data.status = "";
+      // console.log('leg_count ', leg_count);
       if (node_count === 0) { // 1st node, create 1st time point
          next_data.status = "start_trip";
-         console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]
-            }   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count
-            }   meters ${current_meters - day_start_meters}           - start trip`);
+         // console.log(`         way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]
+         //    }   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count
+         //    }   meters ${current_meters - day_start_meters}           - start trip`);
          // don't add to running totals
          pushTimePoint(req, next_data, node_count)
          leg_count++;
@@ -138,7 +138,7 @@ function createTimePoints(req, res, next) {
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
-               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}`);
+               // console.log(`         way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}`);
                pushTimePoint(req, next_data, node_count)
                leg_count++;
                node_count++;
@@ -152,8 +152,8 @@ function createTimePoints(req, res, next) {
                next_data.miles_today = Math.round((current_meters - day_start_meters) / 1609.34)
                   + ' miles'
                next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
-               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters for day`);
-               console.log('');
+               // console.log(`         way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters for day`);
+               // console.log('');
                pushTimePoint(req, next_data, node_count)
                // rest stop, part 2 - "start_day"
                // layover at same node so:
@@ -174,8 +174,8 @@ function createTimePoints(req, res, next) {
                pushTimePoint(req, next_data, node_count)
                // increment midnight to next day:
                midnight += 86400000;
-               leg_count = 0; // begin first driving period of new day
-               console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}       - begin day`);
+               leg_count = 1; // begin first driving period of new day
+               // console.log(`         way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters}       - begin day`);
                node_count++ // now leaving this node in the morning
             }
          } else {  // if last node of trip
@@ -185,8 +185,8 @@ function createTimePoints(req, res, next) {
             current_meters += nodes[node_count - 1].next_leg.distance.meters;
             next_data.miles_today = Math.round((current_meters - day_start_meters) * 0.000621371) + ' miles'
             next_data.hours_today = secondsToHoursStr((next_data.timer - day_start_time) / 1000);
-            console.log(`   way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters last day`);
-            console.log('');
+            // console.log(`         way_pt ${node_count}   all_pt ${req.factory.way_pts_prev_idxs[node_count]}   targets ${req.factory.targets[node_count]} ${Math.round(req.factory.meters_per_leg) * leg_count}   meters ${current_meters - day_start_meters} - total meters last day`);
+            // console.log('');
             pushTimePoint(req, next_data, node_count)
             req.payload.data.trip.overview.end_time = next_data.timer;
             req.payload.data.trip.overview.total_hrs_text = secondsToHoursStr((next_data.timer - start_time) / 1000);

@@ -51,12 +51,12 @@ function formatTimeOld(timeStamp) {
   }
   let time_text = `${hour}:${minutes}`;
   let date_text = `${month}/${date}`;
-  console.log('month :>> ', month);
-  console.log('date :>> ', date);
-  console.log('hour :>> ', hour);
-  console.log('minutes :>> ', minutes);
-  console.log('time_text :>> ', time_text);
-  console.log('date_text :>> ', date_text);
+  // console.log('month ', month);
+  // console.log('date ', date);
+  // console.log('hour ', hour);
+  // console.log('minutes ', minutes);
+  // console.log('time_text ', time_text);
+  // console.log('date_text ', date_text);
   // return time_text;
   return date_text;
 }

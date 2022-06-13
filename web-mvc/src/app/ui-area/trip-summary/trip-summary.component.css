@@ -29,8 +29,12 @@
   margin-left: 8px;
   margin-right: 8px;
 }
-.no_break {
-  white-space: nowrap;
+.align_via {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+}
+.nudge {
+  text-align: center;
 }
 .title_medium {
   font-size: 1.1rem;
@@ -47,7 +51,6 @@
   border-bottom: rgb(232, 230, 230) solid 1px;
   padding-top: 1px;
 }
-
 .places_list .place {
   height: auto;
 }

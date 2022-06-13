@@ -43,7 +43,7 @@ export class MapComponent implements AfterViewInit {
       this.mapInitializer();
     })
     this.publishService.transmitData.subscribe(data => {
-      console.log(`incoming ->`, data)
+      console.log(`response ->`, data)
       this.mapInitializer();
       this.data = data;
       this.setMapBounds(data)

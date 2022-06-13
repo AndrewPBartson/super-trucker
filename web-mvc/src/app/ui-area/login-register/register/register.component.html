@@ -52,5 +52,6 @@
     <button mat-raised-button color="primary" class="register-button">
       Register
     </button>
+        <mat-error *ngIf="showRegisterFailed" class="err_msg">Registration failed - Please try again</mat-error>
   </form>
 </mat-card-content>

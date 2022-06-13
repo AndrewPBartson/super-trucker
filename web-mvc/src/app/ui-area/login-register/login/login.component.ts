@@ -1,8 +1,10 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { LoginService } from '../../../services/login.service';
 import { ILogin } from '../../../models/ilogin';
+import { ButtonService } from '../../../services/button.service';
 import { ViewManagerService } from '../../../services/view-manager.service';
+import isEmpty from '../../../shared/isEmpty';
 import setAuthToken from '../../../shared/setAuthToken';
 import jwt_decode from 'jwt-decode';
 
@@ -13,14 +15,17 @@ import jwt_decode from 'jwt-decode';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  showLoginFailed = false;
 
   user: ILogin = {
     email: '',
-    password: ''
-    // isAuthenticated: false
+    password: '',
+    isAuthenticated: false
   }
 
-  constructor(private loginService: LoginService, public viewManagerService: ViewManagerService) { }
+  constructor(private loginService: LoginService,
+    private buttonService: ButtonService,
+    public viewManagerService: ViewManagerService) { }
 
   ngOnInit() {
     this.loginForm = new FormGroup({
@@ -41,40 +46,44 @@ export class LoginComponent implements OnInit {
       });
     this.loginService.sendLoginRequest(this.user)
       .subscribe(res => {
-        console.log(`res`, res)
-        const token = res.token;
-        // save token to localStorage
-        localStorage.setItem('jwtToken', token)
-        // add token to auth header for all requests
-        setAuthToken(token);
-        // decode token
-        const decoded = jwt_decode(token);
-        console.log(`decoded ->  `, decoded)
-        // this.user.isAuthenticated = true;
-
-        // if decoded is not empty, set true, else false
-        // isAuthenticated: !isEmpty(action.payload),
-        //   user: action.payload
-
-
-        this.viewManagerService.setViewMode.emit('form')
-        console.log(`this.user has token - `, this.user)
-
-        // if login was success
-        // show trip form page including user's saved trip templates
-        // else - login failed 
-        // provide options: 
-        // "Forgot password?" - send link to email address
-        // "Create new account" - redirect to Register page
-        // "Login as guest" - give temporary access to site
-        // with message - "Free access for 10 days or 100 requests"
-        // then redirect to "Start New Trip" page 
-      })
+        // console.log(`res`, res)
+        if (res.token) {
+          const token = res.token;
+          // save token to localStorage
+          localStorage.setItem('jwtToken', token)
+          // add token to auth header for all requests
+          setAuthToken(token);
+          // decode token
+          const decoded = jwt_decode(token);
+          // console.log(`decoded ->  `, decoded)
+          // console.log(`this.user has token - `, this.user)
+          // if decoded is not empty, set true, else false
+          this.user.isAuthenticated = !isEmpty(decoded);
+          // show trip form page 
+          // todo: trip form shows user's saved trip templates
+          this.viewManagerService.setViewMode.emit('form')
+          return this.buttonService.loggedIn.next(true);
+        } else {
+          console.log("No Token");
+        }
+      },
+        (error) => { // login failed 
+          this.showLoginFailed = true;
+          // todo: provide options: 
+          // "Forgot password?" - send link to email address
+          // "Create new account" - redirect to Register page
+          // "Login as guest" - give temporary access to site
+          // with message - "Free access for 10 days or 100 requests"
+          // then redirect to "Start New Trip" page 
+        })
   }
+
   logoutUser() {
+    this.user.isAuthenticated = false;
     // remove token from localStorage
     localStorage.removeItem('jwtToken');
     // remove token from axios header
     setAuthToken(false);
+    return this.buttonService.loggedIn.next(false);
   }
 }

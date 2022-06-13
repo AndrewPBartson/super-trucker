@@ -52,7 +52,7 @@ example of req.body  {
 const createTripOverview = (req) => {
   let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
     origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
-  console.log('   ***  req.body   ', req.body);
+  console.log('     req.body   ', req.body);
   let tz_id = determineHomeTimezone(timezone_user, time_user_str);
 
   // depart_time (string) is in ISO format 
@@ -145,8 +145,6 @@ function setupTripFactory(req, res, next) {
     all_points: [],
     leg_distances: [],
     targets: [],
-    target_calcs: [],
-    key_pts: [],
     meter_counts: [],
     track_units_per_leg: [],
     days: [],

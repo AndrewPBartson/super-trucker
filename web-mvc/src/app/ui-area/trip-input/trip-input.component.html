@@ -4,8 +4,11 @@
   class="inputForm"
 >
   <div class="item_AA">
-    <button (click)="showLogin()" type="button" mat-raised-button>
+    <button *ngIf="!isLoggedIn" (click)="showLogin()" type="button" mat-raised-button>
       Login/Register
+    </button>
+    <button *ngIf="isLoggedIn" (click)="logout()" type="button" mat-raised-button>
+      Logout
     </button>
   </div>
   <!-- <div class="sectionText item_A">Add Options to Trip:</div>
@@ -57,12 +60,12 @@
   <mat-radio-group class="item_G" [ngClass]="{ hideToStart: !advInputVisible }">
     <mat-radio-button
       type="radio"
-      id="typical"
+      id="average"
       class="item_H clickInput"
       value="average"
       (click)="useQuickPick(this.presets.average)"
     >
-      <label for="average">Dalai Lama</label>
+      <label for="average">Pope Francis</label>
     </mat-radio-button>
     <mat-radio-button
       type="radio"
@@ -75,13 +78,13 @@
     </mat-radio-button>
     <mat-radio-button
       type="radio"
-      id="trucker"
+      id="team"
       class="item_J clickInput"
       [ngClass]="{ hideToStart: !advInputVisible }"
-      value="trucker"
-      (click)="useQuickPick(this.presets.trucker)"
+      value="team"
+      (click)="useQuickPick(this.presets.team)"
     >
-      <label for="trucker">Super Trucker</label>
+      <label for="team">Super Team</label>
     </mat-radio-button>
   </mat-radio-group>
   <mat-form-field class="item_N">
@@ -129,7 +132,7 @@
         placeholder="Miles Per Day"
         id="miles_per_day"
         type="number"
-        min="50"
+        min="500"
         max="2472"
         step="20"
         formControlName="miles_per_day"

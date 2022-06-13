@@ -21,14 +21,15 @@
         name="password"
         formControlName="password"
       />
-      <mat-error *ngIf="false"> Password is required </mat-error>
-      <mat-error *ngIf="false"> Password must be of length 6 </mat-error>
+      <mat-error *ngIf="false">Password is required</mat-error>
+      <mat-error *ngIf="false">Password must be at least 6 characters</mat-error>
       <mat-icon matSuffix>lock</mat-icon>
     </mat-form-field>
-    <mat-checkbox>Remember Me!</mat-checkbox>
+    <!-- <mat-checkbox>Remember Me!</mat-checkbox> -->
     <button mat-raised-button color="primary" class="login-button">
       Log In
     </button>
-    <button mat-raised-button class="login-button">Login with Google</button>
+    <!-- <button mat-raised-button class="login-button">Login with Google</button> -->
+    <mat-error *ngIf="showLoginFailed" class="err_msg">Invalid email or password - Please try again</mat-error>
   </form>
 </mat-card-content>

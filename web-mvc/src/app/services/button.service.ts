@@ -5,9 +5,9 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 
-export class ClearMapService {
+export class ButtonService {
 
-  clearMarkers = new BehaviorSubject<boolean>(true);
+  loggedIn = new BehaviorSubject<boolean>(true);
 
   constructor() { }
 }

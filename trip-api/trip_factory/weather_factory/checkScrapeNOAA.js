@@ -31,7 +31,7 @@ const createUrlsForGaps = (req) => {
       weather[i].city_3noaa = 'NOAA api ok, no scraping';
     }
   }
-  console.log('patchIndexesStr :>> ', patchIndexesStr);
+  // console.log('patchIndexesStr :>> ', patchIndexesStr);
 }
 
 const getRawHtmlNOAA = (req, res, next) => {
@@ -104,7 +104,7 @@ const pushSnapshotsToArray = ($, data) => {
     if (data.main_panels[k]) {
       // check for weather hazard warning which has no value for alt attribute
       if ($(data.main_panels[k]).find('img.forecast-icon').attr('alt') === undefined) {
-        console.log('found undefined alt attribute');
+        // console.log('found undefined alt attribute');
         k++;
       }
       icon = $(data.main_panels[k]).find('img.forecast-icon').attr('src');

@@ -6,7 +6,10 @@
           <span class="title_lite">From </span>
           {{ data.trip.overview.origin }} <span class="title_medium"> to </span>
           {{ data.trip.overview.end_point }}
-          <span class="title_lite no_break"> via {{ data.trip.overview.summary }}</span>
+          <div class="align_via">
+            <span class="title_lite nudge"> via {{ data.trip.overview.summary }}</span>
+            <span class="title_lite">Total miles  {{ data.trip.overview.total_mi }}</span>
+          </div>
         </mat-card-title>
       </mat-card-header>
       <div class="btn_wrapper">
