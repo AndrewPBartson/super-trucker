@@ -39,6 +39,16 @@ function getType(elem) {
   }
 }
 
+const showTime = (incoming) => {
+  let t = new Date(incoming);
+  return t.getUTCFullYear() +
+    '-' + ('0' + t.getUTCMonth()).slice(-2) +
+    '-' + ('0' + t.getUTCDate()).slice(-2) +
+    ' ' + ('0' + t.getUTCHours()).slice(-2) +
+    ':' + ('0' + t.getUTCMinutes()).slice(-2) +
+    ':' + ('0' + t.getUTCSeconds()).slice(-2)
+}
+
 function formatTimeOld(timeStamp) {
   // for reference, not using
   let dateTime = new Date(Math.round(timeStamp))
@@ -77,6 +87,7 @@ function secondsToHoursStr(seconds) {
 }
 
 const convertToTimezone = (timestamp, timezone = 'GMT-07:00') => {
+  // output example - 2022-06-18T18:54:57.000Z
   // consider using moment.js to simplify timezone calcs
   let timeStr = '';
   let offsetStr = timezone.replace(/:/g, '');
@@ -147,19 +158,25 @@ const formatDateShort = (dateTime) => {
   return dateStr;
 }
 
-const calcMidnight = (input_time, timezone) => {
-  // console.log('input_time (msec) :>> ', input_time); // ok
-  let midnight;
-  let timeObj = new Date(input_time);
-  // console.log('timeObj :>> ', timeObj);       // 2022-04-28T20:45:10.984Z
-  let newTimeObj = convertToTimezone(timeObj, timezone);
-  // console.log('newTimeObj :>> ', newTimeObj); // 2022-04-28T12:45:10.000Z
-  newTimeObj.setHours(0);
-  newTimeObj.setMinutes(0);
-  newTimeObj.setSeconds(0);
-  newTimeObj.setMilliseconds(0);
-  midnight = newTimeObj.getTime();
-  return midnight;
+const calcMidnight = (start_time_msec, timezone) => {
+  let midnight_msec;
+  let start_time_obj = new Date(start_time_msec); // 2022-06-17T03:39:10.838Z
+  let start_time_obj_tz = convertToTimezone(start_time_obj, timezone); // 2022-06-16T19:39:10.000Z
+  // reset this Date object to previous midnight -
+  start_time_obj_tz.setHours(0);
+  start_time_obj_tz.setMinutes(0);
+  start_time_obj_tz.setSeconds(0);
+  start_time_obj_tz.setMilliseconds(0);
+  midnight_msec = start_time_obj_tz.getTime();
+  // convert previous midnight to next midnight
+  midnight_msec = midnight_msec + 86400000;
+  console.log('    calcMidnight ->');
+  console.log('         start_time_msec           ', start_time_msec);
+  console.log('         start_time_msec converted ', showTime(start_time_msec));
+  console.log('         midnight_msec in user tz  ', midnight_msec);
+  console.log('         midnight_msec converted   ', showTime(midnight_msec));
+  console.log('');
+  return midnight_msec;
 }
 
 module.exports = {
@@ -170,5 +187,6 @@ module.exports = {
   formatDateLong,
   formatDateShort,
   capitalize1stChar,
-  calcMidnight
+  calcMidnight,
+  showTime
 }

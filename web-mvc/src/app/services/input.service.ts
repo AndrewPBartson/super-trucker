@@ -45,7 +45,7 @@ export class InputService {
     return isDataInvalid ? { errorCode: true } : null;
   }
 
-  adjustFormValues(e, tForm, presets) {
+  adjustSpeedMiHrs(e, tForm, presets) {
     tForm.value.miles_per_day = Math.abs(tForm.value.miles_per_day);
     tForm.value.hours_driving = Math.abs(tForm.value.hours_driving);
     tForm.value.avg_speed = Math.abs(tForm.value.avg_speed);
@@ -159,9 +159,12 @@ export class InputService {
         reqData[key] = inputValue;
       });
     // add time string from browser because it has user's default timezone
+    // for sure, needs to be converted to string
     reqData.time_user_str = tripForm.value.depart_time.toString();
     // convert depart_time to milliseconds
     reqData.depart_time_msec = moment(tripForm.value.depart_time).valueOf();
+    // finished with depart_time, don't add to req.body
+    delete reqData.depart_time;
     return reqData;
   }
 

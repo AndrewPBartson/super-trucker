@@ -1,7 +1,6 @@
 const axios = require('axios');
 const polyline = require('polyline');
-// const GMkey = process.env.gmKey;
-const GMkey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
+const GMkey = process.env.gmKey;
 
 function between(x, min, max) {
   return x >= min && x < max;
@@ -96,7 +95,7 @@ const calcTotalLegsMax = (total_meters) => {
   else return 23;
 }
 
-function getSimpleData(req, prelim_data) {
+function getSimpleGeoData(req, prelim_data) {
   req.factory.total_meters = prelim_data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_meters = prelim_data.routes[0].legs[0].distance.value;
   req.payload.data.trip.overview.total_mi_text = prelim_data.routes[0].legs[0].distance.text;
@@ -253,7 +252,7 @@ function getInitialTripData(req, res, next) {
     &key=${GMkey}`
   return axios.get(first_url)
     .then(initial_res => {
-      getSimpleData(req, initial_res.data)
+      getSimpleGeoData(req, initial_res.data)
       calcFirstTripVariables(req.factory)
       // showFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)

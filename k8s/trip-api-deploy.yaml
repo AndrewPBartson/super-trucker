@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: trip-api-pod
-          image: supertacr.azurecr.io/trip-api:v14
+          image: supertacr.azurecr.io/trip-api:v18
           imagePullPolicy: Always
           ports:
             - containerPort: 8880

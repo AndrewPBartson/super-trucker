@@ -8,8 +8,7 @@ import { ITripInput } from '../models/itrip-input';
 
 export class TripService {
 
-  // apiURL: string = 'http://20.124.155.73';
-  apiURL: string = 'http://localhost:8880';
+  apiURL: string = 'http://20.241.224.46';
 
   constructor(private httpClient: HttpClient) { }
 

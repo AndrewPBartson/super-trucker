@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const trips = require('./routes/api/trips');
-// mongoose needs User schema -
+// mongoose needs User schema - don't remove
 const User = require('./models/User');
 const app = express();
 const PORT = 8880;
@@ -22,8 +22,8 @@ app.use(passport.initialize());
 require('./passport/passport')(passport);
 
 // db config
-// const dbURI = `mongodb+srv://${dbUser}:${dbPwd}@${dbUrl}?retryWrites=true&w=majority`;
-const dbURI = `mongodb+srv://AndrewAdmin:EHZWsHFTAtknkjeQ@devconnector.bcmoo.mongodb.net/multipurpose?retryWrites=true&w=majority`;
+const dbURI = `mongodb+srv://${dbUser}:${dbPwd}@${dbUrl}?retryWrites=true&w=majority`;
+
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
@@ -49,8 +49,7 @@ app.use('/', trips);
 // @access  Public
 app.get(
   '/',
-  //(req, res) => res.send('trip-api microservice running in the cloud')
-  (req, res) => res.json(process.env)
+  (req, res) => res.send('trip-api microservice running in the cloud')
 );
 
 // last middleware (except error MW) handles req w/ no matching route
@@ -61,7 +60,7 @@ app.use((req, res, next) => {
 // middleware w/ 4 arguments is only called in case of error
 app.use((err, req, res, next) => {
   console.log('err.status - ', err.status);
-  res.status(500).json({ error: { message: `Whaaaat?   ${err}` } })
+  res.status(500).json({ error: { message: `Error in trip-api   ${err}` } })
 });
 
 // if a MW calls res.anything(), res is returned and sent, 

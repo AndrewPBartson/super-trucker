@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: angular-ui-main
+  name: web-mvc-main
   labels:
-    app: angular-ui
+    app: web-mvc
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: angular-ui
+      app: web-mvc
   template:
     metadata:
       labels:
-        app: angular-ui
+        app: web-mvc
     spec:
       containers:
-        - name: angular-ui-pod
-          image: supertacr.azurecr.io/angular-ui:v17
+        - name: web-mvc-pod
+          image: supertacr.azurecr.io/web-mvc:v4
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -27,10 +27,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: angular-ui-svc
+  name: web-mvc-svc
 spec:
   selector:
-    app: angular-ui
+    app: web-mvc
   ports:
     - name: ng-port
       protocol: TCP
@@ -40,11 +40,11 @@ spec:
 # apiVersion: v1
 # kind: Service
 # metadata:
-#   name: angular-ui-ext-svc
+#   name: web-mvc-ext-svc
 # spec:
 #   type: LoadBalancer
 #   selector:
-#     app: angular-ui
+#     app: web-mvc
 #   ports:
 #     - protocol: TCP
 #       port: 80

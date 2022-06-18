@@ -1,6 +1,5 @@
 const axios = require('axios');
-// const OWMkey = process.env.owmKey;
-const OWMkey = '50568570360fbfb7ecdb0fc8679e4500';
+const OWMkey = process.env.owmKey;
 
 function createUrlsOWM(req) {
   req.factory.urls_OWM = [];

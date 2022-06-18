@@ -122,7 +122,7 @@
     >
       <input
         (change)="
-          this.inputService.adjustFormValues(
+          this.inputService.adjustSpeedMiHrs(
             $event,
             this.tripForm,
             this.presets
@@ -149,7 +149,7 @@
     >
       <input
         (change)="
-          this.inputService.adjustFormValues(
+          this.inputService.adjustSpeedMiHrs(
             $event,
             this.tripForm,
             this.presets
@@ -175,7 +175,7 @@
         matInput
         placeholder="Hours Driving Per Day"
         (change)="
-          this.inputService.adjustFormValues(
+          this.inputService.adjustSpeedMiHrs(
             $event,
             this.tripForm,
             this.presets

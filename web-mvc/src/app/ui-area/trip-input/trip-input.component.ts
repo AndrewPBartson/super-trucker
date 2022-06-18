@@ -81,7 +81,7 @@ export class TripInputComponent implements OnInit {
 
   constructor(
     private clearMapService: ClearMapService,
-    private inputService: InputService,
+    public inputService: InputService,
     private publishService: PublishService,
     private tripService: TripService,
     private buttonService: ButtonService,
@@ -126,7 +126,7 @@ export class TripInputComponent implements OnInit {
   onTripSubmitted(e, tForm, presets) {
     this.showSpinner();
     this.refreshMap();
-    this.inputService.adjustFormValues(e, tForm, presets)
+    this.inputService.adjustSpeedMiHrs(e, tForm, presets)
     this.inputService.buildRequestData(tForm, this.input)
     console.log('form data -> ', this.input);
 

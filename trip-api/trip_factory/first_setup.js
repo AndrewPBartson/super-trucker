@@ -3,7 +3,8 @@ const moment = require('moment-timezone');
 function calcBreakPeriod(hours_driving) {
   // calculate break_period in milliseconds
   let break_period = (24 - hours_driving) * 3600000;
-  // limit break_period to max ten hours
+  // limit break_period to max ten hours bc 10 am
+  // is a reasonable time to resume driving
   if (break_period > 36000000) {
     break_period = 36000000;
   }
@@ -11,7 +12,9 @@ function calcBreakPeriod(hours_driving) {
 }
 
 const extractTimezoneFromDateStr = (date_str) => {
-  // date_str is depart_time in ISO format, has browser timezone
+  // input example - Fri Jun 17 2022 06:00:05 GMT-0800
+  // output example - GMT-08:00
+  // date_str contains browser timezone
   // extract relevant substring from date_str
   let tz_id = date_str.toString().split(' ')[5];
   // insert colon - GMT-0700 becomes GMT-07:00
@@ -20,20 +23,18 @@ const extractTimezoneFromDateStr = (date_str) => {
 }
 
 const determineHomeTimezone = (timezone_user, time_user_str) => {
-  // examples of timezone_user: 'America/Anchorage', 'GMT-0600 (MDT CST)'
-  // example of time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)'
+  // input examples 
+  //    - timezone_user: 'America/Anchorage', 'GMT-0600 (MDT CST)'
+  //    - time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)'
+  // output example - GMT-06:00
   // if timezone_user begins with GMT, that means user selected timezone from UI dropdown
   if (timezone_user.toString().substring(0, 3) === "GMT") {
     // extract timezone offset = digits after "GMT"
     let tz_custom = timezone_user.substring(0, 8);
     tz_custom = tz_custom.slice(0, 6) + ':' + tz_custom.slice(6);
     return tz_custom;
-  } else {
-    // use timezone derived from user's browser  
-    let tz_browser = extractTimezoneFromDateStr(time_user_str);
-    // example of tz_browser: 'GMT-07:00 (MST)'
-    return tz_browser;
-    // example of return value: GMT-06:00
+  } else { // get timezone out of time string from browser 
+    return extractTimezoneFromDateStr(time_user_str);
   }
 }
 /*
@@ -43,25 +44,21 @@ example of req.body  {
   miles_per_day: 510,
   avg_speed: 65,
   hours_driving: 6,
-  depart_time: '2022-04-23T20:00:16.263Z',
   timezone_user: 'America/Anchorage',
   time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)',
-  weather: true
 }
 */
 const createTripOverview = (req) => {
-  let { avg_speed, depart_time, end_point, hours_driving, miles_per_day,
+  let { avg_speed, depart_time_msec, end_point, hours_driving, miles_per_day,
     origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
   console.log('     req.body   ', req.body);
-  let tz_id = determineHomeTimezone(timezone_user, time_user_str);
-
-  // depart_time (string) is in ISO format 
-  // therefore start_time (Date object) is assigned UTC timezone
-  let start_time = new Date(depart_time);
-  let start_time_msec = start_time.getTime();
+  let start_time_msec = depart_time_msec;
+  // get current timestamp
   let current_time_msec = Date.now();
-  // process trip start time so it can't be in the past
-  if (current_time_msec > start_time_msec) {
+  // check and adjust trip start time so it can't be in the past
+  // this adjustment may cause req.body.depart_time_msec to be slightly
+  // earlier than trip.overview.start_time_msec
+  if (start_time_msec < current_time_msec) {
     start_time_msec = current_time_msec;
   }
 
@@ -84,9 +81,9 @@ const createTripOverview = (req) => {
     "legs_per_day": null,
     "miles_per_day": miles_per_day,
     "origin": origin,
-    "start_time": start_time_msec,
+    "start_time_msec": start_time_msec,
     // examples of timezone_user: GMT-08:00, GMT-04:00
-    "timezone_user": tz_id,
+    "timezone_user": determineHomeTimezone(timezone_user, time_user_str),
     // example of time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)'
     "timezone_user_str": time_user_str,
     "services": {

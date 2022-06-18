@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 
 export class RegisterService {
-  apiURL: string = 'http://20.124.155.73';
+  apiURL: string = 'http://20.241.224.46';
 
   constructor(private httpClient: HttpClient) { }
 

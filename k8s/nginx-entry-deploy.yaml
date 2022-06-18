@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-super-t-main
+  name: nginx-entry-main
   labels:
-    app: nginx-super-t
+    app: nginx-entry
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx-super-t
+      app: nginx-entry
   template:
     metadata:
       labels:
-        app: nginx-super-t
+        app: nginx-entry
     spec:
       containers:
-        - name: nginx-super-t-pod
-          image: supertacr.azurecr.io/nginx-entry:v11
+        - name: nginx-entry-pod
+          image: supertacr.azurecr.io/nginx-entry:v12
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -24,11 +24,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-super-t-ext-svc
+  name: nginx-entry-ext-svc
 spec:
   type: LoadBalancer
   selector:
-    app: nginx-super-t
+    app: nginx-entry
   ports:
     - name: nginx-port
       protocol: TCP

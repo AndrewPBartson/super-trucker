@@ -1,6 +1,5 @@
 const axios = require('axios');
-// const GMkey = process.env.gmKey;
-const GMkey = 'AIzaSyAd0ZZdBnJftinI-qHnPoP9kq5Mtkey6Ac';
+const GMkey = process.env.gmKey;
 
 function getExtraWayPoints(factory) {
   let { all_points, way_pts_indexes, way_points_extra } = factory
