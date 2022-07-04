@@ -8,11 +8,6 @@
   overflow: hidden;
 }
 
-span .auth_titles {
-  /* font-family: "Titillium Web", sans-serif; */
-  color: red;
-}
-
 mat-card {
   margin: 2rem;
   border-radius: 8px;

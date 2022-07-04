@@ -111,57 +111,12 @@ function getSimpleGeoData(req, prelim_data) {
   req.factory.total_units = req.factory.all_points.length - 1;
 }
 
-// const showFirstVersionData = (factory) => {
-
-//   console.log('     *')
-//   console.log('   ***  1st way points')
-//   console.log(`   all_points.length         `, factory.all_points.length)
-//   console.log(`   total_units               `, factory.total_units)
-//   console.log('   meters_per_day            ', factory.meters_per_day);
-//   console.log('   days (more if late start) ', factory.total_meters / factory.meters_per_day);
-//   console.log('   legs_per_day              ', factory.legs_per_day);
-//   console.log(`   total_legs_float          `, factory.total_legs_float)
-//   console.log(`   total_legs                `, factory.total_legs)
-//   console.log('   meters_per_leg            ', factory.meters_per_leg);
-//   console.log('   miles per leg             ', factory.meters_per_leg / 1609.34);
-//   console.log('   units_per_leg_float       ', factory.units_per_leg_float);
-//   console.log('   units_per_leg             ', factory.units_per_leg);
-//   console.log(`   meters/leg * legs/day =    ${(factory.meters_per_leg * factory.legs_per_day) / 1609.34} mi/day`);
-//   console.log('   way_points.length         ', factory.way_points.length);
-//   console.log(`   way_pts_indexes.length    `, factory.way_pts_indexes.length)
-//   console.log(`   way_pts_indexes           `, factory.way_pts_indexes)
-//   console.log('   track_units_per_leg.length ', factory.track_units_per_leg.length);
-//   console.log('   track_units_per_leg       ', factory.track_units_per_leg);
-//   let track_units = 0;
-//   for (let i = 0; i < factory.track_units_per_leg.length; i++) {
-//     track_units += factory.track_units_per_leg[i];
-//   }
-//   console.log('   sum of track_units     ', track_units);
-//   console.log('   targets.length   ', factory.targets.length);
-//   console.log('   targets          ', factory.targets);
-//   console.log('     ***  1st version  Done!   *');
-//   console.log('     *')
-// }
-
-// const showFirstTripVariables = (factory) => {
-//   console.log('   ***  1st trip variables');
-//   console.log(`   total_meters`, factory.total_meters)
-//   console.log(`   total miles`, factory.total_meters / 1609.34)
-//   console.log('   total_legs_max :>> ', factory.total_legs_max);
-//   console.log('   legs_per_day :>> ', factory.legs_per_day);
-//   console.log('   meters_per_leg :>> ', factory.meters_per_leg);
-//   console.log('   total_legs_float :>> ', factory.total_legs_float);
-//   console.log('   units_per_leg_float :>> ', factory.units_per_leg_float);
-//   console.log('   units_per_leg :>> ', factory.units_per_leg);
-// }
-
 const initializeTargets = (req) => {
   /* 
   // each target is a meter count at ideal location for each way_point
-  //    so that route is divided into nearly equal distances (legs)
+  // so that route is divided into nearly equal distances (legs)
   */
   let running_total = 0;
-  let calcsObj = {};
   for (let i = 0; i < req.factory.way_points.length; i++) {
     req.factory.targets.push(Math.round(running_total));
     running_total += req.factory.meters_per_leg;
@@ -196,19 +151,17 @@ const calcFirstTrackUnits = (factory) => {
 }
 
 /*  
-  // Gmaps allows max of 23 waypoints per request.
+  // Gmaps allows max of 23 (25?) waypoints per request.
   // This seems to be apart from origin and end_point.
-  // So I'm going with 23 as max number of cities that can be on final trip route.
-  // Design decision - What is optimal amount of weather data to show user?
-  // App is configured to show locations that are at least 25 miles apart. 
-  // Maybe that will provide enough weather reports because weather 
-  // doesn't change that much in 25 miles
+  // So I'm going with 23 as max number of cities that can be on final trip route
+  // App is configured to show locations that are at least 30 miles apart. 
+  // Weather doesn't change that much in 30 miles
 */
 function calcFirstTripVariables(factory) {
   /*
-   these calculations take into account that number of legs per day needs to be an integer
+   these calculations take into account that number of legs per day needs to be integer
    and all legs should be close to same length, except final leg of trip can be shorter. 
-   The length of legs needs to be such that -
+   Length of legs needs to be such that -
    number of legs * meters_per_leg = meters_per_day (set by user as miles per day) 
   */
   factory.total_legs_max = calcTotalLegsMax(factory.total_meters);
@@ -254,10 +207,8 @@ function getInitialTripData(req, res, next) {
     .then(initial_res => {
       getSimpleGeoData(req, initial_res.data)
       calcFirstTripVariables(req.factory)
-      // showFirstTripVariables(req.factory)
       calcFirstWayPoints(req.factory)
       initializeTargets(req)
-      // showFirstVersionData(req.factory)
       return req;
     })
     .catch(function (error) {

@@ -1,6 +1,6 @@
 # SuperTrucker
 
-A web application for planning long-distance multi-day road trips. The user enters the starting point, destination, and number of miles to drive each day. The end result is a trip route and schedule. Each location on the schedule has weather forecast for that time, up to seven days in the future.
+A web application for planning long-distance multi-day road trips. The user enters the starting point, destination, and number of miles to drive each day. The application produces a trip route including schedule and weather reports all along the route.
 
 - - -
 
@@ -10,7 +10,7 @@ A web application for planning long-distance multi-day road trips. The user ente
 
 **Back End** \- Node\, Express\, MongoDb
 
-**Beta Release** \- February 1\, 2022 \(crossed fingers\)
+**Beta Release** \- July 1\, 2022 \(crossed fingers\)
 
 - - -
 
@@ -26,11 +26,11 @@ When the server receives a trip request, the first step is to retrieve a simple 
 
 **Part 3 - Obtain and sort weather data**
 
-For each location on the schedule, the server gathers weather data for the next seven days. Weather data is gathered from two sources: Open Weather Map and US National Weather Service. From this data, the app pulls out the weather forecast that is relevant for the time/location stamp for each point on the schedule. While calculating the schedule and selecting relevant weather data, the server must adjust for the timezone difference for each location. Before the final dataset is returned to the client, it is grouped into days to facilitate presentation of a daily schedule to the user.
+For each location on the schedule, the server gathers weather data for the next eight days. Weather data is gathered from two sources: Open Weather Map and US National Weather Service. From this data, the app pulls out the weather forecast that is relevant for each time and location on the schedule. While calculating the schedule and selecting relevant weather data, the server adjusts for the timezone differences. Two times are shown for each location - 1) local time 2) time at user's home. The scheduled is summarized by days, so that locations, arrival times, and weather reports for each day are grouped together.
 
 **Part 4 - Display trip schedule - location, time, and weather**
 
-When the response comes back to the client, the user sees the route displayed in a table with relevant weather icons, temperature, and summary, that is, weather data for each location at the day and time when the user will be there. Thus at a glance, the user can get a good idea about the probable weather during the trip and the potential for weather hazards such as ice and snow.
+When the response comes back to the client, the route is displayed in two ways - 1) In the form of table, like a train schedule 2) On a map with weather icons along the highways. At a glance, the user can see the probable weather along the route and the potential for weather hazards such as ice and snow.
 
 **About Weather APIs**
 
@@ -42,14 +42,13 @@ When the response comes back to the client, the user sees the route displayed in
     * weather.gov
     * Provides superior highly specific icons and more detailed weather summary
     * About 5% of requests to weather.gov API fail with status 503
-    * For each failed request, my server sends a 2nd request to scrape data from weather.gov html version which is more reliable but less complete
+    * For each failed request, the server sends a 2nd request to scrape data from weather.gov html version which is more reliable but less complete
 
 **Features in future release**
 
-* Display the route, schedule, and weather icons on a Google Map
-* User can save a "Trip Template" for recurring deliveries and routes
+* Ability to save a "Trip Template" for recurring deliveries and routes
 * Improve and optimize the application for mobile devices
-* Ability to find other options along route -
+* Ability to find services along route -
     * Truck stops
     * Hotels
     * Repair shops and tow trucks
@@ -64,7 +63,7 @@ When the response comes back to the client, the user sees the route displayed in
 
 - - -
 
-**scripts - package.json**
+<!-- **scripts - package.json**
 
 ```
 - "ng": "ng",
@@ -92,4 +91,4 @@ During development - npm run dev
 
 <span class="colour" style="color:rgb(201, 209, 217)">`ng e2e` - executes end-to-end tests via [Protractor](http://www.protractortest.org/)</span>
 
-##
+## -->

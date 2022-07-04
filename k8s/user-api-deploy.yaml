@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-api-pod
-          image: supertacr.azurecr.io/user-api:v6
+          image: truckeracr.azurecr.io/user-api:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 7770

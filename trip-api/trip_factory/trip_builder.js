@@ -3,7 +3,6 @@ const { getInitialTripData } = require('./first_version');
 const { fixWayPoints } = require('./waypoints');
 // const { fixWayPoints, getExtraWayPoints } = require('./waypoints');
 // const { searchForServicesSet } = require('./services');
-// const { reviewWaypointCalcs } = require('./devDataCheck');
 const { createNodes } = require('./nodes');
 const { getWeather } = require('./weather_factory/weather_builder');
 const { createTimePoints } = require('./time_points');

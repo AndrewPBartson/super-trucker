@@ -3,7 +3,7 @@ const createDataPoint = (time_pt) => {
     city_state: time_pt.city_state,
     lat: time_pt.latLng.lat,
     lng: time_pt.latLng.lng,
-    date: time_pt.date_local,
+    date: time_pt.date_local_short,
     time: time_pt.time_local,
     time_user: time_pt.time_user,
     date_time: time_pt.date_time_local,
@@ -11,6 +11,9 @@ const createDataPoint = (time_pt) => {
     icon: time_pt.icon,
     text: time_pt.text,
     restart: null
+  }
+  if (!time_pt.text) {
+    data.text = "No Weather Data";
   }
   return data;
 }

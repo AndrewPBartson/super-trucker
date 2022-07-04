@@ -1,4 +1,4 @@
-const { secondsToHoursStr } = require('./utilities');
+const { secondsToHoursStr } = require('./shared');
 
 function getCityString(address) {
    if (address) {
@@ -6,12 +6,10 @@ function getCityString(address) {
       let city = components[components.length - 3].trim();
       let statePlusZip = components[components.length - 2].trim();
       components = statePlusZip.split(' ');
-      // option - add properties for zipCode and country
       let state = components[0]
       let result = city + " " + state;
       return result;
    } else { return "Unknown place"; }
-
 }
 
 function createNodes(req, res, next) {
@@ -29,7 +27,6 @@ function createNodes(req, res, next) {
       }
       // save city to payload for validating/debugging
       payload.data.trip.cities.push(cityState)
-
       duration_in_seconds = legs[i].distance.value / meters_per_second;
       next_leg = {
          "distance": {
@@ -48,7 +45,6 @@ function createNodes(req, res, next) {
          "time_points": [],
          "next_leg": next_leg
       });
-
       // add last way_point (bc waypoints.length = legs.length + 1)
       if (i === legs.length - 1) {
          let destination = getCityString(legs[i].end_address)
@@ -66,6 +62,5 @@ function createNodes(req, res, next) {
 }
 
 module.exports = {
-   createNodes,
-   secondsToHoursStr
+   createNodes
 }

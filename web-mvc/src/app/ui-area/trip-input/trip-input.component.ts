@@ -43,7 +43,6 @@ export class TripInputComponent implements OnInit {
   public stepMinutes = [1, 5, 10, 15, 20, 25];
   public stepSeconds = [1, 5, 10, 15, 20, 25];
 
-  // create property for user input for trip request
   input: ITripInput = {
     avg_speed: null,
     depart_time: null,
@@ -52,8 +51,7 @@ export class TripInputComponent implements OnInit {
     hours_driving: null,
     miles_per_day: 0,
     origin: '',
-    time_user_str: null,
-    timezone_user: null
+    timezone_city: null
     //weather: null
   };
 
@@ -76,7 +74,14 @@ export class TripInputComponent implements OnInit {
   };
 
   selections = [
-    tz.guess(), "GMT-0800 (PST)", "GMT-0700 (PDT MST)", "GMT-0600 (MDT CST)", "GMT-0500 (CDT EST)", "GMT-0400 (EDT)"
+    tz.guess(),
+    "America/Boise",
+    "America/Chicago",
+    "America/Denver",
+    "America/Detroit",
+    "America/Los_Angeles",
+    "America/New_York",
+    "America/Phoenix"
   ]
 
   constructor(
@@ -108,7 +113,7 @@ export class TripInputComponent implements OnInit {
       avg_speed: new FormControl(null),
       hours_driving: new FormControl(null),
       depart_time: new FormControl(moment().toDate()),
-      timezone_user: new FormControl(tz.guess())
+      timezone_city: new FormControl(tz.guess())
     });
     // depart_time is refreshed every 30 seconds but
     // after user sets depart_time manually, it should 

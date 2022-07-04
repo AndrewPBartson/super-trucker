@@ -1,33 +1,20 @@
-const {
-  formatTimesForTimezone,
-  formatTime,
-  formatDateLong,
-  formatDateShort
-} = require('./utilities');
+const moment = require('moment-timezone');
 
-const setDateTimeLocal = (time_pt) => {
-  // based on local timezone for place on route
-  // this is ok but consider refactoring to use moment.js 
-  let local_times = formatTimesForTimezone(time_pt.timestamp, time_pt.timezone_local);
-  time_pt.date_time_local = local_times.timeLong;
-  time_pt.date_local_long = formatDateLong(local_times.timeLong);
-  time_pt.date_local = formatDateShort(local_times.timeShort);
-  time_pt.time_local = formatTime(local_times.timeLong);
-}
-
-const setDateTimeUserHome = (time_pt, tz_user) => {
-  // tz_user is timezone from UI, either user selected or default
-  // this is ok but consider refactoring to use moment.js 
-  let user_times = formatTimesForTimezone(time_pt.timestamp, tz_user)
-  time_pt.date_time_user = user_times.timeLong;
-  time_pt.date_user_long = formatDateLong(user_times.timeLong);
-  time_pt.date_user = formatDateShort(user_times.timeShort);
-  time_pt.time_user = formatTime(user_times.timeLong);
+const setDatesAndTimes = (time_pt, timezone_city) => {
+  // dates & times for local timezone for place on route
+  let date_obj_local = moment.tz(time_pt.timestamp, time_pt.timezone_local)
+  time_pt.date_local = date_obj_local.format("ddd, MMM D");
+  time_pt.date_local_short = date_obj_local.format("MMM D");
+  time_pt.date_local_long = date_obj_local.format("dddd, MMMM D");
+  time_pt.time_local = date_obj_local.format("h:mm A");
+  // dates and times for user timezone from UI input or browser default
+  let date_obj_user = moment.tz(time_pt.timestamp, timezone_city)
+  time_pt.date_user = date_obj_user.format("ddd, MMM D");
+  time_pt.time_user = date_obj_user.format("h:mm a");
 }
 
 const select24HourForecast = (time_pt, weather, idx) => {
   // OWM forecasts in 24 hr increments, except temp in 6 hr increments
-
   for (let z = 0; z < weather[idx].forecast24hour.length; z++) {
     // match forecast period to ETA for this location
     if (time_pt.timestamp >= weather[idx].forecast24hour[z].start_24
@@ -63,7 +50,6 @@ const select12HourForecast = (time_pt, weather, idx) => {
           time_pt.icon = time_pt.weather.forecast12hour.icon_NOAA;
         }
       }
-      // if icon is still missing, use error icon
       if (!time_pt.icon) {
         time_pt.icon = '../../assets/images/nodata.jpg';
       }
@@ -92,16 +78,14 @@ const copyWeatherMetadata = (time_pt, weather, idx) => {
 */
 const addWeatherToTimePts = (req, res, next) => {
   let { weather, time_points, overview } = req.payload.data.trip;
-  let tz_user = overview.timezone_user;
+  let timezone_city = overview.timezone_city;
   let idx; // index for weather[]
   // idx is needed because, for multi-day trips,
   // time_points.length > weather.length
 
   for (let x = 0; x < time_points.length; x++) {
     idx = time_points[x].weather_idx;
-    // consider refactoring following 2 functions to use moment.js 
-    setDateTimeLocal(time_points[x]);
-    setDateTimeUserHome(time_points[x], tz_user);
+    setDatesAndTimes(time_points[x], timezone_city);
     copyWeatherMetadata(time_points[x], weather, idx);
     select24HourForecast(time_points[x], weather, idx);
     select12HourForecast(time_points[x], weather, idx);

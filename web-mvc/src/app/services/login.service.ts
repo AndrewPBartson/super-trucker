@@ -8,12 +8,11 @@ import { Observable } from 'rxjs';
 
 export class LoginService {
 
-  apiURL: string = 'http://20.241.224.46';
+  apiURL: string = 'http://20.124.158.218';
 
   constructor(private httpClient: HttpClient) { }
 
   sendLoginRequest(loginInfo): Observable<any> {
-    // console.log('login.service - user input ', loginInfo);
     return this.httpClient.post(`${this.apiURL}/api/users/login`, loginInfo)
   }
 }

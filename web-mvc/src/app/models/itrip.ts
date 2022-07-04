@@ -8,8 +8,10 @@ export interface ITrip {
           hours_today: string
           time_local: string
           time_user: string
+          date_local: string
+          date_local_short: string
           date_local_long: string
-          date_user_long: string
+          date_user: string
           status: string
           temperature: number
           text: string
@@ -50,4 +52,6 @@ export interface ITrip {
       southwest: { lat: number, lng: number }
     }
   }
+  // time_points?: [],
+  // weather?: []
 }

@@ -1,4 +1,4 @@
-const { capitalize1stChar } = require('../utilities');
+const { capitalize1stChar } = require('../shared');
 /* 
   OWM data - 
     - is in 24 hour increments
@@ -141,28 +141,12 @@ const addSnapshot24 = (pointOWM, previousPointOWM) => {
   return snapshot;
 }
 
-// fix timezone given by OWM
-// to-do: explain entire situation around timezones, 
-// what comes from user and how that is fixed
-// what comes from OWM and how that is fixed
-const formatTimezoneOWM = (timezone_raw) => {
-  let tz_new = (timezone_raw / 36);
-  tz_new = tz_new.toString();
-  // usually need to add leading zero: -700 becomes -0700
-  if (tz_new.length === 4) {
-    tz_new = tz_new.slice(0, 1) + '0' + tz_new.slice(1)
-  }
-  tz_new = "GMT" + tz_new.slice(0, 3) + ':' + tz_new.slice(3);
-  return tz_new;
-}
-
 const initializePointDataObject = () => {
   // initialize set of weather forecasts for one node
   // prefer to initialize here because timezone is from OWM
   let point_data_empty = {
     // save local timezone in point_data{}
     // later local tz will be in time_points[x] when time_points exist 
-    "timezone_local_str": "",
     "timezone_local": "",
     "forecast24hour": [],
     "forecast12hour": [],
@@ -195,8 +179,7 @@ const create24hourForecasts = (nodeDataOWM) => {
 }
 
 const addLocationMetadata = (point_data, nodeDataOWM, city) => {
-  point_data.timezone_local_str = nodeDataOWM.data.timezone;
-  point_data.timezone_local = formatTimezoneOWM(nodeDataOWM.data.timezone_offset);
+  point_data.timezone_local = nodeDataOWM.data.timezone;
   point_data.hasOWMData = nodeDataOWM.data.daily.length !== 0;
   point_data.city_1owm = city;
   if (point_data.hasOWMData) {

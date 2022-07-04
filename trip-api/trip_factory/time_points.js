@@ -1,11 +1,10 @@
-const { secondsToHoursStr, calcMidnight, showTime } = require('./utilities');
-const moment = require('moment-timezone');
+const { secondsToHoursStr } = require('./shared');
 
 const adjustTripStartTime = (start_time, break_period, next_leg_msec, midnight) => {
    // check for edge case - beginning of trip is too close to midnight
    let updated_start_time;
    if (start_time + next_leg_msec < midnight) {
-      // start time doesn't need to be adjusted
+      // start time is fine and doesn't need to be adjusted
       updated_start_time = start_time;
    } else { // if start time is close to midnight
       // assume most people don't want to start a trip by driving all night
@@ -39,7 +38,6 @@ function pushTimePoint(req, next_data, idx) {
          hours_today: next_data.hours_today,
          rest_hours: next_data.rest_hours,
          timezone_local: weather[idx].timezone_local,
-         timezone_local_str: weather[idx].timezone_local_str,
          weather_idx: idx,
          weather: {}
       })
@@ -90,28 +88,17 @@ function createTimePoints(req, res, next) {
    // next_data holds data for next time_point
    let next_data = {
       timer: null, // accumulator for each drive time and/or break period
-      status: '',  // start_trip, start_day, enroute, end_day, end_trip
+      status: '',  // possible values = start_trip, start_day, enroute, end_day, end_trip
       miles_today: null,
       hours_today: null
    }
-   let { start_time_msec, break_period, drive_time_msec,
-      timezone_user, legs_per_day } = req.payload.data.trip.overview;
-   console.log('    overview ->')
-   console.log(`         start_time_msec            `, req.payload.data.trip.overview.start_time_msec);
-   console.log('         start_time_msec converted  ', showTime(start_time_msec));
-   console.log('         timezone_user_str          ', req.payload.data.trip.overview.timezone_user_str);
-   console.log('         timezone_user              ', req.payload.data.trip.overview.timezone_user);
-   console.log('');
-   let midnight = calcMidnight(start_time_msec, timezone_user);
+   let { start_time_msec, break_period, drive_time_msec, legs_per_day } = req.payload.data.trip.overview;
+   let midnight = req.payload.data.trip.overview.midnight_msec;
    next_data.timer = adjustTripStartTime(start_time_msec, break_period, nodes[0].next_leg.duration.msec, midnight);
    //  increment midnight to next day if needed
    if (midnight < next_data.timer) {
       midnight += 86400000;
-      console.log('            start of trip delayed past midnight');
-      console.log('            increment to next midnight    ', midnight);
-      console.log('            next midnight converted       ', showTime(midnight));
    }
-
    let day_start_time = next_data.timer;
    // vars for calculating start time for next day:
    let end_time, next_start_time, rest_stop_msec;
@@ -122,22 +109,17 @@ function createTimePoints(req, res, next) {
       next_data.status = "";
       if (node_count === 0) { // 1st node, create 1st time point
          next_data.status = "start_trip";
-         console.log('     build time points ->')
-         console.log('start_trip');
          // don't add to running totals
          pushTimePoint(req, next_data, node_count)
          leg_count++;
          node_count++;
       } else { // is not first node
          if (!(node_count === nodes.length - 1)) { // if not last node of trip
-            console.log(`    timestamp end of next stop  `, showTime(next_data.timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec))
-            console.log('        compare to midnight     ', showTime(midnight))
             // if all legs for day are not completed
             if (leg_count < legs_per_day &&
                // and if enough time for next interval before midnight
                next_data.timer + nodes[node_count - 1].next_leg.duration.msec + nodes[node_count].next_leg.duration.msec < midnight) {
                next_data.status = "enroute";
-               console.log('enroute');
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
@@ -148,7 +130,6 @@ function createTimePoints(req, res, next) {
             else { // rest stop - done driving for the day, not end of trip
                // rest stop, part 1 - create 1st time point at this location - "end_day"
                next_data.status = "end_day";
-               console.log('end_day');
                // add just completed drive time and distance to running totals
                next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
                current_meters += nodes[node_count - 1].next_leg.distance.meters;
@@ -166,7 +147,6 @@ function createTimePoints(req, res, next) {
                // get number of milliseconds between end_time and next_start_time
                rest_stop_msec = next_start_time - end_time;
                next_data.status = "start_day";
-               console.log('start_day');
                next_data.rest_hours = rest_stop_msec / 3600000;
                next_data.timer += rest_stop_msec;
                next_data.miles_today = null;
@@ -180,10 +160,7 @@ function createTimePoints(req, res, next) {
                node_count++ // now leaving this node in the morning
             }
          } else {  // if last node of trip
-            console.log(`  check final timestamp         `, showTime(next_data.timer + nodes[node_count - 1].next_leg.duration.msec))
-            console.log('        compare to midnight     ', showTime(midnight))
             next_data.status = "end_trip";
-            console.log('end_trip')
             // add just completed drive time and distance to running totals
             next_data.timer += nodes[node_count - 1].next_leg.duration.msec;
             current_meters += nodes[node_count - 1].next_leg.distance.meters;

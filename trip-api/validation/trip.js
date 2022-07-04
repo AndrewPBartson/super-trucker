@@ -1,5 +1,10 @@
 const Validator = require('validator');
-const isEmpty = require('./is_empty');
+
+const isEmpty = value =>
+  value === undefined ||
+  value === null ||
+  (typeof value === 'object' && Object.keys(value).length === 0) ||
+  (typeof value === 'string' && value.trim().length === 0);
 
 module.exports = function validateTripInput(data) {
   let errors = {};
@@ -20,12 +25,8 @@ module.exports = function validateTripInput(data) {
     errors.avg_speed = "Average Speed field is required";
   }
 
-  if (isEmpty(data.timezone_user)) {
-    errors.timezone_user = "User Timezone string is required";
-  }
-
-  if (isEmpty(data.time_user_str)) {
-    errors.time_user_str = "User Time string is required";
+  if (isEmpty(data.timezone_city)) {
+    errors.timezone_city = "Home Time Zone string is required";
   }
 
   return {

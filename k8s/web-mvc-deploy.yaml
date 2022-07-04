@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: web-mvc-pod
-          image: supertacr.azurecr.io/web-mvc:v4
+          image: truckeracr.azurecr.io/web-mvc:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 80

@@ -17,7 +17,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 // convert incoming data to json if needed -
 app.use(express.urlencoded({ extended: false }))
-// passport init
+
 app.use(passport.initialize());
 require('./passport/passport')(passport);
 

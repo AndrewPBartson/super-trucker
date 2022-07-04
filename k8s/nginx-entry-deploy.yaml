@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx-entry-pod
-          image: supertacr.azurecr.io/nginx-entry:v12
+          image: truckeracr.azurecr.io/nginx-entry:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80

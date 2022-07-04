@@ -7,8 +7,7 @@ export interface ITripInput {
   hours_driving?: number;
   miles_per_day?: number;
   origin: string;
-  time_user_str: string;
-  timezone_user: string;
+  timezone_city: string;
   truck_stops?: boolean;
   weather?: boolean;
 }

@@ -35,7 +35,6 @@ function getExtraWayPoints(factory) {
 
 function createTestUrl(factory) {
   // create test url (not to API) for checking way points
-  let { way_points } = factory
   factory.test_url = `https://www.google.com/maps/dir/`
   for (let i = 0; i < factory.way_points.length; i++) {
     factory.test_url += factory.way_points[i];
@@ -52,23 +51,17 @@ function savePreviousWaypoints(f) { //
 
 function getLegDistances(route, leg_distances) {
   let leg_set = route.legs;
-  //leg_distances = [];
-  // console.log('     *');
-  // console.log('   ***  New leg distances from new geo data');
   // this if/else is only necessary because leg_distances array is behaving weirdly
   if (leg_distances.length > 0) {
     for (let i = 0; i < leg_set.length; i++) {
       leg_distances[i] = leg_set[i].distance.value;
-      // console.log(`leg ${i}   ${leg_set[i].distance.text} ${leg_set[i].distance.value} > ${leg_set[i].start_address}  ==> ${leg_set[i].end_address}`);
     }
   }
   else {
     for (let i = 0; i < leg_set.length; i++) {
       leg_distances.push(leg_set[i].distance.value);
-      // console.log(`leg ${i}   ${leg_set[i].distance.text} ${leg_set[i].distance.value} > ${leg_set[i].start_address}  ==> ${leg_set[i].end_address}`);
     }
   }
-  // console.log('     *');
 }
 
 function setUrlWithWayPoints(factory) {
@@ -84,38 +77,13 @@ function setUrlWithWayPoints(factory) {
   // console.log(`factory.trip_url`, factory.trip_url)
 }
 
-// const showRevisedData = (factory) => {
-//   console.log('     * =================================================')
-//   console.log('   ***  Revised data - new way points')
-//   console.log(`   all_points.length      `, factory.all_points.length)
-//   console.log('   meter_counts.length    ', factory.meter_counts.length);
-//   console.log(`   total_units            `, factory.total_units)
-//   console.log('   last item meter_counts ', factory.meter_counts[factory.meter_counts.length - 1]);
-//   console.log(`   total_meters           `, factory.total_meters)
-//   console.log('    leg_distances.length  ', factory.leg_distances.length);
-//   console.log('    leg_distances         ', factory.leg_distances);
-//   console.log('       *');
-//   console.log('   way_points.length      ', factory.way_points.length);
-//   console.log(`   way_pts_indexes.length `, factory.way_pts_indexes.length)
-//   console.log(`   way_pts_indexes        `, factory.way_pts_indexes)
-//   console.log('   track_units_per_leg.length ', factory.track_units_per_leg.length);
-//   console.log('   track_units_per_leg        ', factory.track_units_per_leg);
-//   let track_units = 0;
-//   for (let i = 0; i < factory.track_units_per_leg.length; i++) {
-//     track_units += factory.track_units_per_leg[i];
-//   }
-//   console.log('   sum of track_units     ', track_units);
-//   console.log('     ***    Next!')
-//   console.log('')
-// }
-
 function getMeterCounts(factory) {
   /*
   // Goal - Make revised estimate of meter count at each all_point based on: 
   // 1) leg distance
   // 2) all_point_index - get from way_pts_indexes
   // 3) track_units_per_leg
-  // Save running_total for each all_point so you end up with 
+  // Save running_total for each all_point so we end up with 
   // array of meter_counts, one for each all_point
 
   // estimated meter count is calculated using leg distances, 
@@ -131,7 +99,6 @@ function getMeterCounts(factory) {
   let running_total = 0;
   let size_of_step = 0;
   let all_pt_count = 0;
-  let units_per_leg_count;
   factory.meter_counts = [0]; // set first meter_count (starting point) to 0
 
   for (let i = 0; i < leg_distances.length; i++) {
@@ -162,8 +129,6 @@ function selectNewWayPoints(factory) {
             - check if this all-point is closer to target
               than previous all-point
 */
-  // console.log('        *')
-  // console.log('   *** select new way_points - use in 1st multi-stop call to google api')
   let { all_points, meter_counts, targets } = factory;
   savePreviousWaypoints(factory)
   factory.way_points = [];
@@ -176,7 +141,6 @@ function selectNewWayPoints(factory) {
     // loop iterates one past end of meter_counts bc meter_counts.length is
     // one less than all_points.length
     if (x === 0) {
-      // console.log(` all_pt ${x}  value ${meter_counts[x]}  target ${target_meters} - 1st one`);
       factory.way_points.push(all_points[x]);
       factory.way_pts_indexes.push(x);
       target_idx++;
@@ -185,7 +149,6 @@ function selectNewWayPoints(factory) {
     }
     // if last target or last meter_count
     else if (target_idx === targets.length - 1 || x === meter_counts.length - 1) { // for last one, we already know what the end point is
-      // console.log(` all_pt ${all_points.length - 1}  value ${meter_counts[all_points.length - 1]}  target ${target_meters} - last one`);
       factory.way_points.push(all_points[all_points.length - 1]);
       factory.way_pts_indexes.push(all_points.length - 1);
       target_idx++;
@@ -199,7 +162,6 @@ function selectNewWayPoints(factory) {
       if (Math.abs(target_meters - meter_counts[x]) <=
         Math.abs(target_meters - meter_counts[x - 1])) // if current one is closer than previous
       {
-        // console.log(` all_pt ${x}  value ${meter_counts[x]}  target ${target_meters}`);
         factory.way_points.push(all_points[x]);
         factory.way_pts_indexes.push(x);
         target_idx++;
@@ -209,7 +171,6 @@ function selectNewWayPoints(factory) {
         count_to_next_hit = 0;
       }
       else { // previous one is closer
-        // console.log(` all_pt ${x - 1}  value ${meter_counts[x - 1]}  target ${target_meters}`);
         factory.way_points.push(all_points[x - 1]);
         factory.way_pts_indexes.push(x - 1);
         target_idx++;
@@ -223,7 +184,6 @@ function selectNewWayPoints(factory) {
       count_to_next_hit += 1;
     }
   }
-  // console.log('        *')
 }
 
 const getRouteData = (url) => {
@@ -257,7 +217,6 @@ const fixWayPoints = (req, res, next) => {
           req.factory.legs = incoming.data.routes[0].legs;
           return req;
         })
-      //})
     })
 }
 

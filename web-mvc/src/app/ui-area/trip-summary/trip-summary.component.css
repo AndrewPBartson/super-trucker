@@ -129,9 +129,33 @@
 .time_place_title {
   max-width: 180px;
 }
-.summary_footer {
-  min-height: 52px;
+.summary_panel {
+  min-height: 86px;
   padding-top: 5px;
+}
+.summary_header {
+min-height: 80px;
+}
+.summary_grid {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr 25px;
+}
+div.summary_grid p.summary_row {
+  margin: 0;
+  display: grid;
+}
+.row_2_col {
+  grid-template-columns: 98px 1fr;
+}
+.row_3_col {
+  grid-template-columns: 98px 92px 1fr;
+}
+.summary_cell {
+  padding-top: 4px;
+}
+.time_cell {
+  padding-top: 6px;
 }
 .day_title {
   padding-bottom: 5px;
@@ -143,4 +167,7 @@
 .tint {
   background-color: #fcfcfc;
   box-shadow: 0 0 .4em #e7e7e7;
+}
+div.mat-expansion-panel-body {
+  padding-bottom: 3px;
 }

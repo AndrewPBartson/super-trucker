@@ -8,11 +8,12 @@ import { ITripInput } from '../models/itrip-input';
 
 export class TripService {
 
-  apiURL: string = 'http://20.241.224.46';
+  apiURL: string = 'http://20.124.158.218';
 
   constructor(private httpClient: HttpClient) { }
 
   tripRequest(tripSettings: ITripInput): Observable<ITrip> {
+    console.log(`req.body ->`, tripSettings)
     return this.httpClient.post<ITrip>(`${this.apiURL}/api/trips`, tripSettings);
   }
 }

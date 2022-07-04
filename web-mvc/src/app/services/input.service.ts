@@ -37,7 +37,6 @@ export class InputService {
     let min = 100;
     let errorCode = '';
     let isDataInvalid = false;
-    // if miles per day less than 100 - "Miles per day must be at least 100"
     if (control.value && control.value < min) {
       errorCode = 'milesLessThanMin';
       isDataInvalid = true;
@@ -152,20 +151,35 @@ export class InputService {
     return;
   }
 
+  formatISOString(string) {
+    return string.slice(0, 10) + ' ' + string.slice(11, 19)
+  }
+
   buildRequestData(tripForm, reqData) {
-    // convert form to clean data
     Object.entries(tripForm.value)
       .forEach(([key, inputValue]) => {
         reqData[key] = inputValue;
       });
-    // add time string from browser because it has user's default timezone
-    // for sure, needs to be converted to string
-    reqData.time_user_str = tripForm.value.depart_time.toString();
-    // convert depart_time to milliseconds
-    reqData.depart_time_msec = moment(tripForm.value.depart_time).valueOf();
-    // finished with depart_time, don't add to req.body
+
+    // depart_msec_browser =
+    // timestamp from date/time picker which is hardwired to assume browser timezone
+    let depart_msec_browser = moment(tripForm.value.depart_time).valueOf();
+    // depart_str = string representation of this timestamp that's
+    // formatted so as to exclude timezone information
+    let depart_str = moment(depart_msec_browser).format("YYYY-MM-DD HH:mm:ss")
+    // depart_obj =
+    // new moment object created from depart_str, and passing in timezone_city from html form
+    let depart_obj = moment.tz(depart_str, reqData.timezone_city);
+    // pull out timestamp for depart time
+    reqData.depart_time_msec = depart_obj.valueOf();
+    // convert this moment object to beginning of day in timezone_city and
+    // pull out timestamp for beginning of day
+    let midnight_prev = depart_obj.startOf('day').valueOf()
+    // calculate timestamp for beginning of next day (next midnight)
+    let midnight = midnight_prev + 86400000
+    reqData.midnight_msec = midnight;
     delete reqData.depart_time;
+
     return reqData;
   }
-
 }

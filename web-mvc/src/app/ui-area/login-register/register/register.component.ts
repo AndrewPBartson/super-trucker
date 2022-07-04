@@ -47,7 +47,7 @@ export class RegisterComponent implements OnInit {
     this.registerService.sendRegisterRequest(this.newUser)
       .subscribe(res => {
         if (res._id) {
-          console.log(`new user registered `, this.newUser)
+          console.log(`New user registered `, this.newUser)
           this.newUser = this.handleResponse(res);
 
           this.viewManagerService.setViewMode.emit('form')

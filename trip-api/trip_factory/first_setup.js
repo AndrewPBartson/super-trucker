@@ -1,7 +1,4 @@
-const moment = require('moment-timezone');
-
 function calcBreakPeriod(hours_driving) {
-  // calculate break_period in milliseconds
   let break_period = (24 - hours_driving) * 3600000;
   // limit break_period to max ten hours bc 10 am
   // is a reasonable time to resume driving
@@ -11,56 +8,33 @@ function calcBreakPeriod(hours_driving) {
   return break_period;
 }
 
-const extractTimezoneFromDateStr = (date_str) => {
-  // input example - Fri Jun 17 2022 06:00:05 GMT-0800
-  // output example - GMT-08:00
-  // date_str contains browser timezone
-  // extract relevant substring from date_str
-  let tz_id = date_str.toString().split(' ')[5];
-  // insert colon - GMT-0700 becomes GMT-07:00
-  let tz_id_final = tz_id.slice(0, 6) + ':' + tz_id.slice(6);
-  return tz_id_final;
-}
-
-const determineHomeTimezone = (timezone_user, time_user_str) => {
-  // input examples 
-  //    - timezone_user: 'America/Anchorage', 'GMT-0600 (MDT CST)'
-  //    - time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)'
-  // output example - GMT-06:00
-  // if timezone_user begins with GMT, that means user selected timezone from UI dropdown
-  if (timezone_user.toString().substring(0, 3) === "GMT") {
-    // extract timezone offset = digits after "GMT"
-    let tz_custom = timezone_user.substring(0, 8);
-    tz_custom = tz_custom.slice(0, 6) + ':' + tz_custom.slice(6);
-    return tz_custom;
-  } else { // get timezone out of time string from browser 
-    return extractTimezoneFromDateStr(time_user_str);
-  }
-}
-/*
-example of req.body  {
-  origin: 'Jasper AL',
-  end_point: 'Little Rock AR',
-  miles_per_day: 510,
-  avg_speed: 65,
-  hours_driving: 6,
-  timezone_user: 'America/Anchorage',
-  time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)',
-}
-*/
-const createTripOverview = (req) => {
-  let { avg_speed, depart_time_msec, end_point, hours_driving, miles_per_day,
-    origin, timezone_user, time_user_str, hotels, truck_stops, weather } = req.body;
-  console.log('     req.body   ', req.body);
-  let start_time_msec = depart_time_msec;
-  // get current timestamp
-  let current_time_msec = Date.now();
+const fixStartTime = (depart_time_msec) => {
   // check and adjust trip start time so it can't be in the past
-  // this adjustment may cause req.body.depart_time_msec to be slightly
-  // earlier than trip.overview.start_time_msec
-  if (start_time_msec < current_time_msec) {
+  // this adjustment may cause trip.overview.start_time_msec to be slightly
+  // later than req.body.depart_time_msec
+  let start_time_msec = depart_time_msec;
+  let current_time_msec = Date.now();
+  if (depart_time_msec < current_time_msec) {
     start_time_msec = current_time_msec;
   }
+  return start_time_msec;
+}
+/*
+example of req.body ->  {
+  avg_speed: 50,
+  depart_time_msec: 1656496806000,
+  end_point: 'Sweetgrass MT',
+  hours_driving: 10.2,
+  miles_per_day: 510,
+  origin: 'Baytown TX',
+  timezone_city: 'America/New_York',
+  midnight_msec: 1656561600000
+}
+
+*/
+const createTripOverview = (req) => {
+  let { avg_speed, depart_time_msec, end_point, hours_driving, midnight_msec, miles_per_day,
+    origin, timezone_city, hotels, truck_stops, weather } = req.body;
 
   let overview = {
     "avg_speed": avg_speed,
@@ -81,17 +55,15 @@ const createTripOverview = (req) => {
     "legs_per_day": null,
     "miles_per_day": miles_per_day,
     "origin": origin,
-    "start_time_msec": start_time_msec,
-    // examples of timezone_user: GMT-08:00, GMT-04:00
-    "timezone_user": determineHomeTimezone(timezone_user, time_user_str),
-    // example of time_user_str: 'Sat Apr 23 2022 12:00:16 GMT-0800 (Alaska Daylight Time)'
-    "timezone_user_str": time_user_str,
+    "start_time_msec": fixStartTime(depart_time_msec),
+    "midnight_msec": midnight_msec,
+    // example of timezone_city: America/Los_Angeles
+    "timezone_city": timezone_city,
     "services": {
       "hotels": hotels,
       "truck_stops": truck_stops,
       "weather": weather
     },
-
     "end_time": null,
     "summary": null,
     "total_meters": null,
@@ -111,7 +83,7 @@ const setupPayload = (req, res, next) => {
         "markers": [],
         "polyline": [],
         // in production, time_points[] and weather[] are not needed in
-        // the overview. For now, they are included for diagnostics
+        // overview. For now, they are included for diagnostics
         "time_points": [],
         "weather": [],
         "overview": createTripOverview(req)

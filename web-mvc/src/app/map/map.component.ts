@@ -27,6 +27,46 @@ export class MapComponent implements AfterViewInit {
 
   markers = [];
 
+  styledMapType = new google.maps.StyledMapType(
+    [
+      {
+        featureType: 'poi.business',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.park',
+        elementType: 'labels.text',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'road.highway',  // main roads
+        elementType: 'geometry',
+        stylers: [{ color: '#0EFDAA' }]
+      },
+      {
+        featureType: 'road.highway',
+        elementType: 'geometry.stroke',
+        stylers: [{ color: '#008B2D' }]
+      },
+      {
+        featureType: 'road.highway.controlled_access',  // freeways
+        elementType: 'geometry',
+        stylers: [{ color: '#0EFDAA' }]
+      },
+      {
+        featureType: 'road.highway.controlled_access',
+        elementType: 'geometry.stroke',
+        stylers: [{ color: '#008B2D' }]
+      },
+      {
+        featureType: 'water',
+        elementType: 'geometry.fill',
+        stylers: [{ color: '#b9dfff' }]
+      }
+    ],
+    { name: "SuperTrucker" }
+  )
+
   constructor(
     private clearMapService: ClearMapService,
     private publishService: PublishService,
@@ -35,6 +75,10 @@ export class MapComponent implements AfterViewInit {
   mapOptions: google.maps.MapOptions = {
     center: this.coordinates,
     zoom: 5,
+    mapTypeControlOptions: {
+      mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "styled_map"],
+    },
+    mapTypeId: 'styled_map'
   };
 
   ngAfterViewInit() {
@@ -56,7 +100,7 @@ export class MapComponent implements AfterViewInit {
       this.mapSizeFlicker = !this.mapSizeFlicker;
     })
     let bounds = new google.maps.LatLngBounds();
-    // set location where map first opens - middle of USA
+    // location where map first opens - middle of USA
     bounds.extend(new google.maps.LatLng(45.6, -81.0));
     bounds.extend(new google.maps.LatLng(30.6, -117.0));
     this.map.fitBounds(bounds)
@@ -64,6 +108,7 @@ export class MapComponent implements AfterViewInit {
 
   mapInitializer() {
     this.map = new google.maps.Map(this.gmap.nativeElement, this.mapOptions);
+    this.map.mapTypes.set("styled_map", this.styledMapType)
     this.markers = [];
   }
 
@@ -220,16 +265,17 @@ export class MapComponent implements AfterViewInit {
           <div style="padding:2px 0 5px 0;margin-bottom:10px;font-family:Verdana;color:white;text-align:center;background-color:gray;border-radius:3px;">
            Rest for <br/>${marker.restart.rest_hours} hours
           </div>
-          <div style="padding-bottom:3px;margin:30px 0 0 0;border:#2929ff solid 1px;border-radius:3px;font-family:Verdana;color:blue;font-size:larger;text-align:center;"><b>Day ${marker.dayNum + 2}</b></div>
+          <div style="padding-bottom:3px;margin:30px 0 0 0;border:#2929ff solid 1px;border-radius:3px;font-family:Verdana;color:blue;font-size:larger;text-align:center;">
+            <b>Day ${marker.dayNum + 2}</b>
+            <br />
+            <b>${marker.restart.date_2}</b>
+          </div>
           <div style="border:#838383 solid 1px;border-radius:3px;margin:3px 0;padding:4px;text-align:center;">
             <b>${marker.city_state}</b>
           </div>
           <p style="padding:0;margin:3px 0 0 0;text-align:center;"><b>Resume driving</b></p>
           <p style="padding:0;margin:0;text-align:center;">
             <span style="color:blue;font-size:larger";><b>${marker.restart.time_2}</b></span>
-          </p>
-          <p style="padding:0;margin:0;text-align:center;">
-            on <span style="color:blue;">${marker.restart.date_2}</span>
           </p>
           <p style="padding:0;margin:0;text-align:center;">
             <span style="color:magenta;font-size:smaller;padding:0;margin:0;">
@@ -247,55 +293,4 @@ export class MapComponent implements AfterViewInit {
   }
 
   points: any[] = [];
-  options: any[] = [
-    {
-      featureType: 'poi.business',
-      stylers: [{ visibility: 'off' }]
-    },
-    {
-      featureType: 'poi.park',
-      elementType: 'labels.text',
-      stylers: [{ visibility: 'off' }]
-    },
-    {
-      featureType: 'road',
-      elementType: 'geometry',
-      stylers: [{ color: '#f5f1e6' }]
-    },
-    {
-      featureType: 'road.arterial',
-      elementType: 'geometry',
-      stylers: [{ color: '#fdfcf8' }]
-    },
-    {
-      featureType: 'road.highway',
-      elementType: 'geometry',
-      stylers: [{ color: '#0EFDAA' }]
-    },
-    {
-      featureType: 'road.highway',
-      elementType: 'geometry.stroke',
-      stylers: [{ color: '#008B2D' }]
-    },
-    {
-      featureType: 'road.highway.controlled_access',
-      elementType: 'geometry',
-      stylers: [{ color: '#0EFDAA' }]
-    },
-    {
-      featureType: 'road.highway.controlled_access',
-      elementType: 'geometry.stroke',
-      stylers: [{ color: '#008B2D' }]
-    },
-    {
-      featureType: 'road.local',
-      elementType: 'labels',
-      stylers: [{ visibility: 'off' }]
-    },
-    {
-      featureType: 'water',
-      elementType: 'geometry.fill',
-      stylers: [{ color: '#c4deFF' }]
-    }
-  ];
 }

@@ -46,7 +46,6 @@ export class LoginComponent implements OnInit {
       });
     this.loginService.sendLoginRequest(this.user)
       .subscribe(res => {
-        // console.log(`res`, res)
         if (res.token) {
           const token = res.token;
           // save token to localStorage
@@ -55,16 +54,12 @@ export class LoginComponent implements OnInit {
           setAuthToken(token);
           // decode token
           const decoded = jwt_decode(token);
-          // console.log(`decoded ->  `, decoded)
-          // console.log(`this.user has token - `, this.user)
           // if decoded is not empty, set true, else false
           this.user.isAuthenticated = !isEmpty(decoded);
           // show trip form page 
           // todo: trip form shows user's saved trip templates
           this.viewManagerService.setViewMode.emit('form')
           return this.buttonService.loggedIn.next(true);
-        } else {
-          console.log("No Token");
         }
       },
         (error) => { // login failed 
