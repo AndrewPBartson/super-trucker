@@ -42,7 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', users);
+app.use('/api/users', users);
 
 // @route   /
 // @desc    Test route
@@ -54,7 +54,7 @@ app.get(
 
 // last middleware (except error MW) handles req w/ no matching route
 app.use((req, res, next) => {
-  res.status(404).json({ error: { message: 'Not found - status 404' } })
+  res.status(404).json({ error: { message: 'Not found on login server - status 404' } })
 });
 
 // middleware w/ 4 arguments is only called in case of error

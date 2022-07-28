@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx-entry-pod
-          image: truckeracr.azurecr.io/nginx-entry:v1
+          image: registry.digitalocean.com/all-purpose-cr/nginx-entry:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 80

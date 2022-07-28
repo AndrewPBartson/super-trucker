@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-api-pod
-          image: truckeracr.azurecr.io/user-api:v1
+          image: registry.digitalocean.com/all-purpose-cr/user-api:v3
           imagePullPolicy: Always
           ports:
             - containerPort: 7770

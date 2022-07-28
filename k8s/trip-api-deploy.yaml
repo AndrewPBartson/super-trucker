@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: trip-api-pod
-          image: truckeracr.azurecr.io/trip-api:v2
+          image: registry.digitalocean.com/all-purpose-cr/trip-api:v4
           imagePullPolicy: Always
           ports:
             - containerPort: 8880

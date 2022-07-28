@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: web-mvc-pod
-          image: truckeracr.azurecr.io/web-mvc:v2
+          image: registry.digitalocean.com/all-purpose-cr/web-mvc:v5
           imagePullPolicy: Always
           ports:
             - containerPort: 80
