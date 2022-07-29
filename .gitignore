@@ -46,3 +46,4 @@ report.*.json
 
 # protect intellectual property
 # this app is worth big money
+/trip-api/trip_factory
