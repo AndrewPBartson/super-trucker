@@ -3,7 +3,6 @@
 /web-mvc/src/environments/environments.ts
 /k8s/db-secret.yaml
 
-
 # compiled output
 /dist
 /tmp
@@ -17,7 +16,6 @@
 
 # vs code and other settings
 /.vscode
-/.unotes
 
 # production
 /build
