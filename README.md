@@ -38,7 +38,7 @@
 
 ### Providing a competitive advantage
 
-<table>
+<table width="722px">
 <tr>
 <td>
 
@@ -87,7 +87,7 @@
 
 ### Under the Hood
 
-<table>
+<table width="722px">
 <tr>
 <td>
 
@@ -171,7 +171,7 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
 ### Microservices Architecture
 - Consists of four microservices plus one database
 - Deployed on Digital Ocean 
-<table>
+<table width="722px">
 <tr>
 <td>
 
@@ -218,7 +218,7 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
 <td>
 
 ### Sources for Weather Data
-<table>
+<table width="722px">
 <tr>
 <td>
 
@@ -286,7 +286,7 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
 <td>
 
 ### Features under development
-<table>
+<table width="722px">
 <tr>
 <td>
 
