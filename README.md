@@ -32,13 +32,11 @@
 </tr>
 </table>
 
-<table>
-<tr>
-<td>
+---
 
 ### Providing a competitive advantage
 
-<table width="722px">
+<table>
 <tr>
 <td>
 
@@ -55,15 +53,10 @@
 </tr>
 </table>
 
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<td>
+---
 
 ### Tech Stack
+
 <table>
 <tr>
 <td>
@@ -77,17 +70,11 @@
 </tr>
 </table>
 
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<td>
+---
 
 ### Under the Hood
 
-<table width="722px">
+<table>
 <tr>
 <td>
 
@@ -154,24 +141,19 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
 </tr>
 </table>
 
-</td>
-</tr>
-</table>
 <div align="center">
 <button >
   <a href="#anchor_on_top">Back to the Top</a>
 </button>
 </div>
-<br />
 
-<table>
-<tr>
-<td>
+---
 
 ### Microservices Architecture
 - Consists of four microservices plus one database
 - Deployed on Digital Ocean 
-<table width="722px">
+
+<table>
 <tr>
 <td>
 
@@ -191,16 +173,10 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
   - NodeJS server
   - Enables the user to register and login
   - Provides secure access using JWT tokens, Bcrypt, and Passport
-  ###
-
 5) ### **MongoDb**
   - Mongo database is deployed separately on MongoDB Atlas
   - Not deployed on Digital Ocean with the four microservices
   - This approach avoids scalability and complexity issues that may occur with a database microservice
-
-</td>
-</tr>
-</table>
 
 </td>
 </tr>
@@ -211,14 +187,11 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
   <a href="#anchor_on_top">Back to the Top</a>
 </button>
 </div>
-<br />
  
-<table>
-<tr>
-<td>
+---
 
 ### Sources for Weather Data
-<table width="722px">
+<table>
 <tr>
 <td>
 
@@ -272,21 +245,15 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
   - For any times on the schedule that are beyond these time frames, the schedule tells the user, "No Weather Data for [ date ]"
   
 </details>
- 
-</td>
-</tr>
-</table>
 
 </td>
 </tr>
 </table>
 
-<table>
-<tr>
-<td>
+---
 
 ### Features under development
-<table width="722px">
+<table>
 <tr>
 <td>
 
@@ -310,9 +277,6 @@ The route and schedule can have up to 23 locations, with ETA for each location. 
 </tr>
 </table>
 
-</td>
-</tr>
-</table>
 <div align="center">
 <button >
   <a href="#anchor_on_top">Back to the Top</a>
