@@ -2,24 +2,45 @@
 <img id="anchor_on_top" alt="Super Trucker - Weather on your route" width="70%" src="./imgs_readme/banner.jpg">
 </div>
 
+---
+
+<div align="center">
+<button >
+  <a href="https://supertrucker.app">Link to SuperTrucker.app - Beta</a>
+</button>
+</div>
+
+---
+
+<table>
+<tr>
+<td>
+
 <details open="open">
 <summary>Table of Contents</summary>
 
-- [How can this app help me?](#how-can-this-app-help-me)
+- [How can this app help you?](#how-can-this-app-help-you)
 - [Competitive advantage](#providing-a-competitive-advantage)
 - [Tech stack](#tech-stack)
 - [Under the hood](#under-the-hood)
-  1. [Send trip request to server](#part-1---the-user-sends-a-trip-request)
-  2. [Calculate route](#part-2---build-the-trip)
-  3. [Display trip data in browser](#part-3---show-results-to-the-user)
-- [Deployment in containers](#deployment-in-containers)
+  - [User sends trip request](#step-1---the-user-sends-a-trip-request-to-server)
+  - [Calculate route](#step-2---calculate-directions-and-schedule-for-the-trip)
+  - [Gather weather data](#step-3---gather-weather-data-for-each-location-on-route)
+  - [Display trip schedule in browser](#step-4---display-the-trip-schedule-for-the-user)
+- [Containers & Microservices](#containers---microservices)
 - [Sources for weather data](#sources-for-weather-data)
-- [What's next for this project?](#whats-next---wish-list-for-additional-features)
+- [What's next for this project?](#whats-next-wish-list-for-additional-features)
 - [Screenshots](#screenshots)
 
 </details>
 
-## How can this app help me?
+</td>
+</tr>
+</table>
+
+---
+
+## How can this app help you?
 
 <table>
 <tr>
@@ -28,12 +49,14 @@
 - SuperTrucker is for planning long-distance multi-day road trips
 - The user enters starting point, destination, and number of miles to drive each day
 - The app produces a trip route, schedule, and weather reports along the route
-- [Link to deployed app](https://supertrucker.app)
+
 </td>
 </tr>
 </table>
 
 ---
+
+### :chart_with_upwards_trend:
 
 ## Providing a Competitive Advantage
 
@@ -41,16 +64,16 @@
 <tr>
 <td>
 
-### :truck: &nbsp; Target audience
+### :truck: &nbsp;Target audience
 
-- Trucking Industry
-- Drivers, fleet managers, load planners
+- Trucking industry
+- Drivers / Fleet managers / Load planners
 
-### :snowflake: &nbsp; Anticipate weather delays
+### :snowflake: &nbsp;Anticipate weather delays
 
-- This app helps you to anticipate snow and ice storms during winter. More accurate and high resolution weather information can reduce the number of late deliveries. Obviously this improves your cred with customers.
+- This app helps you to anticipate snow and ice storms during winter. More accurate and high resolution weather information can reduce the number of late deliveries.
 
-### :alarm_clock: &nbsp; Estimate ETA quickly
+### :alarm_clock: &nbsp;Estimate ETA quickly
 
 - This app provides an accurate estimate of the earliest realistic arrival time for a shipment. It allows you to quickly figure out whether an expedited delivery schedule is impossible, difficult, or just normal trucking.
 
@@ -62,7 +85,7 @@
 
 ---
 
-### Tech Stack
+## Tech Stack
 
 <table>
 <tr>
@@ -79,22 +102,27 @@
 
 ---
 
-### Under the Hood
+### &nbsp; :wrench: :hammer:
+
+## Under the Hood
 
 <table>
 <tr>
 <td>
 
-#### **Part 1** - The user sends a trip request
+### Step 1 - The user sends a trip request to server
 
-    Gather user input and send request to server
+### :white_check_mark:
 
-<details>
-<summary>More</summary>
-
-At a minimum, the user must enter two locations - starting point and destination. The user has the option to enter other trip parameters - miles per hour, hours driving per day, miles per day, and/or home timezone. Trip parameters are sent in a POST request to the trip-api server.
-
-</details>
+- At a minimum, the user must enter -
+  - Starting point
+  - Destination
+- The user can modify other settings for the trip -
+  - Miles per hour
+  - Hours driving per day
+  - Miles per day
+  - Home timezone
+- The user's input is sent in a POST request to the trip-api server
 
 </td>
 </tr>
@@ -104,29 +132,21 @@ At a minimum, the user must enter two locations - starting point and destination
 <tr>
 <td>
 
-#### **Part 2** - Build the trip
+### Step 2 - Calculate directions and schedule for the trip
 
-    Calculate route and stopping places for the trip
+### :white_check_mark:
 
-<details>
-<summary>More</summary>
+- When a trip request comes in, the server initially retrieves a simple route from Google Directions API, that is, a route from starting point to destination as specified by the user
+- Building on this simple route, intermediate locations are added
+- This series of locations is then submitted to Google Directions API to produce a route with multiple stops
+- However, thus far, the distances between the stops are random. Further calculations plus one or more calls to Google Directions API are needed to adjust the stops so that they are evenly spaced along the route
+- The schedule for the trip is calculated based on user input or default values for -
 
-When trip request comes in, the trip server initially retrieves a simple route from Google Directions API, a route from starting point to destination as specified by the user. Building on this simple route, intermediate locations are added. This data is then submitted to Google Directions API to produce a route with multiple stops. However, thus far, the distances between the stops are random. Further calculations plus a third call to Google Directions API are needed to adjust the stops so that they are evenly spaced along the route.
+  - Starting date and time
+  - Miles per hour
+  - Hours driving per day
 
-</details>
-
-    Obtain and sort weather data
-
-<details>
-<summary>More</summary>
-
-For each location on the route, the server obtains weather data for the next eight days. Weather data is gathered from two sources: Open Weather Map and US Weather Service. From this data, the app pulls out the 12-hour forecast that is relevant for each time and location on the schedule.
-
-While calculating the schedule and selecting relevant weather data, the server adjusts for timezones. Two times are shown for each location - 1) local time 2) time at user's home timezone.
-
-Finally the data, including locations, arrival times, and relevant weather reports, is organized into sections, one for each day.
-
-</details>
+- The route and schedule can show as many as 24 locations with ETA for each location
 
 </td>
 </tr>
@@ -136,19 +156,42 @@ Finally the data, including locations, arrival times, and relevant weather repor
 <tr>
 <td>
 
-#### **Part 3** - Show results to the user
+### Step 3 - Gather weather data for each location on route
 
-    Display trip information - Route, locations, times, weather
+### :white_check_mark:
 
-<details>
-<summary>More</summary>
+- For each location on the route, the server gathers weather data from:
+  - Open Weather Map
+  - US Weather Service
+- Gathering weather data for a multi-day trip may require more than 70 requests
 
-When the response comes back to the browser, results are displayed in two formats
+- A series of weather data points is selected, each one matches a time and location on the schedule
 
-- Expandable table - consists of accordion UI elements that show or hide the details for each day
-- Map - consists of a series of weather icons displayed along the highways with pop-up information windows
+- Times on the schedule are calculated for two timezones -
 
-The route and schedule can have up to 24 locations, with ETA for each location. For example, in [screenshot 6](#6---expanded-weather-for-one-day), the driver starts out from Pecos TX at 6 am, passes through Carlsbad NM at 8:37 am, and arrives in Alamogordo NM at 12:40 pm.
+  - Local time for location on schedule
+  - Time for user's home timezone
+
+- Data is also organized into sections, one for each day
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>
+
+### Step 4 - Display the trip schedule for the user
+
+### :white_check_mark:
+
+- The trip schedule is displayed in two formats
+
+  - Map with a series of weather icons displayed along the highways with pop-up information windows
+    - [Example screenshot - Map with weather](#2---summary-of-trip)
+  - Expandable table - a set of accordion UI elements that show or hide the details for each day
+    - [Example screenshot - Schedule for a day](#5---schedule-for-one-day-expanded-to-show-weather-along-the-route)
 
 </details>
 
@@ -164,21 +207,25 @@ The route and schedule can have up to 24 locations, with ETA for each location. 
 
 ---
 
-### Deployment in Containers
+## Containers - Microservices
 
-- Consists primarily of four containers plus one database
+- Four containers and one database
+- Built with Docker and Kubernetes
 - Deployed on Digital Ocean
 
 <details>
 <summary>
-View flow chart of Kubernetes containers and services<br> 
-<img style="margin-right: 20px" src="./imgs_readme/containers_thumbnail.jpg" alt="Flowchart of K8s architecture"/></summary>
+See flow chart of Kubernetes containers and services<br> 
+<p align="center">
+<img style="margin-right: 20px" src="./imgs_readme/containers_thumbnail.jpg" alt="Thumbnail showing K8s architecture"/>
+</p>
+</summary>
 
 <table>
 <tr>
 <td>
 
-<img src="./imgs_readme/superTcontainers.jpg" alt="Flowchart of Kubernetes architecture"/>
+<img src="./imgs_readme/containersK8s.jpg" alt="Flowchart showing Kubernetes architecture"/>
 
 </td>
 </tr>
@@ -190,32 +237,32 @@ View flow chart of Kubernetes containers and services<br>
 <tr>
 <td>
 
-1. ### **nginx-ingress**
+### **nginx-ingress** &nbsp;<img src="./imgs_readme/kubernetes.svg" title="Kubernetes" alt="Kubernetes" width="40" height="40"/>
 
 - Secure entry point that directs traffic to internal services
 - All further traffic and responses are encrypted - HTTPS / TLS / SSL
 
-2. ### **web-mvc**
+### **web-mvc** &nbsp;<img src="./imgs_readme/angular.svg" title="Angular" alt="Angular" width="40" height="40"/>
 
-- Frontend built on Angular
+- Web framework by Angular
 - Angular Material Design - UI library
 - Google Map
 
-3. ### **trip-api**
+### **trip-api** &nbsp;<img src="./imgs_readme/nodejs.svg" title="NodeJS" alt="NodeJS" width="40" height="40"/>
 
-- NodeJS server
+- Express server running on NodeJS
 - Creates a trip route with properly spaced locations
 - Calculates the schedule with arrival times expressed in two timezones
 - Gathers weather forecasts for each location, including web-scraping
 - Pulls out weather data for the timestamp when user is scheduled to be at that location
 
-4. ### **user-api**
+### **user-api** &nbsp;<img src="./imgs_readme/nodejs.svg" title="NodeJS" alt="NodeJS" width="40" height="40"/>
 
-- NodeJS server
-- Enables the user to register and login
+- Express server running on NodeJS
+- Allows the user to register and login
 - Provides secure access using JWT tokens, Bcrypt, and Passport
 
-5. ### **MongoDb**
+### **MongoDb** &nbsp;<img src="./imgs_readme/mongodb.svg" title="MongoDB" alt="MongoDB" width="40" height="40"/>
 
 - Mongo database is deployed separately on MongoDB Atlas
 
@@ -230,8 +277,8 @@ View flow chart of Kubernetes containers and services<br>
 </div>
  
 ---
-
-### Sources for Weather Data
+### &nbsp; :sunny: :umbrella: :snowflake:
+## Sources for Weather Data
 
 <table>
 <tr>
@@ -282,7 +329,7 @@ View flow chart of Kubernetes containers and services<br>
 </details>
 
 <details>
-<summary><b>Time limits for weather data</b></summary>
+<summary><b>Time limitations for weather data</b></summary>
 
 - US Weather Service data covers approximately the next seven days
 - Open Weather Map data covers the next eight days
@@ -296,7 +343,9 @@ View flow chart of Kubernetes containers and services<br>
 
 ---
 
-### What's next? - Wish list for additional features
+### &nbsp; :rocket:
+
+## What's next? &nbsp;Wish list for additional features
 
 <table>
 <tr>
@@ -315,7 +364,7 @@ View flow chart of Kubernetes containers and services<br>
 - Extend the app to more countries
   - At this time, trip data is only available for the US and Canada
   - Mexico is the next target
-  - Unfortunately weather data for trips in Canada is lower quality
+  - Need to upgrade to higher quality weather data for Canada
 
 </td>
 </tr>
@@ -332,11 +381,13 @@ View flow chart of Kubernetes containers and services<br>
 <tr>
 <td>
 
-### Screenshots
+## Screenshots
 
 #### 1 - Welcome screen - Form for user input
 
-<img src="./imgs_readme/screen1_form_w_input.jpg" alt="Form with user input"/>
+<img src="./imgs_readme/ui_form_w_input.jpg" alt="Form with user input"/>
+
+---
 
 <details>
 <summary>Expand welcome screen to show one-click options</summary>
@@ -345,7 +396,7 @@ View flow chart of Kubernetes containers and services<br>
 <tr>
 <td>
 
-<img src="./imgs_readme/screen2_form_w_settings.jpg" alt="Form with more settings"/>
+<img src="./imgs_readme/ui_form_w_settings.jpg" alt="Form with more settings"/>
 
 </td>
 </tr>
@@ -355,27 +406,34 @@ View flow chart of Kubernetes containers and services<br>
 
 ---
 
-#### 3 - Summary of trip
+<div>
 
-<img src="./imgs_readme/screen3_trip_summary.jpg" alt="Summary of trip"/>
+#### 2 - Summary of trip
 
----
+<img src="./imgs_readme/ui_trip_summary.jpg" alt="Summary of trip"/>
 
-#### 4 - Details for one day
-
-<img src="./imgs_readme/screen4_trip_day_3.jpg" alt="Details for one day"/>
+</div>
 
 ---
 
-#### 5 - Login and register
+#### 3 - Details for one day
 
-<img src="./imgs_readme/screen5_auth.jpg" alt="UI for login and register"/>
+<img src="./imgs_readme/ui_trip_day_3.jpg" alt="Details for one day"/>
 
 ---
 
-#### 6 - Expanded weather for one day
+#### 4 - Login and register
 
-<img src="./imgs_readme/screen6_trip_table.jpg" alt="Expanded weather data for one day" height="700"/>
+<img src="./imgs_readme/ui_auth.jpg" alt="UI for login and register"/>
+
+---
+
+#### 5 - Schedule for one day
+
+- Displayed in table format
+- Expanded to show weather along route
+
+<img src="./imgs_readme/ui_trip_table.jpg" alt="Expanded weather data for one day" height="700"/>
 
 </td>
 </tr>
