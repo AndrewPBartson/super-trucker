@@ -54,8 +54,6 @@
 </tr>
 </table>
 
----
-
 ### :chart_with_upwards_trend:
 
 ## Providing a Competitive Advantage
@@ -83,8 +81,6 @@
 </tr>
 </table>
 
----
-
 ## Tech Stack
 
 <table>
@@ -99,8 +95,6 @@
 </td>
 </tr>
 </table>
-
----
 
 ### &nbsp; :wrench: :hammer:
 
@@ -205,8 +199,6 @@
 </button>
 </div>
 
----
-
 ## Containers - Microservices
 
 - Four containers and one database
@@ -217,7 +209,7 @@
 <summary>
 See flow chart of Kubernetes containers and services<br> 
 <p align="center">
-<img style="margin-right: 20px" src="./imgs_readme/containers_thumbnail.jpg" alt="Thumbnail showing K8s architecture"/>
+<img style="margin-top:10px;" src="./imgs_readme/containers_thumbnail.jpg" alt="Thumbnail showing K8s architecture"/>
 </p>
 </summary>
 
@@ -275,9 +267,9 @@ See flow chart of Kubernetes containers and services<br>
   <a href="#anchor_on_top">Back to the Top</a>
 </button>
 </div>
- 
----
+
 ### &nbsp; :sunny: :umbrella: :snowflake:
+
 ## Sources for Weather Data
 
 <table>
@@ -285,7 +277,10 @@ See flow chart of Kubernetes containers and services<br>
 <td>
 
 <details>
+
 <summary><b>Open Weather Map API</b></summary>
+
+---
 
 - Provides most data in 24-hour periods - midnight to midnight
 - except temperature data is in 6-hour periods -
@@ -298,10 +293,15 @@ See flow chart of Kubernetes containers and services<br>
 - Example URL
   - https://api.openweathermap.org/data/2.5/onecall?lat=35.5&lon=97.5&appid={APIkey}
 - API key is required
+
 </details>
+
+---
 
 <details>
 <summary><b>US Weather Service API</b></summary>
+
+---
 
 - provides data in 12-hour periods -
   - 6 am to 6 pm
@@ -314,10 +314,15 @@ See flow chart of Kubernetes containers and services<br>
   - [https://api.weather.gov/gridpoints/OUN/97,94/forecast](https://api.weathergov/gridpoints/OUN/97,94/forecast)
   - Second URL returns the actual forecast (except when the weather server returns an error)
 - No API key is required
+
 </details>
 
+---
+
 <details>
-<summary><b>US Weather Service HTML (web page)</b></summary>
+<summary><b>US Weather Service HTML (web page) &nbsp; </b></summary>
+
+---
 
 - About 5% of requests to api.weather.gov fail with status 500 or 503
 - For each failed request, data is gathered from forecast.weather.gov, which is the US Weather Service consumer-facing web page
@@ -326,7 +331,10 @@ See flow chart of Kubernetes containers and services<br>
 - Example URL
   - <a href="https://forecast.weather.gov/MapClick.php?lat=35.5&lon=-97.5">https://forecast.weather.gov/MapClick.php?lat=35.5&lon=-97.5</a>
 - No API key is required
+
 </details>
+
+---
 
 <details>
 <summary><b>Time limitations for weather data</b></summary>
@@ -340,8 +348,6 @@ See flow chart of Kubernetes containers and services<br>
 </td>
 </tr>
 </table>
-
----
 
 ### &nbsp; :rocket:
 
@@ -389,46 +395,31 @@ See flow chart of Kubernetes containers and services<br>
 
 ---
 
-<details>
-<summary>Expand welcome screen to show one-click options</summary>
-
-<table>
-<tr>
-<td>
+#### 2 - Welcome screen - Expanded to show one-click options
 
 <img src="./imgs_readme/ui_form_w_settings.jpg" alt="Form with more settings"/>
 
-</td>
-</tr>
-</table>
-
-</details>
-
 ---
 
-<div>
-
-#### 2 - Summary of trip
+#### 3 - Summary of trip
 
 <img src="./imgs_readme/ui_trip_summary.jpg" alt="Summary of trip"/>
 
-</div>
-
 ---
 
-#### 3 - Details for one day
+#### 4 - Details for one day
 
 <img src="./imgs_readme/ui_trip_day_3.jpg" alt="Details for one day"/>
 
 ---
 
-#### 4 - Login and register
+#### 5 - Login and register
 
 <img src="./imgs_readme/ui_auth.jpg" alt="UI for login and register"/>
 
 ---
 
-#### 5 - Schedule for one day
+#### 6 - Schedule for one day
 
 - Displayed in table format
 - Expanded to show weather along route
