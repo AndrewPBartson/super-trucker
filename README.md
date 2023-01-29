@@ -208,9 +208,9 @@
 <details>
 <summary>
 See flow chart of Kubernetes containers and services<br> 
-<p align="center">
+<picture align="center">
 <img style="margin-top:10px;" src="./imgs_readme/containers_thumbnail.jpg" alt="Thumbnail showing K8s architecture"/>
-</p>
+</picture>
 </summary>
 
 <table>
